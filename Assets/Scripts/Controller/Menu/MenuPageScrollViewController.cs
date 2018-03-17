@@ -15,7 +15,7 @@ using System;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(ScrollRect))]
-public class MenuPageScrollViewController : ScrollViewController, IBeginDragHandler, IEndDragHandler,IPointerClickHandler
+public class MenuPageScrollViewController : ScrollViewController, IBeginDragHandler, IEndDragHandler
 // ViewControllerクラスを継承して、IBeginDragHandlerインターフェイスと
 // IEndDragHandlerインターフェイスを実装する
 {
@@ -30,23 +30,6 @@ public class MenuPageScrollViewController : ScrollViewController, IBeginDragHand
     [SerializeField] private int MAX_ICON_NUM = 17;
     [SerializeField] private int FIX_LENGTH = 31;
 
-    [SerializeField] private Image BTN_HOME1;
-    [SerializeField] private Image BTN_HOME2;
-    [SerializeField] private Image BTN_HOME3;
-    [SerializeField] private Image BTN_HOME4;
-    [SerializeField] private Image BTN_HOME5;
-    [SerializeField] private Image BTN_HOME6;
-    [SerializeField] private Image BTN_HOME7;
-    [SerializeField] private Image BTN_HOME8;
-    [SerializeField] private Image BTN_HOME9;
-    [SerializeField] private Image BTN_HOME10;
-    [SerializeField] private Image BTN_HOME11;
-    [SerializeField] private Image BTN_HOME12;
-    [SerializeField] private Image BTN_HOME13;
-    [SerializeField] private Image BTN_HOME14;
-    [SerializeField] private Image BTN_HOME15;
-    [SerializeField] private Image BTN_HOME16;
-
     ///=============================
     /// 制御用プロパティ
     private bool isAnimating = false;       // アニメーション中フラグ
@@ -55,10 +38,7 @@ public class MenuPageScrollViewController : ScrollViewController, IBeginDragHand
     private AnimationCurve animationCurve;  // 自動スクロールのアニメーションカーブ
     private int prevPageIndex = 0;          // 前のページのインデックスを保持
 
-
-
-
-
+    
     ///=============================
     ///  スクロールビューの矩形を保持
     private Rect currentViewRect;
@@ -76,48 +56,9 @@ public class MenuPageScrollViewController : ScrollViewController, IBeginDragHand
     #region 初期化処理
     void Start()
     {
-        //ボタンの初期化
-        initButtonList();
-
         // 「Scroll Content」のPaddingを初期化する
         UpdateView();
     }
-
-
-    void initButtonList()
-    {
-        // 初回だけの処理
-        if (BtnList == null)
-        {
-            BtnList = new List<Image>();
-            BtnList.Add(BTN_HOME1);
-            BtnList.Add(BTN_HOME2);
-            BtnList.Add(BTN_HOME3);
-            BtnList.Add(BTN_HOME4);
-            BtnList.Add(BTN_HOME5);
-            BtnList.Add(BTN_HOME6);
-            BtnList.Add(BTN_HOME7);
-            BtnList.Add(BTN_HOME8);
-            BtnList.Add(BTN_HOME9);
-            BtnList.Add(BTN_HOME10);
-            BtnList.Add(BTN_HOME11);
-            BtnList.Add(BTN_HOME12);
-            BtnList.Add(BTN_HOME13);
-            BtnList.Add(BTN_HOME14);
-            BtnList.Add(BTN_HOME15);
-            BtnList.Add(BTN_HOME16);
-
-        }
-    }
-
-
-
-
-
-
-
-
-
 
     #endregion
 
@@ -219,31 +160,6 @@ public class MenuPageScrollViewController : ScrollViewController, IBeginDragHand
 
         // アニメーション中フラグをセットする
         isAnimating = true;
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        foreach(var btn in BtnList)
-        {
-            RectTransform rt = btn.rectTransform;
-
-
-
-            bool isOn = RectTransformUtility.RectangleContainsScreenPoint(btn.rectTransform, eventData.position);
-
-            if (isOn)
-            {
-                //ホームボタンクリック
-                Debug.Log("BtnHome_Click : " + btn.name);
-
-
-                //if ((data.pressPosition - data.position).magnitude < CLICK_ACCURACY)
-                //{
-                //    uiManager.currentMember = m_Cards[i].data;
-                //    uiManager.SwitchContentToCharacter();
-                //}
-            }
-        }
     }
     #endregion
 

@@ -1156,7 +1156,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// <summary>
     /// 次へ送るボタンクリック
     /// </summary>
-    public void BtnNext_Click()
+    public void Btn_Next_Click()
     {
         //
         SetNextTopic();

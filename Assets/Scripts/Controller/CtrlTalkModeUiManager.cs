@@ -15,7 +15,7 @@ using System.Collections;
 public class CtrlTalkModeUiManager : MonoBehaviour
 { 
 	[SerializeField] private CoverUI coverUI;
-    [SerializeField] private ContentCategoly m_CurrentContentCategoly = ContentCategoly.WorldMap;
+    [SerializeField] private ContentCategoly m_CurrentContentCategoly = ContentCategoly.home;
     [SerializeField] private ContentController[] m_Contents;
 
 
@@ -51,10 +51,9 @@ public class CtrlTalkModeUiManager : MonoBehaviour
 
     public enum ContentCategoly
     {
-        WorldMap = 0,
-        PartiyEdit = 1,
-        Character = 2,
-        Battle = 3
+        home = 0,
+        omakase = 1,
+        news = 2
     }
 
 
@@ -80,24 +79,39 @@ public class CtrlTalkModeUiManager : MonoBehaviour
             yield break;
         }
     }
+    //====================================================================
+    //
+    //                          メニュー操作
+    //                         
+    //====================================================================
+    #region メニュー操作
 
-    public void SwitchContentToWorldMap()
+    /// <summary>
+    /// ホームボタンクリック
+    /// </summary>
+    public void Btn_Home_Click()
     {
-        StartCoroutine(SwitchContent(ContentCategoly.WorldMap));
+        Debug.Log("GameCtlr BtnHome_Click");
+        StartCoroutine(SwitchContent(ContentCategoly.home));
     }
 
-    public void SwitchContentToPartiyEdit()
+    /// <summary>
+    /// おまかせボタンクリック
+    /// </summary>
+    public void Btn_Omakase_Click()
     {
-        StartCoroutine(SwitchContent(ContentCategoly.PartiyEdit));
+        Debug.Log("GameCtlr BtnOmakase_Click");
+        StartCoroutine(SwitchContent(ContentCategoly.omakase));
     }
 
-    public void SwitchContentToCharacter()
+    /// <summary>
+    /// ニュースボタンクリック
+    /// </summary>
+    public void Btn_News_Click()
     {
-        StartCoroutine(SwitchContent(ContentCategoly.Character));
+        Debug.Log("GameCtlr Btn_News_Click");
+        StartCoroutine(SwitchContent(ContentCategoly.news));
     }
 
-    public void SwitchContentToBattle()
-    {
-        StartCoroutine(SwitchContent(ContentCategoly.Battle));
-    }
+    #endregion  
 }

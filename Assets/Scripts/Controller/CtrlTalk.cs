@@ -183,18 +183,18 @@ public class CtrlTalk : ConcurrentBehaviour
 	}
 
 
-    /// <summary>
-    /// ウインドウメンテナンス
-    /// </summary>
-    private void WindowMaintenance()
-    {
-        LiplisStatus.Instance.CharDataList.WindowMaintenance(WINDOW_LIFESPAN_TIME);
-    }
+	/// <summary>
+	/// ウインドウメンテナンス
+	/// </summary>
+	private void WindowMaintenance()
+	{
+		LiplisStatus.Instance.CharDataList.WindowMaintenance(WINDOW_LIFESPAN_TIME);
+	}
 
-    /// <summary>
-    /// おしゃべり待ち
-    /// </summary>
-    private void TalkWating()
+	/// <summary>
+	/// おしゃべり待ち
+	/// </summary>
+	private void TalkWating()
 	{
 		try
 		{
@@ -237,17 +237,17 @@ public class CtrlTalk : ConcurrentBehaviour
 			//ニュートラル戻しタイムアウト
 			if (TalkWaitCount == TALK_WAIT_NEUTRAL_DEFAULT)
 			{
-                OnNeutralAll();
+				OnNeutralAll();
 			}
 			if (TalkWaitCount == TALK_WAIT_NEUTRAL_IDLE_DEFAULT)
 			{
-                OnIdleAll();
+				OnIdleAll();
 			}
 
 
 
-            //おしゃべり待ちタイムアウト
-            if (TalkWaitCount >= TALK_WAIT_DEFAULT)
+			//おしゃべり待ちタイムアウト
+			if (TalkWaitCount >= TALK_WAIT_DEFAULT)
 			{
 				TalkWaitCount = 0;
 				OnTalkWaitTimeout();
@@ -293,205 +293,205 @@ public class CtrlTalk : ConcurrentBehaviour
 	{
 		LiplisStatus.Instance.NewTopic.InterruptTopicList.Add(topic);
 	}
-    public void AddInterruptTopic(List<MsgTopic> topicList)
-    {
-        LiplisStatus.Instance.NewTopic.InterruptTopicList.AddRange(topicList);
-    }
-
-    //====================================================================
-    //
-    //                  定型文関連処理(あいさつ、時報など)
-    //                         
-    //====================================================================
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public void Greet()
+	public void AddInterruptTopic(List<MsgTopic> topicList)
 	{
-        //挨拶トピックリストを生成する
-        //AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetGreet());
-        this.NowLoadTopic = CreateGreet();
+		LiplisStatus.Instance.NewTopic.InterruptTopicList.AddRange(topicList);
+	}
 
-        //センテンスをセットする
-        SetNextSentence();
-    }
-    public MsgTopic CreateGreet()
-    {
-        //トピックを生成する
-        MsgTopic topic = new MsgTopic();
+	//====================================================================
+	//
+	//                  定型文関連処理(あいさつ、時報など)
+	//                         
+	//====================================================================
 
-        //各キャラクターの挨拶を取得する
-        List<MsgTopic> lst = LiplisStatus.Instance.CharDataList.GetGreet();
+	/// <summary>
+	/// 
+	/// </summary>
+	public void Greet()
+	{
+		//挨拶トピックリストを生成する
+		//AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetGreet());
+		this.NowLoadTopic = CreateGreet();
 
-        //センテンスを入れなおす
-        foreach (var charGreet in lst)
-        {
-            foreach (var sentence in charGreet.TalkSentenceList)
-            {
-                topic.TalkSentenceList.Add(sentence);
-            }
-        }
+		//センテンスをセットする
+		SetNextSentence();
+	}
+	public MsgTopic CreateGreet()
+	{
+		//トピックを生成する
+		MsgTopic topic = new MsgTopic();
 
-        //アニバーサリーセンテンスセット
-        SetAnniversarySentence(topic);
+		//各キャラクターの挨拶を取得する
+		List<MsgTopic> lst = LiplisStatus.Instance.CharDataList.GetGreet();
 
-        //お天気センテンスセット
-        SetWetherSentence(topic);
+		//センテンスを入れなおす
+		foreach (var charGreet in lst)
+		{
+			foreach (var sentence in charGreet.TalkSentenceList)
+			{
+				topic.TalkSentenceList.Add(sentence);
+			}
+		}
 
-        return topic;
-    }
+		//アニバーサリーセンテンスセット
+		SetAnniversarySentence(topic);
 
-    /// <summary>
-    /// アニバーサリーセンテンスをセットする。
-    /// </summary>
-    /// <param name="topic"></param>
-    public void SetAnniversarySentence(MsgTopic topic)
-    {
-        //データ取得
-        ResWhatDayIsToday DataList = LiplisStatus.Instance.InfoAnniversary.DataList;
+		//お天気センテンスセット
+		SetWetherSentence(topic);
 
-        if (DataList == null)
-        {
-            return;
-        }
+		return topic;
+	}
 
-        int sentenceIdx = 0;
-        int AllocationId = 0;
+	/// <summary>
+	/// アニバーサリーセンテンスをセットする。
+	/// </summary>
+	/// <param name="topic"></param>
+	public void SetAnniversarySentence(MsgTopic topic)
+	{
+		//データ取得
+		ResWhatDayIsToday DataList = LiplisStatus.Instance.InfoAnniversary.DataList;
 
-        foreach (var data in DataList.AnniversaryDaysList)
-        {
-            foreach (MsgSentence talkSentence in data.TalkSentenceList)
-            {
-                MsgSentence sentence = talkSentence.Clone();
+		if (DataList == null)
+		{
+			return;
+		}
 
-                //キャラデータ取得
-                CharacterData cahrData = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId];
+		int sentenceIdx = 0;
+		int AllocationId = 0;
 
-                if (sentenceIdx == 0)
-                {
-                    sentence.BaseSentence = "今日は" + sentence.BaseSentence + "みたいです～♪";
-                    sentence.TalkSentence = sentence.BaseSentence;
-                }
-                else
-                {
-                    sentence.ToneConvert(cahrData.Tone);
-                }
+		foreach (var data in DataList.AnniversaryDaysList)
+		{
+			foreach (MsgSentence talkSentence in data.TalkSentenceList)
+			{
+				MsgSentence sentence = talkSentence.Clone();
 
-                //アロケーションID設定
-                sentence.AllocationId = AllocationId;
+				//キャラデータ取得
+				CharacterData cahrData = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId];
 
-                //インデックスインクリメント
-                sentenceIdx++;
-                AllocationId++;
+				if (sentenceIdx == 0)
+				{
+					sentence.BaseSentence = "今日は" + sentence.BaseSentence + "みたいです～♪";
+					sentence.TalkSentence = sentence.BaseSentence;
+				}
+				else
+				{
+					sentence.ToneConvert(cahrData.Tone);
+				}
 
-                //アロケーションIDコントロール
-                if(AllocationId > 3)
-                {
-                    AllocationId = 0;
-                }
+				//アロケーションID設定
+				sentence.AllocationId = AllocationId;
 
-                //センテンスを追加
-                topic.TalkSentenceList.Add(sentence);
-            }
-        }
-    }
+				//インデックスインクリメント
+				sentenceIdx++;
+				AllocationId++;
 
-    public void SetWetherSentence(MsgTopic topic)
-    {
-        //NULLチェック
-        if (LiplisStatus.Instance.InfoWether.WetherDtlList == null)
-        {
-            return;
-        }
+				//アロケーションIDコントロール
+				if(AllocationId > 3)
+				{
+					AllocationId = 0;
+				}
 
-        if (LiplisStatus.Instance.InfoWether.WetherDtlList.Count < 1)
-        {
-            return;
-        }
+				//センテンスを追加
+				topic.TalkSentenceList.Add(sentence);
+			}
+		}
+	}
 
-        //最終センテンス取得
-        MsgSentence lastSentence = topic.TalkSentenceList[topic.TalkSentenceList.Count - 1];
-        CharacterData cahrData1;
-        CharacterData cahrData2;
-        CharacterData cahrData3;
-        int AllocationId1;
-        int AllocationId2;
-        int AllocationId3;
+	public void SetWetherSentence(MsgTopic topic)
+	{
+		//NULLチェック
+		if (LiplisStatus.Instance.InfoWether.WetherDtlList == null)
+		{
+			return;
+		}
 
-        //アロケーションID取得
-        AllocationId1 = lastSentence.AllocationId + 1;
-        if (AllocationId1 > 3){ AllocationId1 = 0;}
-        AllocationId2 = AllocationId1 + 1;
-        if (AllocationId2 > 3) { AllocationId2 = 0; }
-        AllocationId3 = AllocationId2 + 1;
-        if (AllocationId3 > 3) { AllocationId3 = 0; }
+		if (LiplisStatus.Instance.InfoWether.WetherDtlList.Count < 1)
+		{
+			return;
+		}
 
-        //キャラクターデータ取得
-        cahrData1 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId1];
-        cahrData2 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId2];
-        cahrData3 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId3];
+		//最終センテンス取得
+		MsgSentence lastSentence = topic.TalkSentenceList[topic.TalkSentenceList.Count - 1];
+		CharacterData cahrData1;
+		CharacterData cahrData2;
+		CharacterData cahrData3;
+		int AllocationId1;
+		int AllocationId2;
+		int AllocationId3;
+
+		//アロケーションID取得
+		AllocationId1 = lastSentence.AllocationId + 1;
+		if (AllocationId1 > 3){ AllocationId1 = 0;}
+		AllocationId2 = AllocationId1 + 1;
+		if (AllocationId2 > 3) { AllocationId2 = 0; }
+		AllocationId3 = AllocationId2 + 1;
+		if (AllocationId3 > 3) { AllocationId3 = 0; }
+
+		//キャラクターデータ取得
+		cahrData1 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId1];
+		cahrData2 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId2];
+		cahrData3 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId3];
 
 
-        //現在時刻取得
-        DateTime dt = DateTime.Now;
+		//現在時刻取得
+		DateTime dt = DateTime.Now;
 
-        //天気コード取得
-        MsgDayWether todayWether = LiplisStatus.Instance.InfoWether.GetWetherSentenceToday(dt);
+		//天気コード取得
+		MsgDayWether todayWether = LiplisStatus.Instance.InfoWether.GetWetherSentenceToday(dt);
 
-        //0～12 今日 午前、午後、夜の天気
-        if (dt.Hour >= 0 && dt.Hour <= 18)
-        {
-            SentenceCreatorWether.CreateWetherMessage("今日の天気は", todayWether, topic.TalkSentenceList, cahrData1.Tone, cahrData1.AllocationId);
-        }
+		//0～12 今日 午前、午後、夜の天気
+		if (dt.Hour >= 0 && dt.Hour <= 18)
+		{
+			SentenceCreatorWether.CreateWetherMessage("今日の天気は", todayWether, topic.TalkSentenceList, cahrData1.Tone, cahrData1.AllocationId);
+		}
 
-        //19～23 明日の天気
-        else if (dt.Hour >= 19 && dt.Hour <= 23)
-        {
-            //明日の天気も取得
-            MsgDayWether tomorrowWether = LiplisStatus.Instance.InfoWether.GetWetherSentenceTommorow(dt);
+		//19～23 明日の天気
+		else if (dt.Hour >= 19 && dt.Hour <= 23)
+		{
+			//明日の天気も取得
+			MsgDayWether tomorrowWether = LiplisStatus.Instance.InfoWether.GetWetherSentenceTommorow(dt);
 
-            SentenceCreatorWether.CreateWetherMessage("", todayWether, topic.TalkSentenceList, cahrData2.Tone, cahrData2.AllocationId);
-            SentenceCreatorWether.CreateWetherMessage("明日の天気は", tomorrowWether, topic.TalkSentenceList, cahrData3.Tone, cahrData3.AllocationId);
+			SentenceCreatorWether.CreateWetherMessage("", todayWether, topic.TalkSentenceList, cahrData2.Tone, cahrData2.AllocationId);
+			SentenceCreatorWether.CreateWetherMessage("明日の天気は", tomorrowWether, topic.TalkSentenceList, cahrData3.Tone, cahrData3.AllocationId);
 
-        }
-    }
+		}
+	}
 
-    #endregion
+	#endregion
 
-    //====================================================================
-    //
-    //                 　        トーク関連処理
-    //                         
-    //====================================================================
-    #region トーク関連処理
-    /// <summary>
-    /// おしゃべり待ち終了時処理
-    /// </summary>
-    private void OnTalkWaitTimeout()
+	//====================================================================
+	//
+	//                 　        トーク関連処理
+	//                         
+	//====================================================================
+	#region トーク関連処理
+	/// <summary>
+	/// おしゃべり待ち終了時処理
+	/// </summary>
+	private void OnTalkWaitTimeout()
 	{
 		NextTalkOrSkip();
 	}
 
-    /// <summary>
-    /// ニュートラル戻し
-    /// </summary>
-    private void OnNeutralAll()
-    {
-        //全登録モデルをニュートラルに戻す
-        LiplisStatus.Instance.CharDataList.NeutralAll();
-    }
-    private void OnIdleAll()
-    {
-        //全登録モデルをニュートラルに戻す
-        LiplisStatus.Instance.CharDataList.NeutralAll();
-    }
+	/// <summary>
+	/// ニュートラル戻し
+	/// </summary>
+	private void OnNeutralAll()
+	{
+		//全登録モデルをニュートラルに戻す
+		LiplisStatus.Instance.CharDataList.NeutralAll();
+	}
+	private void OnIdleAll()
+	{
+		//全登録モデルをニュートラルに戻す
+		LiplisStatus.Instance.CharDataList.NeutralAll();
+	}
 
 
-    /// <summary>
-    /// 次の文章をセットする
-    /// </summary>
- 	private void SetNextSentence()
+	/// <summary>
+	/// 次の文章をセットする
+	/// </summary>
+	private void SetNextSentence()
 	{
 		try
 		{
@@ -525,17 +525,17 @@ public class CtrlTalk : ConcurrentBehaviour
 			if (sentence.TalkSentence != null)
 			{
 				CreateWindow(sentence.TalkSentence, sentence.AllocationId);
-            }
+			}
 		}
 		else
 		{
-            this.NowTalkWindow.AddText(sentence.TalkSentence);
+			this.NowTalkWindow.AddText(sentence.TalkSentence);
 		}
 
-        //表情設定
-        LiplisStatus.Instance.CharDataList.SetExpression(sentence);
+		//表情設定
+		LiplisStatus.Instance.CharDataList.SetExpression(sentence);
 
-        Debug.Log(sentence.Emotion + " : " + sentence.Point);
+		Debug.Log(sentence.Emotion + " : " + sentence.Point);
 	}
 
 	/// <summary>
@@ -546,8 +546,8 @@ public class CtrlTalk : ConcurrentBehaviour
 		//ウインドウを一旦クリア
 		DestroyAllWindow();
 
-        //話題取得
-        if (LiplisStatus.Instance.NewTopic.TalkTopicList.Count > 0 || LiplisStatus.Instance.NewTopic.InterruptTopicList.Count > 0)
+		//話題取得
+		if (LiplisStatus.Instance.NewTopic.TalkTopicList.Count > 0 || LiplisStatus.Instance.NewTopic.InterruptTopicList.Count > 0)
 		{
 			//トピックをセットする
 			SetToipc();
@@ -558,15 +558,15 @@ public class CtrlTalk : ConcurrentBehaviour
 			SetTopicDirect();
 		}
 
-        //キャラクター位置移動
-        LiplisStatus.Instance.CharDataList.ShuffleCharPosition(this.NowLoadTopic);
+		//キャラクター位置移動
+		LiplisStatus.Instance.CharDataList.ShuffleCharPosition(this.NowLoadTopic);
 
-        //タイトルウインドウをセットする
-        SetTitleWindow(this.NowLoadTopic.Title, this.NowLoadTopic.ThumbnailUrl, this.NowLoadTopic.Url);
+		//タイトルウインドウをセットする
+		SetTitleWindow(this.NowLoadTopic.Title, this.NowLoadTopic.ThumbnailUrl, this.NowLoadTopic.Url);
 
-        //センテンスをセットする
-        SetNextSentence();
-    }
+		//センテンスをセットする
+		SetNextSentence();
+	}
 
 
 
@@ -592,21 +592,21 @@ public class CtrlTalk : ConcurrentBehaviour
 			this.NowLoadTopic = LiplisStatus.Instance.NewTopic.InterruptTopicList.Dequeue();
 		}
 	}
-    private void InsertTopToipc(MsgTopic topic)
-    {
-        LiplisStatus.Instance.NewTopic.TalkTopicList.Insert(0, topic);
+	private void InsertTopToipc(MsgTopic topic)
+	{
+		LiplisStatus.Instance.NewTopic.TalkTopicList.Insert(0, topic);
 
-        SetNextTopic();
-    }
+		SetNextTopic();
+	}
 
-    /// <summary>
-    /// 話題を直接セットする
-    /// </summary>
-    private void SetTopicDirect()
+	/// <summary>
+	/// 話題を直接セットする
+	/// </summary>
+	private void SetTopicDirect()
 	{
 		//トピックをセット
 		this.NowLoadTopic = SetTopicDirectTopic();
-    }
+	}
 
 	/// <summary>
 	/// ショートニュースからトピックを生成する
@@ -658,9 +658,9 @@ public class CtrlTalk : ConcurrentBehaviour
 		{
 			topic.FlgNotAddChatted = true;
 
-            //アロケーションIDを設定する
-            TopicUtil.SetAllocationId(topic);
-        }
+			//アロケーションIDを設定する
+			TopicUtil.SetAllocationId(topic);
+		}
 
 		//データ追加
 		LiplisStatus.Instance.NewTopic.TalkTopicList.AddRange(data.topicList);
@@ -716,80 +716,80 @@ public class CtrlTalk : ConcurrentBehaviour
 	//====================================================================
 	#region ウインドウ関連処理
 
-    /// <summary>
-    /// ウインドウインフォを作成する
-    /// </summary>
-    /// <param name="targetModel"></param>
-    /// <returns></returns>
-    private MsgWindowInfo GetWindowInfo(string targetModel)
-    {
-        MsgWindowInfo result = new MsgWindowInfo();
+	/// <summary>
+	/// ウインドウインフォを作成する
+	/// </summary>
+	/// <param name="targetModel"></param>
+	/// <returns></returns>
+	private MsgWindowInfo GetWindowInfo(string targetModel)
+	{
+		MsgWindowInfo result = new MsgWindowInfo();
 
-        //ウインドウのプレハブからインスタンス生成
-        result.windowInstances = (GameObject)Resources.Load(LiplisStatus.Instance.CharDataList.GetWindowName(targetModel));
+		//ウインドウのプレハブからインスタンス生成
+		result.windowInstances = (GameObject)Resources.Load(LiplisStatus.Instance.CharDataList.GetWindowName(targetModel));
 
-        //インスタンティエイト
-        result.window = Instantiate(result.windowInstances) as GameObject;
+		//インスタンティエイト
+		result.window = Instantiate(result.windowInstances) as GameObject;
 
-        //親キャンバス取得
-        result. canvasParent = transform.Find("CanvasFront");
+		//親キャンバス取得
+		result. canvasParent = transform.Find("CanvasFront");
 
-        //テキストオブジェクト取得
-        result.windowText = result.window.transform.Find("TxtTalkText").gameObject;
+		//テキストオブジェクト取得
+		result.windowText = result.window.transform.Find("TxtTalkText").gameObject;
 
-        return result;
-    }
+		return result;
+	}
 
 	/// <summary>
 	/// すべてのウインドウを除去する
 	/// </summary>
 	public void DestroyAllWindow()
 	{
-        LiplisStatus.Instance.CharDataList.DestroyAllWindow();
+		LiplisStatus.Instance.CharDataList.DestroyAllWindow();
 	}
 
-    /// <summary>
-    /// ウインドウ作成
-    /// </summary>
-    /// <param name="message"></param>
-    /// <param name="AllocationId"></param>
-    public void CreateWindow(string message, int AllocationId)
-    {
-        //キャラクターデータ取得
-        CharacterData charData = LiplisStatus.Instance.CharDataList.GetCharacter(AllocationId);
+	/// <summary>
+	/// ウインドウ作成
+	/// </summary>
+	/// <param name="message"></param>
+	/// <param name="AllocationId"></param>
+	public void CreateWindow(string message, int AllocationId)
+	{
+		//キャラクターデータ取得
+		CharacterData charData = LiplisStatus.Instance.CharDataList.GetCharacter(AllocationId);
 
-        //向き変更
-        charData.ChengeDirectionRandam();
+		//向き変更
+		charData.ChengeDirectionRandam();
 
-        //ウインドウ
-        LiplisWindow window  = charData.CreateWindowTalk(message, GetWindowInfo(charData.ModelName));
+		//ウインドウ
+		LiplisWindow window  = charData.CreateWindowTalk(message, GetWindowInfo(charData.ModelName));
 
-        if(window == null)
-        {
-            return;
-        }
+		if(window == null)
+		{
+			return;
+		}
 
-        //現在おしゃべりウインドウ設置
-        this.NowTalkWindow = window;
+		//現在おしゃべりウインドウ設置
+		this.NowTalkWindow = window;
 
-        //ウインドウセット
-        charData.SetWindow(window, AllocationId);
-    }
-
-
-
-    #endregion
+		//ウインドウセット
+		charData.SetWindow(window, AllocationId);
+	}
 
 
-    //====================================================================
-    //
-    //                      タイトルウインドウ関連処理
-    //                         
-    //====================================================================
-    #region タイトルウインドウ関連処理
-    private const float TITLE_HEIGHT_IMG_3 = 60;
+
+	#endregion
+
+
+	//====================================================================
+	//
+	//                      タイトルウインドウ関連処理
+	//                         
+	//====================================================================
+	#region タイトルウインドウ関連処理
+	private const float TITLE_HEIGHT_IMG_3 = 60;
 	private const float TITLE_HEIGHT_TXT_3 = 50;
-    private const float TITLE_POS_Y_TXT_3 = 7;
+	private const float TITLE_POS_Y_TXT_3 = 7;
 						
 	private const float TITLE_HEIGHT_IMG_2 = 45;
 	private const float TITLE_HEIGHT_TXT_2 = 35;
@@ -808,7 +808,7 @@ public class CtrlTalk : ConcurrentBehaviour
 	/// <param name="z"></param>
 	private LiplisTitleWindow CreateWindowTitle(float x, float y, float z, string message, string thumbnailUrl, string url)
 	{
-        message = message.Trim().Replace("\n", "");
+		message = message.Trim().Replace("\n", "");
 
 		//サイズ計算
 		float width = CulcWindowTitleWidth(message);
@@ -819,27 +819,27 @@ public class CtrlTalk : ConcurrentBehaviour
 		float heightText = TITLE_HEIGHT_TXT_1;
 		float posTextY = TITLE_POS_Y_TXT_1;
 
-        if (div >= 3)
-        {
-            heightImg = TITLE_HEIGHT_IMG_3;
-            heightText = TITLE_HEIGHT_TXT_3;
-            posTextY = TITLE_POS_Y_TXT_3;
-        }
-        else if (div == 2)
-        {
-            heightImg = TITLE_HEIGHT_IMG_2;
-            heightText = TITLE_HEIGHT_TXT_2;
-            posTextY = TITLE_POS_Y_TXT_2;
-        }
-        else
-        {
-            heightImg = TITLE_HEIGHT_IMG_1;
-            heightText = TITLE_HEIGHT_TXT_1;
-            posTextY = TITLE_POS_Y_TXT_1;
-        }
+		if (div >= 3)
+		{
+			heightImg = TITLE_HEIGHT_IMG_3;
+			heightText = TITLE_HEIGHT_TXT_3;
+			posTextY = TITLE_POS_Y_TXT_3;
+		}
+		else if (div == 2)
+		{
+			heightImg = TITLE_HEIGHT_IMG_2;
+			heightText = TITLE_HEIGHT_TXT_2;
+			posTextY = TITLE_POS_Y_TXT_2;
+		}
+		else
+		{
+			heightImg = TITLE_HEIGHT_IMG_1;
+			heightText = TITLE_HEIGHT_TXT_1;
+			posTextY = TITLE_POS_Y_TXT_1;
+		}
 
-        //ウインドウのプレハブからインスタンス生成
-        GameObject windowInstances = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_INFO);
+		//ウインドウのプレハブからインスタンス生成
+		GameObject windowInstances = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_INFO);
 
 		//インスタンティエイト
 		GameObject window = Instantiate(windowInstances) as GameObject;
@@ -876,49 +876,49 @@ public class CtrlTalk : ConcurrentBehaviour
 		//親キャンバスに登録
 		window.transform.SetParent(canvasParent, false);
 
-        //クリックイベント
-        try
-        {
-            window.GetComponent<Button>().onClick.AddListener(() => Title_Click(url));
-        }
-        catch(Exception ex)
-        {
-            Debug.Log(ex.Message);
-        }
-        
+		//クリックイベント
+		try
+		{
+			window.GetComponent<Button>().onClick.AddListener(() => Title_Click(url));
+		}
+		catch(Exception ex)
+		{
+			Debug.Log(ex.Message);
+		}
+		
 
-        //結果を返す
-        return new LiplisTitleWindow(window, heightImg, heightText, posTextY);
+		//結果を返す
+		return new LiplisTitleWindow(window, heightImg, heightText, posTextY);
 	}
-    
-    /// <summary>
-    /// タイトルクリック
-    /// </summary>
-    private void Title_Click(string url)
-    {
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            InAppBrowser.DisplayOptions options = new InAppBrowser.DisplayOptions();
-            options.displayURLAsPageTitle = false;
-            options.pageTitle = LpsDefine.APPLICATION_TITLE;
+	
+	/// <summary>
+	/// タイトルクリック
+	/// </summary>
+	private void Title_Click(string url)
+	{
+		if (Application.platform == RuntimePlatform.Android)
+		{
+			InAppBrowser.DisplayOptions options = new InAppBrowser.DisplayOptions();
+			options.displayURLAsPageTitle = false;
+			options.pageTitle = LpsDefine.APPLICATION_TITLE;
 
-            InAppBrowser.OpenURL(url, options);
-        }
-        else if (Application.platform == RuntimePlatform.WindowsPlayer )
-        {
-            Application.OpenURL(url);
-        }
+			InAppBrowser.OpenURL(url, options);
+		}
+		else if (Application.platform == RuntimePlatform.WindowsPlayer )
+		{
+			Application.OpenURL(url);
+		}
 
 
-    }
+	}
 
-    /// <summary>
-    /// 横幅計算
-    /// </summary>
-    /// <param name="message"></param>
-    /// <returns></returns>
-    const float MAX_WIDTH_TITLE = 300;
-    private float CulcWindowTitleWidth(string message)
+	/// <summary>
+	/// 横幅計算
+	/// </summary>
+	/// <param name="message"></param>
+	/// <returns></returns>
+	const float MAX_WIDTH_TITLE = 300;
+	private float CulcWindowTitleWidth(string message)
 	{
 		float width = (float)message.Length * 13.5f + 20.0f;
 
@@ -977,6 +977,10 @@ public class CtrlTalk : ConcurrentBehaviour
 
 	}
 
+    //ウインドウ位置定義
+    private const float TITLE_POS_X = 250; //130;
+    private const float TITLE_POS_Y = 150; //-185;
+	private const float TITLE_POS_Z = 0;
 
 	/// <summary>
 	/// ウインドウセット
@@ -996,7 +1000,7 @@ public class CtrlTalk : ConcurrentBehaviour
 		}
 
 		//タイトルウインドウ表示
-		AddTitleWindow(130, -185, 0, title,thumbnailUrl,url);
+		AddTitleWindow(TITLE_POS_X, TITLE_POS_Y, TITLE_POS_Z, title,thumbnailUrl,url);
 
 		//ウインドウイメージ
 		SetImage(thumbnailUrl);
@@ -1024,14 +1028,14 @@ public class CtrlTalk : ConcurrentBehaviour
 		//ウインドウ名設定
 		window.name = "ImageWindow" + WindowImageListQ.Count;
 
-        //ウインドウ生成
-        LiplisImageWindow lpsWindow = new LiplisImageWindow(window, url);
+		//ウインドウ生成
+		LiplisImageWindow lpsWindow = new LiplisImageWindow(window, url);
 
-        //位置設定
-        window.transform.position = new Vector3(Screen.width/6, 0, -100);
+		//位置設定
+		window.transform.position = new Vector3(Screen.width/6, 0, -100);
 
-        //スケール設定
-        window.transform.localScale = new Vector3(1, 1, 1);
+		//スケール設定
+		window.transform.localScale = new Vector3(1, 1, 1);
 
 		//親キャンバス取得
 		Transform canvasParent = transform.Find("CanvasBackGround");
@@ -1039,10 +1043,10 @@ public class CtrlTalk : ConcurrentBehaviour
 		//親キャンバスに登録
 		window.transform.SetParent(canvasParent, false);
 
-        //結果を返す
-        return lpsWindow;
+		//結果を返す
+		return lpsWindow;
 
-    }
+	}
 
 	/// <summary>
 	/// ウインドウを追加する
@@ -1086,14 +1090,14 @@ public class CtrlTalk : ConcurrentBehaviour
 	/// </summary>
 	public void ImgWeather_Click()
 	{
-        ////トピックを生成する
-        //MsgTopic topic = new MsgTopic();
+		////トピックを生成する
+		//MsgTopic topic = new MsgTopic();
 
-        ////お天気センテンスセット
-        //SetWetherSentence(topic);
+		////お天気センテンスセット
+		//SetWetherSentence(topic);
 
-        ////トピックスセット
-        //InsertTopToipc(topic);
+		////トピックスセット
+		//InsertTopToipc(topic);
 	}
 
 	/// <summary>
@@ -1102,45 +1106,45 @@ public class CtrlTalk : ConcurrentBehaviour
 	public void TxtDate_Click()
 	{
 
-        ////トピックを生成する
-        //MsgTopic topic = new MsgTopic();
+		////トピックを生成する
+		//MsgTopic topic = new MsgTopic();
 
-        ////お天気センテンスセット
-        //SetAnniversarySentence(topic);
+		////お天気センテンスセット
+		//SetAnniversarySentence(topic);
 
-        ////トピックスセット
-        //InsertTopToipc(topic);
-    }
+		////トピックスセット
+		//InsertTopToipc(topic);
+	}
 
-    /// <summary>
-    /// 温度クリック
-    /// </summary>
-    public void TxtTemp_Click()
-    {
-        ////割り込みリストに追加する
-        //AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetTemperature());
+	/// <summary>
+	/// 温度クリック
+	/// </summary>
+	public void TxtTemp_Click()
+	{
+		////割り込みリストに追加する
+		//AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetTemperature());
 
-        ////トピック送り
-        //SetNextTopic();
-    }
+		////トピック送り
+		//SetNextTopic();
+	}
 
-    /// <summary>
-    /// 降水確率クリック
-    /// </summary>
-    public void TxtChanceOfRain_Click()
-    {
-        ////割り込みリストに追加する
-        //AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetChanceOfRain());
+	/// <summary>
+	/// 降水確率クリック
+	/// </summary>
+	public void TxtChanceOfRain_Click()
+	{
+		////割り込みリストに追加する
+		//AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetChanceOfRain());
 
 
-        ////トピック送り
-        //SetNextTopic();
-    }
+		////トピック送り
+		//SetNextTopic();
+	}
 
-    /// <summary>
-    /// 時刻クリックイベント
-    /// </summary>
-    public void TxtTime_Click()
+	/// <summary>
+	/// 時刻クリックイベント
+	/// </summary>
+	public void TxtTime_Click()
 	{
 		Debug.Log("TxtTime_Click");
 	}
@@ -1153,17 +1157,17 @@ public class CtrlTalk : ConcurrentBehaviour
 		Debug.Log("TxtLocation_Click");
 	}
 
-    /// <summary>
-    /// 次へ送るボタンクリック
-    /// </summary>
-    public void Btn_Next_Click()
-    {
-        //
-        SetNextTopic();
+	/// <summary>
+	/// 次へ送るボタンクリック
+	/// </summary>
+	public void Btn_Next_Click()
+	{
+		//
+		SetNextTopic();
 
-    }
+	}
 
-    #endregion
+	#endregion
 
 
 

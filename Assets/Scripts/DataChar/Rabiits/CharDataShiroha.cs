@@ -23,7 +23,8 @@ namespace Assets.Scripts.DataChar.Rabiits
         public int ALLOCATION_ID = 1;
 
         //葉月 Y座標
-        public const float CARACTER_LOCATION_Y = -2.2f;
+        //public const float CARACTER_LOCATION_Y = -2.2f;
+        public const float CARACTER_LOCATION_Y = -146f;
 
         //葉月デフォルト位置
         public MST_CARACTER_POSITION DEFAULT_POSITION = MST_CARACTER_POSITION.Right;

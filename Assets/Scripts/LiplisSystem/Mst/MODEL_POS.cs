@@ -18,10 +18,14 @@ namespace Assets.Scripts.LiplisSystem.Mst
 
         ///=============================
         ///各配置のX座標
-        public const float LOCATION_X_MODERATOR = 7f;
-        public const float LOCATION_X_RIGHT     = -1f;
-        public const float LOCATION_X_CENTER    = -4f;
-        public const float LOCATION_X_LEFT      = -7f;
+        //public const float LOCATION_X_MODERATOR = 7f;
+        //public const float LOCATION_X_RIGHT     = -1f;
+        //public const float LOCATION_X_CENTER    = -4f;
+        //public const float LOCATION_X_LEFT      = -7f;
+        public const float LOCATION_X_MODERATOR = 448f;
+        public const float LOCATION_X_RIGHT = -64f;
+        public const float LOCATION_X_CENTER = -256f;
+        public const float LOCATION_X_LEFT = -448f;
 
         /// <summary>
         /// 位置取得

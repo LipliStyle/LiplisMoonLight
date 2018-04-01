@@ -1006,18 +1006,25 @@ public class CtrlTalk : ConcurrentBehaviour
 		SetImage(thumbnailUrl);
 	}
 
-	#endregion
+    #endregion
 
-	//====================================================================
-	//
-	//                      イメージウインドウ関連処理
-	//                         
-	//====================================================================
-	#region イメージウインドウ関連処理
-	/// <summary>
-	/// ウインドウを作成する
-	/// </summary>
-	private LiplisImageWindow CreateWindowImage(string url)
+    //====================================================================
+    //
+    //                      イメージウインドウ関連処理
+    //                         
+    //====================================================================
+
+
+    //ウインドウ位置定義
+    private const float IMAGE_POS_X = 0;
+    private const float IMAGE_POS_Y = 0;
+    private const float IMAGE_POS_Z = 50;
+
+    #region イメージウインドウ関連処理
+    /// <summary>
+    /// ウインドウを作成する
+    /// </summary>
+    private LiplisImageWindow CreateWindowImage(string url)
 	{
 		//ウインドウのプレハブからインスタンス生成
 		GameObject windowInstances = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_IMAGE);
@@ -1032,7 +1039,7 @@ public class CtrlTalk : ConcurrentBehaviour
 		LiplisImageWindow lpsWindow = new LiplisImageWindow(window, url);
 
 		//位置設定
-		window.transform.position = new Vector3(Screen.width/6, 0, -100);
+		window.transform.position = new Vector3(Screen.width/6, IMAGE_POS_Y, IMAGE_POS_Z);
 
 		//スケール設定
 		window.transform.localScale = new Vector3(1, 1, 1);

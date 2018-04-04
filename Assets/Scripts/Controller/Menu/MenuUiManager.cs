@@ -52,7 +52,8 @@ public class MenuUiManager : MonoBehaviour
     {
         home = 0,
         omakase = 1,
-        news = 2
+        news = 2 ,
+        matome =3
     }
 
     #endregion
@@ -145,6 +146,15 @@ public class MenuUiManager : MonoBehaviour
     {
         Debug.Log("GameCtlr Btn_News_Click");
         StartCoroutine(SwitchContent(ContentCategoly.news));
+    }
+
+    /// <summary>
+    /// ニュースボタンクリック
+    /// </summary>
+    public void Btn_Matome_Click()
+    {
+        Debug.Log("GameCtlr Btn_Matome_Click");
+        StartCoroutine(SwitchContent(ContentCategoly.matome));
     }
 
     #endregion  

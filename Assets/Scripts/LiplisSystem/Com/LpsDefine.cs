@@ -41,6 +41,8 @@ namespace Assets.Scripts.LiplisSystem.Com
         public const string LIPLIS_API_NEW_TOPIC_2_MLT   = @"https://liplis.mine.nu/Clalis/v60/Compress/ClalisForLiplisGetNewTopic2Mlt.aspx";
         public const string LIPLIS_API_NEW_TOPIC_ONE_MLT = @"https://liplis.mine.nu/Clalis/v60/Compress/ClalisForLiplisGetNewTopicOneMlt.aspx";
 
+        public const string LIPLIS_API_NEWS_LIST = @"https://liplis.mine.nu/Clalis/v60/Compress/ClalisForLiplisGetNewsList.aspx";
+
         public const string LIPLIS_TONE_URL_HAZUKI  = @"little.pretty.hazuki.xml";
         public const string LIPLIS_TONE_URL_SHIROHA = @"little.pretty.shiroha.xml";
         public const string LIPLIS_TONE_URL_KUROHA  = @"little.pretty.kuroha.xml";

@@ -34,7 +34,7 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis.v60
                 //APIの結果受け取り用クラス
                 return JsonConvert.DeserializeObject<ResLpsTopicList>(jsonText);
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }

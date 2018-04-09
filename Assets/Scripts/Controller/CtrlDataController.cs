@@ -65,6 +65,9 @@ public class CtrlDataController : ConcurrentBehaviour
         //天気情報は常に最新を取る
         LiplisStatus.Instance.InfoWether.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
 
+        //ニュースリストは常に最新を取る
+        LiplisStatus.Instance.NewsList.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
+
         //ビジブルセット
         SetHidden();
 
@@ -160,6 +163,10 @@ public class CtrlDataController : ConcurrentBehaviour
 
         //天気情報収集
         StartCoroutine(DataCollectWether());
+
+        //ニュースリスト取得
+        StartCoroutine(SetLastNewsList());
+
 
         //背景を変更しておく
         yield return this.ctrlBackground.ChangeBackground();
@@ -548,6 +555,50 @@ public class CtrlDataController : ConcurrentBehaviour
 
     }
 
+    /// <summary>
+    /// 最新のニュースリストを取得する
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator SetLastNewsList()
+    {
+
+        //トークインスタンス取得
+        DatNewsList newsList = LiplisStatus.Instance.NewsList;
+
+        //指定時間経過していなければ抜ける
+        if (LpsDatetimeUtil.dec(newsList.LastUpdateTime).AddMinutes(60) > DateTime.Now)
+        {
+            goto End;
+        }
+
+        //最新データをダウンロードする
+        yield return StartCoroutine(SetLastNews(newsList));
+
+        //終了ラベル
+        End:;
+    }
+
+    /// <summary>
+    /// 最新データをダウンロードする
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator SetLastNews(DatNewsList newsList)
+    {
+        //最新ニュースデータ取得
+        var Async = ClalisForLiplisGetNewsList.GetNewsList();
+
+        //非同期実行
+        yield return Async;
+
+        //データ取得
+        ResLpsBaseNewsList DataList = (ResLpsBaseNewsList)Async.Current;
+
+        //データセット
+        newsList.SetData(DataList);
+
+        //最終更新時刻設定
+        yield return newsList.LastUpdateTime = LpsDatetimeUtil.Now;
+    }
 
     #endregion
 

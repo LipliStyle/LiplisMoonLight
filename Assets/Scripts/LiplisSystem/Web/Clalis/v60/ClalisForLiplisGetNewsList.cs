@@ -1,6 +1,6 @@
 ﻿//====================================================================
-//  ClassName : ClalisWeatherNews
-//  概要      : 天気ニュース取得
+//  ClassName : ClalisForLiplisGetNewsList
+//  概要      : ニュースリスト取得
 //              
 //
 //  LiplisLive2D
@@ -15,7 +15,7 @@ using UnityEngine.Networking;
 
 namespace Assets.Scripts.LiplisSystem.Web.Clalis.v60
 {
-    public class ClalisLocationWetherList
+    public class ClalisForLiplisGetNewsList
     {
         /// <summary>
         /// 対象地域の天気を取得する
@@ -23,12 +23,12 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis.v60
         /// </summary>
         /// <param name="regionId"></param>
         /// <returns></returns>
-        public static IEnumerator GetWetherList(int days)
+        public static IEnumerator GetNewsList()
         {
             WWWForm ps = new WWWForm();
             string jsonText = "";
 
-            using (UnityWebRequest request = UnityWebRequest.Post(LpsDefine.LIPLIS_API_LOCATION_WEATHER, ps))
+            using (UnityWebRequest request = UnityWebRequest.Post(LpsDefine.LIPLIS_API_NEWS_LIST, ps))
             {
                 yield return request.SendWebRequest();
 
@@ -49,7 +49,7 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis.v60
             }
 
             //APIの結果受け取り用クラス
-            yield return JsonConvert.DeserializeObject<ResLpsWeatherInfo60List>(jsonText);
+            yield return JsonConvert.DeserializeObject<ResLpsBaseNewsList>(jsonText);
         }
     }
 }

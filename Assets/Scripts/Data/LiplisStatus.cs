@@ -71,6 +71,7 @@ namespace Assets.Scripts.Data
             if (this.InfoAnniversary == null) { this.InfoAnniversary = new DatAnniversaryDays(); }
             if (this.EnvironmentInfo == null) { this.EnvironmentInfo = new DatEnvironmentInfomation(); }
             if (this.CharDataList    == null) { this.CharDataList = new CharacterDataList(); }
+            if (this.NewsList        == null) { this.NewsList = new DatNewsList(); }
         }
 
         #endregion
@@ -107,6 +108,8 @@ namespace Assets.Scripts.Data
         //感情値
         //非同期処理
 
+        //ニュースリスト
+        public DatNewsList NewsList;
 
         public string testText;
 

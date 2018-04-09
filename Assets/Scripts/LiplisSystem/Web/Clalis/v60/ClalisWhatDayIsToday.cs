@@ -30,7 +30,7 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis.v60
 
             using (UnityWebRequest request = UnityWebRequest.Post(LpsDefine.LIPLIS_API_WHATDAY_ISTODAY,ps))
             {
-                yield return request.Send();
+                yield return request.SendWebRequest();
 
                 if (request.isNetworkError)
                 {

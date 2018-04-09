@@ -53,7 +53,9 @@ public class MenuUiManager : MonoBehaviour
         home = 0,
         omakase = 1,
         news = 2 ,
-        matome =3
+        matome =3,
+        retweet = 4,
+        hotPicture = 5
     }
 
     #endregion
@@ -149,7 +151,7 @@ public class MenuUiManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ニュースボタンクリック
+    /// まとめボタンクリック
     /// </summary>
     public void Btn_Matome_Click()
     {
@@ -157,5 +159,22 @@ public class MenuUiManager : MonoBehaviour
         StartCoroutine(SwitchContent(ContentCategoly.matome));
     }
 
+    /// <summary>
+    /// リツイートボタンクリック
+    /// </summary>
+    public void Btn_Retweet_Click()
+    {
+        Debug.Log("GameCtlr Btn_Retweet_Click");
+        StartCoroutine(SwitchContent(ContentCategoly.retweet));
+    }
+
+    /// <summary>
+    /// 話題の画像ボタンクリック
+    /// </summary>
+    public void Btn_HotPicture_Click()
+    {
+        Debug.Log("GameCtlr Btn_HotPicture_Click");
+        StartCoroutine(SwitchContent(ContentCategoly.hotPicture));
+    }
     #endregion  
 }

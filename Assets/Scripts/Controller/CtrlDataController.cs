@@ -2,19 +2,19 @@
 //  ClassName : CtrlDataController
 //  概要      : データコントローラー
 //              
+//              2018/07/09 定期リソース解放処理追加
+//                         テクスチャなどのリソース解放は「Resources.UnloadUnusedAssets();」によって行われる。
+//　　　　　　　　　　　　　→開放処理をCtrlGameControllerに移動
 //
 //  LiplisLive2D
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //====================================================================
-
 using Assets.Scripts.Data;
 using Assets.Scripts.Data.SubData;
 using Assets.Scripts.LiplisSystem.Cif.v60.Res;
 using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.LiplisSystem.Web.Clalis.v60;
-using Assets.Scripts.LiplisUi;
-using Assets.Scripts.Utils;
 using SpicyPixel.Threading;
 using System;
 using System.Collections;
@@ -29,6 +29,9 @@ public class CtrlDataController : ConcurrentBehaviour
     [SerializeField] Text TxtQNum;
     [SerializeField] Text TxtTopicNum;
     [SerializeField] Text TxtChatedNum;
+    [SerializeField] Text TxtNewsListNum;
+    [SerializeField] Slider TopicQSlider;
+    [SerializeField] Text TxtTopicNumR;
 
     ///=============================
     ///背景ゲームオブジェクト
@@ -38,6 +41,11 @@ public class CtrlDataController : ConcurrentBehaviour
     ///=============================
     ///タイムアウト時間定義
     private float setTimeOut = 60f;
+
+    ///=============================
+    ///WateFrame
+    private float WAIT_FRAME_NORMAL = 2f;
+    private float WAIT_FRAME_LONG = 10f;
 
     /// <summary>
     /// 初期化
@@ -68,28 +76,21 @@ public class CtrlDataController : ConcurrentBehaviour
         //ニュースリストは常に最新を取る
         LiplisStatus.Instance.NewsList.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
 
-        //ビジブルセット
-        SetHidden();
+        //地域データは常に最新を取る
+        LiplisStatus.Instance.InfoLocation.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
+
+        //最終解放日時
+        LiplisStatus.Instance.LastRunReleaseProcessing = DateTime.Now;
+
+        //保持件数が少ない場合は更新時刻を初期化する
+        LiplisStatus.Instance.NewTopic.InitLastUpdateTime();
+
+        //ペンディングフォルス設定
+        LiplisStatus.Instance.EnvironmentInfo.SetPendingOff();
 
         //定周期ループスタート
         StartCoroutine(DacaCollectTimerTick());
     }
-
-    /// <summary>
-    /// ボタンを設定する
-    /// </summary>
-    private void SetHidden()
-    {
-        //エディタ以外の場合は非表示とする
-        if (Application.platform != RuntimePlatform.WindowsEditor)
-        {
-            //件数表示の非表示
-            VisibleUtil.SetVisible(TxtQNum, false);
-            VisibleUtil.SetVisible(TxtTopicNum, false);
-            VisibleUtil.SetVisible(TxtChatedNum, false);
-        }
-    }
-
 
     /// <summary>
     /// 更新処理
@@ -112,6 +113,11 @@ public class CtrlDataController : ConcurrentBehaviour
             TxtQNum.text = NewTopic.TalkTopicList.Count.ToString();
             TxtTopicNum.text = NewTopic.LastData.topicList.Count.ToString();
             TxtChatedNum.text = NewTopic.ChattedKeyList.Count.ToString();
+            TxtNewsListNum.text = LiplisStatus.Instance.NewsList.LastNewsList.NewsList.Count.ToString();
+            TxtTopicNumR.text = NewTopic.TalkTopicList.Count.ToString();
+
+            //カウント
+            TopicQSlider.value = NewTopic.TalkTopicList.Count;
         }
         catch
         {
@@ -143,7 +149,6 @@ public class CtrlDataController : ConcurrentBehaviour
             //トピック収集処理
             StartCoroutine(DataCollectTopic());
 
-
             //非同期待機
             yield return new WaitForSeconds(setTimeOut);
         }
@@ -156,23 +161,19 @@ public class CtrlDataController : ConcurrentBehaviour
     private IEnumerator DataCollect()
     {
         //地域データ取得
-        StartCoroutine(DataCollectLocation());
+        yield return StartCoroutine(DataCollectLocation());
 
         //本日情報データ取得
-        StartCoroutine(DataCollectAnniversaryDays());
+        yield return StartCoroutine(DataCollectAnniversaryDays());
 
         //天気情報収集
-        StartCoroutine(DataCollectWether());
-
-        //ニュースリスト取得
-        StartCoroutine(SetLastNewsList());
-
+        yield return StartCoroutine(DataCollectWether());
 
         //背景を変更しておく
         yield return this.ctrlBackground.ChangeBackground();
 
-        //取得ニュースデータ保存
-        Save();
+        //ニュースリスト取得
+        StartCoroutine(SetLastNewsList());
     }
 
     /// <summary>
@@ -183,21 +184,22 @@ public class CtrlDataController : ConcurrentBehaviour
     {
         //ニュースデータ収集
         yield return StartCoroutine(DataCollectNewTopic());
-
-        //取得ニュースデータ保存
-        Save();
     }
+
+
 
     /// <summary>
     /// データセーブ
     /// </summary>
-    public void Save()
+    public IEnumerator Save()
     {
         //指定キー「LiplisStatus」でリプリスステータスのインスタンスを保存する
         SaveData.SetClass(LpsDefine.SETKEY_LIPLIS_STATUS, LiplisStatus.Instance);
 
         //セーブ発動
         SaveData.Save();
+
+        yield return null;
     }
 
     /// <summary>
@@ -207,6 +209,12 @@ public class CtrlDataController : ConcurrentBehaviour
     {
         //指定キー「LiplisStatus」でリプリスステータスのインスタンスをロードする
         LiplisStatus.SetInstance(SaveData.GetClass<LiplisStatus>(LpsDefine.SETKEY_LIPLIS_STATUS, LiplisStatus.Instance));
+
+        //指定キー「LiplisStatus」でリプリスステータスのインスタンスをロードする
+        LiplisSetting.SetInstance(SaveDataSetting.GetClass<LiplisSetting>(LpsDefine.SETKEY_LIPLIS_SETTING, LiplisSetting.Instance));
+
+        //キャッシュインスタンス化
+        LiplisCache c = LiplisCache.Instance;
     }
 
 
@@ -224,7 +232,6 @@ public class CtrlDataController : ConcurrentBehaviour
     {
         //トークインスタンス取得
         DatLocation Location = LiplisStatus.Instance.InfoLocation;
-
 
         //指定時間経過していなければ抜ける
         if (LpsDatetimeUtil.dec(Location.LastUpdateTime).AddMinutes(10) > DateTime.Now)
@@ -398,19 +405,20 @@ public class CtrlDataController : ConcurrentBehaviour
             goto End;
         }
 
+        //最終更新時刻設定
+        yield return LiplisStatus.Instance.NewTopic.LastUpdateTime = LpsDatetimeUtil.Now;
+
         //最新データをダウンロードする
-        //StartCoroutine(SetLastTopicData());
-        StartCoroutine(SetLastTopicMltData());
+        yield return StartCoroutine(SetLastTopicMltData());
 
         //古いデータを削除する
         StartCoroutine(DeleteOldData());
 
-        //最終更新時刻設定
-        yield return LiplisStatus.Instance.NewTopic.LastUpdateTime = LpsDatetimeUtil.Now;
-
         //終了ラベル
         End:;
     }
+
+    private bool FlgRunSetLastTopicMltData = false;
 
     /// <summary>
     /// 最新データをダウンロードする
@@ -418,24 +426,56 @@ public class CtrlDataController : ConcurrentBehaviour
     /// <returns></returns>
     private IEnumerator SetLastTopicMltData()
     {
-        //最新ニュースデータ取得
-        var Async = ClalisForLiplisGetNewTopic2Mlt.GetNewTopic(LiplisStatus.Instance.NewTopic.ToneUrlList);
+        if(FlgRunSetLastTopicMltData)
+        {
+            goto End;
+        }
 
-        //非同期実行
-        yield return Async;
+        //実行中
+        FlgRunSetLastTopicMltData = true;
 
         //トークインスタンス取得
         DatNewTopic NewTopic = LiplisStatus.Instance.NewTopic;
 
+        //最新ニュースデータ取得
+        IEnumerator Async;
+
+        //件数が少ない場合はライト版で取得する
+        if (NewTopic == null)
+        {
+            NewTopic = new DatNewTopic();
+            NewTopic.LastData = new ResLpsTopicList();
+            Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
+        }
+        else if (NewTopic.LastData == null)
+        {
+            NewTopic.LastData = new ResLpsTopicList();
+            Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
+        }
+        else if (NewTopic.TalkTopicList.Count <= 25)
+        {
+            Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
+        }
+        else
+        {
+            Async = ClalisForLiplisGetNewTopicMl.GetNewTopic();
+        }
+
+        //非同期実行
+        yield return Async;
+
         //データ取得
-        NewTopic.LastData = (ResLpsTopicList)Async.Current;
+        ResLpsTopicList DownloadLastData = (ResLpsTopicList)Async.Current;
+
+        //NULLチェック
+        if (DownloadLastData == null) { goto End; }
+        if (DownloadLastData.topicList == null) { goto End; }
+
+        //データ取得
+        NewTopic.LastData = DownloadLastData;
 
         //キーリスト取得
         List<string> keyList = NewTopic.GetKeyList();
-
-        //NULLチェック
-        if (NewTopic.LastData == null) { goto End; }
-        if (NewTopic.LastData.topicList == null) { goto End; }
 
         //スライス
         yield return new WaitForSeconds(1f);
@@ -446,78 +486,39 @@ public class CtrlDataController : ConcurrentBehaviour
             //話題を積む条件は精査必要
             if (!keyList.Contains(topic.DataKey))
             {
-                NewTopic.TalkTopicList.Add(topic);
+                if (LiplisSetting.Instance.Setting.CatCheck(topic.TopicClassification))
+                {
+                    //対象カテゴリならトピックリストに追加する
+                    NewTopic.TalkTopicList.InsertToNotDuplicate(topic.Clone(), 0);
+                }
+                else
+                {
+                    //おしゃべり済みに追加
+                    NewTopic.ChattedKeyList.AddToNotDuplicate(topic.Clone());
+                }
             }
 
-
-            //yield return new WaitForSeconds(1f);
+            //1フレームスキップ
+            yield return null;
         }
 
-        //シャッフル
-        NewTopic.TalkTopicList.Shuffle();
-
-        //終了ラベル
-        End:;
-    }
-
-
-    /// <summary>
-    /// 最新データをダウンロードする
-    /// 
-    /// 廃止予定
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator SetLastTopicData()
-    {
-        //最新ニュースデータ取得
-        var Async = ClalisForLiplisGetNewTopic2.GetNewTopic(LpsDefine.LIPLIS_TONE_URL_HAZUKI);
-
-        //非同期実行
-        yield return Async;
-
-        //トークインスタンス取得
-        DatNewTopic NewTopic = LiplisStatus.Instance.NewTopic;
-
-        //データ取得
-        NewTopic.LastData = (ResLpsTopicList)Async.Current;
-
-        //アロケーションIDチェック
-        FixAllocationId();
-
-        //キーリスト取得
-        List<string> keyList = NewTopic.GetKeyList();
-
-        //NULLチェック
-        if (NewTopic.LastData == null) { goto End; }
-        if (NewTopic.LastData.topicList == null) { goto End; }
-
-        //スライス
-        yield return new WaitForSeconds(1f);
-
-        //キーが無ければ入れる。
-        foreach (MsgTopic topic in NewTopic.LastData.topicList)
+        //取得した結果、120件以下ならおかわり
+        if (NewTopic.TalkTopicList.Count <= 120)
         {
-            //口調変換
-            //foreach (MsgSentence sentence in topic.TalkSentenceList)
-            //{
-            //    sentence.ToneConvert();
-            //}
+            //終了にする
+            FlgRunSetLastTopicMltData = false;
 
-            //アロケーションIDを設定する
-            TopicUtil.SetAllocationId(topic);
-
-            //話題を積む条件は精査必要
-            if (!keyList.Contains(topic.DataKey))
-            {
-                NewTopic.TalkTopicList.Add(topic);
-            }
-
-
-            yield return new WaitForSeconds(1f);
+            StartCoroutine(SetLastTopicMltData());
         }
+
+        //重複排除
+        NewTopic.RemoveDuplicateTopicList();
 
         //終了ラベル
         End:;
+
+        //終了にする
+        FlgRunSetLastTopicMltData = false;
     }
 
     /// <summary>
@@ -526,34 +527,17 @@ public class CtrlDataController : ConcurrentBehaviour
     /// <returns></returns>
     private IEnumerator DeleteOldData()
     {
-        //トークインスタンス取得
-        DatNewTopic NewTopic = LiplisStatus.Instance.NewTopic;
-
         //指定条件に合致するデータを削除する
-        NewTopic.TalkTopicList.RemoveAll(TermOldTopicDelete);
-        NewTopic.ChattedKeyList.RemoveAll(TermOldTopicDelete);
+        LiplisStatus.Instance.NewTopic.DeleteOldData();
+
+        //削除まで終わったらセーブする
+        StartCoroutine(Save());
 
         //繰越
         yield return new WaitForSeconds(1f);
     }
 
-    /// <summary>
-    /// 古データ 削除条件
-    /// </summary>
-    /// <param name="topic"></param>
-    /// <returns></returns>
-    private bool TermOldTopicDelete(MsgTopic topic)
-    {
-        return LpsDatetimeUtil.dec(topic.CreateTime) <= DateTime.Now.AddHours(-6);
-    }
 
-    /// <summary>
-    /// アロケーションIDの修正
-    /// </summary>
-    private void FixAllocationId()
-    {
-
-    }
 
     /// <summary>
     /// 最新のニュースリストを取得する
@@ -572,17 +556,17 @@ public class CtrlDataController : ConcurrentBehaviour
         }
 
         //最新データをダウンロードする
-        yield return StartCoroutine(SetLastNews(newsList));
+        yield return StartCoroutine(SetLastNews());
 
         //終了ラベル
-        End:;
+        End:;    
     }
 
     /// <summary>
     /// 最新データをダウンロードする
     /// </summary>
     /// <returns></returns>
-    private IEnumerator SetLastNews(DatNewsList newsList)
+    private IEnumerator SetLastNews()
     {
         //最新ニュースデータ取得
         var Async = ClalisForLiplisGetNewsList.GetNewsList();
@@ -594,10 +578,13 @@ public class CtrlDataController : ConcurrentBehaviour
         ResLpsBaseNewsList DataList = (ResLpsBaseNewsList)Async.Current;
 
         //データセット
-        newsList.SetData(DataList);
+        LiplisStatus.Instance.NewsList.SetData(DataList);
+
+        //取得ニュースデータ保存
+        StartCoroutine(Save());
 
         //最終更新時刻設定
-        yield return newsList.LastUpdateTime = LpsDatetimeUtil.Now;
+        yield return LiplisStatus.Instance.NewsList.LastUpdateTime = LpsDatetimeUtil.Now;
     }
 
     #endregion

@@ -6,6 +6,7 @@
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.LiplisSystem.UI
@@ -23,14 +24,8 @@ namespace Assets.Scripts.LiplisSystem.UI
         /// コンストラクター
         /// </summary>
         /// <param name="Window"></param>
-        public LiplisImageWindow(GameObject Window, string url)
+        public LiplisImageWindow(GameObject Window)
         {
-            //ウインドウ取得
-            //this.Window = Window;
-
-            //サイズ変更
-            //windowRect = this.Window.GetComponent<RectTransform>();
-
             //ウインドウインスタンス取得
             imgWindow = Window.GetComponent<ImageWindow>();
 
@@ -38,12 +33,11 @@ namespace Assets.Scripts.LiplisSystem.UI
             imgWindow.SetParentWindow(Window);
 
             //URL設定
-            imgWindow.SetImage(url);
+            //imgWindow.SetImage(url);
 
             //作成時刻設定
             this.CreateTime = DateTime.Now;
         }
-
 
 
         /// <summary>
@@ -83,13 +77,35 @@ namespace Assets.Scripts.LiplisSystem.UI
         /// テキストを追加する
         /// </summary>
         /// <param name="message"></param>
-        public void SetImage(string url)
+        public void SetImage(List<string> urlList)
         {
-            imgWindow.SetImage(url);
+            imgWindow.SetImage(urlList);
         }
 
+        /// <summary>
+        /// 最小化する
+        /// </summary>
+        public void FixPicture()
+        {
+            imgWindow.FixPicture();
+        }
 
+        /// <summary>
+        /// 移動目標を再設定する。
+        /// </summary>
+        /// <param name="TargetPosition"></param>
+        public void SetMoveTarget(Vector3 TargetPosition)
+        {
+            this.imgWindow.SetMoveTarget(TargetPosition);
+        }
 
+        /// <summary>
+        /// 表示位置を初期化する
+        /// </summary>
+        public void InitLocation()
+        {
+            this.imgWindow.InitLocation();
+        }
 
     }
 }

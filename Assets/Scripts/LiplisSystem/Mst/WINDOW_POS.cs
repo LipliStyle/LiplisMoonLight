@@ -18,10 +18,10 @@ namespace Assets.Scripts.LiplisSystem.Mst
 
         ///=============================
         ///各配置のX座標
-        public const float LOCATION_X_MODERATOR = 300f;
-        public const float LOCATION_X_RIGHT = -30f;
-        public const float LOCATION_X_CENTER = -180f;
-        public const float LOCATION_X_LEFT = -330f;
+        public const float LOCATION_X_MODERATOR = 250f;
+        public const float LOCATION_X_RIGHT = -80f;
+        public const float LOCATION_X_CENTER = -230f;
+        public const float LOCATION_X_LEFT = -380f;
 
         /// <summary>
         /// 位置取得
@@ -29,7 +29,7 @@ namespace Assets.Scripts.LiplisSystem.Mst
         /// <param name="position"></param>
         /// <param name="charLocationY"></param>
         /// <returns></returns>
-        public static Vector3 GetPos(MST_CARACTER_POSITION position)
+        public static Vector3 GetPosDefault(MST_CARACTER_POSITION position)
         {
             //指定された位置から、配置すべき位置を示すベクターを返す
             if (position == MST_CARACTER_POSITION.Right)
@@ -52,6 +52,11 @@ namespace Assets.Scripts.LiplisSystem.Mst
                 //司会配置
                 return new Vector3(LOCATION_X_MODERATOR, LOCATION_Y, LOCATION_Z);
             }
+        }
+
+        public static Vector3 GetPos(Vector3 pos)
+        {
+            return new Vector3(pos.x - 80, pos.y + 100,0);
         }
     }
 }

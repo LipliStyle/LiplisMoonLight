@@ -14,6 +14,7 @@ using System.Collections.Generic;
 
 namespace Assets.Scripts.Data.SubData
 {
+    [Serializable]
     public class DatNewsList
     {
         ///=============================
@@ -44,7 +45,15 @@ namespace Assets.Scripts.Data.SubData
             }
 
             //最新ニュースリストセット
-            this.LastNewsList = DataList;
+            if(LastNewsList == null)
+            {
+                this.LastNewsList = DataList;
+            }
+            else
+            {
+                this.LastNewsList.UpdateList(DataList);
+            }
+            
         }
         #endregion
 

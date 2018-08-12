@@ -9,6 +9,7 @@
 using Assets.Scripts.DataChar.CharacterTalk;
 using Assets.Scripts.LiplisSystem.Com;
 using System;
+using UnityEngine;
 
 namespace Assets.Scripts.LiplisSystem.Msg
 {
@@ -30,6 +31,10 @@ namespace Assets.Scripts.LiplisSystem.Msg
         public int Point;               //ポイント
         public int Mode;
         public bool FlgAddMessge;          //追加メッセージ
+
+        ///=============================
+        /// 音声データ
+        public AudioClip VoiceData; 
 
         ///=============================
         /// 口調変換するかどうか
@@ -124,7 +129,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
             msg.CreateTime   = this.CreateTime;
             msg.DataKey      = this.DataKey;
             msg.SubId        = this.SubId;
-            msg.AllocationId = this.AllocationId = -1;
+            msg.AllocationId = this.AllocationId;
             msg.BaseSentence = this.BaseSentence;    //ベース文章
             msg.TalkSentence = this.TalkSentence;     //おしゃべり文章
             msg.Emotion      = this.Emotion;             //エモーション

@@ -24,7 +24,7 @@ namespace Assets.Scripts.DataChar.Rabiits
 
         //葉月 Y座標
         //public const float CARACTER_LOCATION_Y = -2.0f;
-        public const float CARACTER_LOCATION_Y = -140f;
+        public const float CARACTER_LOCATION_Y = -93;
 
 
         //葉月デフォルト位置
@@ -36,7 +36,7 @@ namespace Assets.Scripts.DataChar.Rabiits
         /// <returns></returns>
         public CharacterData CreateCharData()
         {
-            return base.CreateCharData(LIVE2D_CANVAS.L2DC_Hazuki_F, LIVE2D_CANVAS.L2DC_Hazuki_R, LIVE2D_CANVAS.L2DC_Hazuki_L, ALLOCATION_ID ,DEFAULT_POSITION, PREFAB_NAMES.WINDOW_TALK_1, CARACTER_LOCATION_Y);
+            return base.CreateCharData(LIVE2D_CANVAS.L2DC_Hazuki_F, LIVE2D_CANVAS.L2DC_Hazuki_R, LIVE2D_CANVAS.L2DC_Hazuki_L, ALLOCATION_ID ,DEFAULT_POSITION, PREFAB_NAMES.WINDOW_TALK_S_1, CARACTER_LOCATION_Y);
         }
 
         /// <summary>

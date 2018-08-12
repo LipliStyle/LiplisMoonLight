@@ -13,6 +13,7 @@ using Assets.Scripts.LiplisSystem.Web.Clalis.v40;
 using System.Collections.Generic;
 using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Mst;
+using UnityEngine;
 
 namespace Assets.Scripts.DataChar
 {
@@ -51,6 +52,17 @@ namespace Assets.Scripts.DataChar
         {
             return CharIdList[AllocationId];
         }
+
+        /// <summary>
+        /// キャラクターモデルを取得する
+        /// </summary>
+        /// <param name="AllocationId"></param>
+        /// <returns></returns>
+        public LAppModel GetCharacterModel(int AllocationId)
+        {
+            return LAppLive2DManager.Instance.GetModel(CharIdList[AllocationId].NowModelName);
+        }
+
 
         public CharacterData GetCharacterRandam()
         {
@@ -179,7 +191,25 @@ namespace Assets.Scripts.DataChar
             return CharDataList[modelName].WindowName;
         }
 
+        /// <summary>
+        /// ボイスを再生する
+        /// </summary>
+        /// <param name="AllocationId"></param>
+        /// <param name="acVoice"></param>
+        public void StartVoice(int AllocationId, AudioClip acVoice)
+        {
+            LAppLive2DManager.Instance.GetModel(CharIdList[AllocationId].NowModelName).StartVoice(acVoice);
+        }
 
+        /// <summary>
+        /// 現在のモデルが音声おしゃべり中か？
+        /// </summary>
+        /// <param name="AllocationId"></param>
+        /// <returns></returns>
+        public bool IsPlaying(int AllocationId)
+        {
+            return LAppLive2DManager.Instance.GetModel(CharIdList[AllocationId].NowModelName).IsPlaying();
+        }
         #endregion
 
 
@@ -285,8 +315,11 @@ namespace Assets.Scripts.DataChar
         {
             foreach (KeyValuePair<string, CharacterData> kv in CharDataList)
             {
-                LAppLive2DManager.Instance.SetExpression(kv.Value.NowModelName ,EXPRESSION.NORMAL_01);
-                LAppLive2DManager.Instance.StartRandomMotion(kv.Value.NowModelName, MOTION.IDLE);
+                foreach (var model in kv.Value.ModelList)
+                {
+                    LAppLive2DManager.Instance.SetExpression(model, EXPRESSION.NORMAL_01);
+                    LAppLive2DManager.Instance.StartRandomMotion(model, MOTION.IDLE);
+                }
             }
         }
 
@@ -316,8 +349,16 @@ namespace Assets.Scripts.DataChar
                 AllocationId = 1;
             }
 
-            LAppLive2DManager.Instance.SetExpression(CharIdList[AllocationId].NowModelName, EXPRESSION.Instance.GetExpression(sentence.Emotion, sentence.Point));
-            LAppLive2DManager.Instance.StartRandomMotion(CharIdList[AllocationId].NowModelName, MOTION.GetMotion(sentence.Emotion, sentence.Point), LAppDefine.PRIORITY_NORMAL);
+            //一旦モーションをリセットする
+            LAppLive2DManager.Instance.StartRandomMotion(CharIdList[AllocationId].NowModelName, MOTION.GetDefaultMotion(), LAppDefine.PRIORITY_FORCE);
+            LAppLive2DManager.Instance.SetExpression(CharIdList[AllocationId].NowModelName, EXPRESSION.Instance.GetDefaultExpresssion());
+
+            //表情設定
+            LAppLive2DManager.Instance.SetExpressionNext(CharIdList[AllocationId].NowModelName, EXPRESSION.Instance.GetExpression(sentence.Emotion, sentence.Point));
+
+            //モーション設定
+            LAppLive2DManager.Instance.StartRandomMotion(CharIdList[AllocationId].NowModelName, MOTION.GetMotion(sentence.Emotion, sentence.Point), LAppDefine.PRIORITY_FORCE);
+
         }
 
         /// <summary>
@@ -340,11 +381,48 @@ namespace Assets.Scripts.DataChar
         /// </summary>
         public void ShuffleCharPosition(MsgTopic topic)
         {
+
+            //位置リストを取得
+            Dictionary<MST_CARACTER_POSITION, Vector3> locationList = SearchLocationList();
+
+            //キャラクターロケーションYリスト
+            Dictionary<MST_CARACTER_POSITION, float> CharLocationYList = SearchCharLocationYList();
+
+            //前回キャラクター位置
+            List<CharacterData> PrvCharList = new List<CharacterData>(CharList);
+
+            //先頭アロケーションID取得
+            int allocationId = topic.TalkSentenceList[0].AllocationId;
+
+            //範囲内なら選択
+            if (allocationId >= 0 && allocationId <= 3)
+            {
+                //司会設定
+                CharIdList[allocationId].Position = MST_CARACTER_POSITION.Moderator;
+            }
+            else
+            {
+                //ポジションの初期化
+                initPosition();
+
+                //ここでタイトル追加は廃止　いずれこのコード自体削除
+                //モデレーターに選ばれたキャラでタイトルセンテンスを追加
+                //タイトルセンテンス追加
+                //topic.TalkSentenceList.Insert(0, new MsgSentence(CharList[0].Tone, topic.Title, 0, 0,0 ,false, 0));
+
+                foreach (KeyValuePair<string, CharacterData> kv in CharDataList)
+                {
+                    kv.Value.MoveTarget();
+                }
+
+                return;
+            }
+
             //司会キャラ
-            CharacterData moderator = SearchModerator();
+            CharacterData moderator = CharIdList[allocationId];
 
             //その他位置キャラリスト
-            List<CharacterData> OtherCharList = SearchMember();
+            List<CharacterData> OtherCharList = SearchMember(allocationId);
 
             //もし司会がNULLなら、初期配置に戻す
             if (moderator == null)
@@ -352,39 +430,58 @@ namespace Assets.Scripts.DataChar
                 //ポジションの初期化
                 initPosition();
 
+                //ここでタイトル追加は廃止　いずれこのコード自体削除
+                //モデレーターに選ばれたキャラでタイトルセンテンスを追加
                 //タイトルセンテンス追加
-                topic.TalkSentenceList.Insert(0, new MsgSentence(CharList[0].Tone, topic.Title, 0, 0,0 ,false, 0));
+                //topic.TalkSentenceList.Insert(0, new MsgSentence(CharList[0].Tone, topic.Title, 0, 0,0 ,false, 0));
+
+                foreach (KeyValuePair<string, CharacterData> kv in CharDataList)
+                {
+                    kv.Value.MoveTarget();
+                }
+
                 return;
             }
             
             //位置リスト
             List<MST_CARACTER_POSITION> PosList = CreatePosList();
-
-            //司会位置のキャラクターの次の位置を決定
-            moderator.Position = PosList.Dequeue();
-
-            //司会位置を追加
-            PosList.Add(MST_CARACTER_POSITION.Moderator);
-            PosList.Shuffle();
-
+            
             //選択されたもの以外の位置をほかのキャラクターにセットする
             foreach (CharacterData charData in OtherCharList)
             {
                 //ポジション設定
                 charData.Position = PosList.Dequeue();
 
+                //ここでタイトル追加は廃止　いずれこのコード自体削除
                 //モデレーターに選ばれたキャラでタイトルセンテンスを追加
-                if(charData.Position == MST_CARACTER_POSITION.Moderator)
-                {
-                    topic.TalkSentenceList.Insert(0, new MsgSentence(charData.Tone, topic.Title, 0, 0, 0, false, charData.AllocationId));
-                }
-
+                //if(charData.Position == MST_CARACTER_POSITION.Moderator)
+                //{
+                //    topic.TalkSentenceList.Insert(0, new MsgSentence(charData.Tone, topic.Title, 0, 0, 0, false, charData.AllocationId));
+                //}
             }
 
-            //移動する
-            foreach (KeyValuePair<string, CharacterData> kv in CharDataList)
+            //Y座標の補正 身長差の分、位置がずれてしまうため補正
+            int idx = 0;
+            foreach (CharacterData charData in CharList)
             {
-                kv.Value.MoveTarget();
+                //身長差を算出
+                float diff = charData.LocationY - CharLocationYList[charData.Position];
+
+                //移動後Y座標
+                float afterMovementY = locationList[charData.Position].y + diff;
+
+                //位置リストのY座標を更新
+                locationList[charData.Position] = new Vector3(locationList[charData.Position].x, afterMovementY, locationList[charData.Position].z);
+
+                //インデックスインクリメント
+                idx++;
+            }
+
+            //移動
+            foreach (CharacterData charData in CharList)
+            {
+                charData.NowModelLocation = locationList[charData.Position];
+                charData.MoveTarget(locationList[charData.Position]);
             }
         }
 
@@ -413,19 +510,15 @@ namespace Assets.Scripts.DataChar
         /// メンバーリスト生成する
         /// </summary>
         /// <returns></returns>
-        private List<CharacterData> SearchMember()
+        private List<CharacterData> SearchMember(int allocationID)
         {
             //その他位置キャラリスト
             List<CharacterData> OtherCharList = new List<CharacterData>();
 
-            //位置リスト
-            List<MST_CARACTER_POSITION> PosList = CreatePosList();
-
-
             //司会位置のキャラクターを探し、それ以外のキャラをリスト化する
             foreach (CharacterData charData in CharList)
             {
-                if (charData.Position == MST_CARACTER_POSITION.Moderator)
+                if (charData.AllocationId == allocationID)
                 {
   
                 }
@@ -439,7 +532,55 @@ namespace Assets.Scripts.DataChar
             return OtherCharList;
         }
 
+        /// <summary>
+        /// ロケーションリストを生成する
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<MST_CARACTER_POSITION, Vector3> SearchLocationList()
+        {
+            //その他位置キャラリスト
+            Dictionary<MST_CARACTER_POSITION,Vector3> locationList = new Dictionary<MST_CARACTER_POSITION, Vector3>();
 
+            //位置リスト
+            List<MST_CARACTER_POSITION> PosList = CreatePosList();
+
+            foreach (MST_CARACTER_POSITION pos in PosList)
+            {
+                locationList.Add(pos,new Vector3());
+            }
+
+            foreach (CharacterData charData in CharList)
+            {
+                locationList[charData.Position] = charData.NowModelLocation;
+            }
+
+            return locationList;
+        }
+
+        /// <summary>
+        /// 対象位置のキャラクターロケーションYリスト
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<MST_CARACTER_POSITION, float> SearchCharLocationYList()
+        {
+            //その他位置キャラリスト
+            Dictionary<MST_CARACTER_POSITION, float> locationList = new Dictionary<MST_CARACTER_POSITION, float>();
+
+            //位置リスト
+            List<MST_CARACTER_POSITION> PosList = CreatePosList();
+
+            foreach (MST_CARACTER_POSITION pos in PosList)
+            {
+                locationList.Add(pos,0);
+            }
+
+            foreach (CharacterData charData in CharList)
+            {
+                locationList[charData.Position] = charData.LocationY;
+            }
+
+            return locationList;
+        }
 
 
         /// <summary>

@@ -28,6 +28,15 @@ namespace Assets.Scripts.LiplisSystem.Com
             list.Add(t);
         }
 
+        public static void InsertToNotDuplicate<T>(this List<T> list, T t, int idx)
+        {
+            if (list.Contains(t))
+            {
+                return;
+            }
+            list.Insert(idx, t);
+        }
+
         /// <summary>
         /// 重複を無くす
         /// </summary>

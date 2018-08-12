@@ -69,5 +69,14 @@ namespace Assets.Scripts.Define
             else if (emotion == EMOTION.PROUD && point < 0) { return PROUD_M; }
             else { return IDLE; }
         }
+
+        /// <summary>
+        /// デフォルトモーションを返す
+        /// </summary>
+        /// <returns></returns>
+        public static string GetDefaultMotion()
+        {
+            return NORMAL;
+        }
     }
 }

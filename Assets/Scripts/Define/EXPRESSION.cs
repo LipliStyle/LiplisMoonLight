@@ -210,5 +210,13 @@ namespace Assets.Scripts.Define
             else                                                    { return LstNORMAL.GetAtRandom(); }
         }
 
+        /// <summary>
+        /// ノーマルエクスプレッションを返す
+        /// </summary>
+        /// <returns></returns>
+        public string GetDefaultExpresssion()
+        {
+            return LstNORMAL.GetAtRandom();
+        }
     }
 }

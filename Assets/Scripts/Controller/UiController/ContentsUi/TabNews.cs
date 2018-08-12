@@ -9,6 +9,7 @@
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //=======================================================================﻿
 using Assets.Scripts.Data;
+using Assets.Scripts.Define;
 using System.Collections;
 
 public class TabNews : TabBaseTopicList
@@ -31,6 +32,8 @@ public class TabNews : TabBaseTopicList
     protected override void Start()
     {
         this.Clear();
+        this.Categoly = ContentCategoly.news;
+        base.Start();
     }
 
     #endregion
@@ -45,6 +48,7 @@ public class TabNews : TabBaseTopicList
     void Update()
     {
         if (frameCount % 600 == 0) { UpdateUI_600F(); }
+        if (frameCount % 30000 == 0) { UpdateUI_30000F(); }
 
         UpdateFps();
     }
@@ -55,6 +59,14 @@ public class TabNews : TabBaseTopicList
     public override void UpdateUI_600F()
     {
         StartCoroutine(UpdateNewsList());
+    }
+
+    /// <summary>
+    /// サムネイル更新実行
+    /// </summary>
+    public void UpdateUI_30000F()
+    {
+
     }
 
     /// <summary>
@@ -77,6 +89,20 @@ public class TabNews : TabBaseTopicList
 
         //最終チェック時刻更新
         LastCheckTime = LiplisStatus.Instance.NewsList.LastUpdateTime;
+    }
+
+    /// <summary>
+    /// ニュースリスト即更新
+    /// </summary>
+    public void UpdateNewsListInstant()
+    {
+        //データが更新されていたら、更新する
+        if (LastCheckTime == LiplisStatus.Instance.NewsList.LastUpdateTime)
+        {
+            return;
+        }
+
+        StartCoroutine(UpdateContent(this.Content, LiplisStatus.Instance.NewsList.LastNewsList.NewsList));
     }
 
 

@@ -8,79 +8,84 @@
 	"motions":{
 		"MOTION_IDLE":[
 			{"file":"motions/MOTION_IDLE_01.mtn"},
-			{"file":"motions/MOTION_IDLE_02.mtn"},
-			{"file":"motions/MOTION_IDLE_03.mtn"},
-			{"file":"motions/MOTION_IDLE_04.mtn"},
-			{"file":"motions/MOTION_IDLE_05.mtn"}
+			{"file":"motions/MOTION_IDLE_02.mtn"}
 		],
 		"MOTION_NORMAL":[
 			{"file":"motions/MOTION_NORMAL_01.mtn"},
 			{"file":"motions/MOTION_NORMAL_02.mtn"},
 			{"file":"motions/MOTION_NORMAL_03.mtn"},
-			{"file":"motions/MOTION_NORMAL_04.mtn"}
+			{"file":"motions/MOTION_NORMAL_04.mtn"},
+			{"file":"motions/MOTION_NORMAL_05.mtn"}
 		],
 		"MOTION_JOY_P":[
 			{"file":"motions/MOTION_JOY_P_01.mtn"},
 			{"file":"motions/MOTION_JOY_P_02.mtn"},
-			{"file":"motions/MOTION_ADMIRATION_P_01.mtn"},
-			{"file":"motions/MOTION_ADMIRATION_P_02.mtn"}
+			{"file":"motions/MOTION_JOY_P_03.mtn"}
 		],
 		"MOTION_JOY_M":[
-			{"file":"motions/MOTION_JOY_M_01.mtn"},
-			{"file":"motions/MOTION_JOY_M_02.mtn"},
-			{"file":"motions/MOTION_JOY_M_03.mtn"}
+			{"file":"motions/MOTION_JOY_M_01.mtn"}
 		],
 		"MOTION_ADMIRATION_P":[
 			{"file":"motions/MOTION_JOY_P_01.mtn"},
 			{"file":"motions/MOTION_JOY_P_02.mtn"},
-			{"file":"motions/MOTION_ADMIRATION_P_01.mtn"},
-			{"file":"motions/MOTION_ADMIRATION_P_02.mtn"}
+			{"file":"motions/MOTION_JOY_P_03.mtn"}
 		],
 		"MOTION_ADMIRATION_M":[
-			{"file":"motions/MOTION_ADMIRATION_M_01.mtn"},
-			{"file":"motions/MOTION_ADMIRATION_M_02.mtn"}
+			{"file":"motions/MOTION_ADMIRATION_M_01.mtn"}
 		],
 		"MOTION_PEACE_P":[
+			{"file":"motions/MOTION_PEACE_P_01.mtn"}
 		],
 		"MOTION_PEACE_M":[
-			{"file":"motions/MOTION_PEACE_M_01.mtn"},
-			{"file":"motions/MOTION_PEACE_M_02.mtn"}
+			{"file":"motions/MOTION_PEACE_M_01.mtn"}
 		],
 		"MOTION_ECSTASY_P":[
+			{"file":"motions/MOTION_JOY_P_01.mtn"},
+			{"file":"motions/MOTION_JOY_P_02.mtn"},
+			{"file":"motions/MOTION_JOY_P_03.mtn"}
 		],
 		"MOTION_ECSTASY_M":[
+			{"file":"motions/MOTION_JOY_M_01.mtn"}
 		],
 		"MOTION_AMAZEMENT_P":[
 			{"file":"motions/MOTION_AMAZEMENT_P_01.mtn"}
 		],
 		"MOTION_AMAZEMENT_M":[
+			{"file":"motions/MOTION_AMAZEMENT_P_01.mtn"}
 		],
 		"MOTION_RAGE_P":[
 			{"file":"motions/MOTION_RAGE_P_01.mtn"},
-			{"file":"motions/MOTION_RAGE_P_02.mtn"},
-			{"file":"motions/MOTION_RAGE_P_03.mtn"}
+			{"file":"motions/MOTION_RAGE_P_02.mtn"}
 		],
 		"MOTION_RAGE_M":[
-			{"file":"motions/MOTION_RAGE_M_01.mtn"}
+			{"file":"motions/MOTION_RAGE_P_01.mtn"},
+			{"file":"motions/MOTION_RAGE_P_02.mtn"}
 		],
 		"MOTION_INTEREST_P":[
+			{"file":"motions/MOTION_JOY_P_01.mtn"},
+			{"file":"motions/MOTION_JOY_P_02.mtn"},
+			{"file":"motions/MOTION_JOY_P_03.mtn"}
 		],
 		"MOTION_INTEREST_M":[
-			{"file":"motions/MOTION_INTEREST_M_01.mtn"},
-			{"file":"motions/MOTION_INTEREST_M_02.mtn"}
+			{"file":"motions/MOTION_INTEREST_M_01.mtn"}
 		],
 		"MOTION_RESPECT_P":[
+			{"file":"motions/MOTION_JOY_P_01.mtn"}
 		],
 		"MOTION_RESPECT_M":[
-			{"file":"motions/MOTION_RESPECT_M_01.mtn"}
+			{"file":"motions/MOTION_INTEREST_M_01.mtn"}
 		],
 		"MOTION_CLAMLY_P":[
+			{"file":"motions/MOTION_PEACE_P_01.mtn"}
 		],
 		"MOTION_CLAMLY_M":[
+			{"file":"motions/MOTION_AMAZEMENT_P_01.mtn"}
 		],
 		"MOTION_PROUD_P":[
+			{"file":"motions/MOTION_PROUD_P_01.mtn"}
 		],
 		"MOTION_PROUD_M":[
+			{"file":"motions/MOTION_PROUD_M_01.mtn"}
 		]
 	},
 	"expressions":[

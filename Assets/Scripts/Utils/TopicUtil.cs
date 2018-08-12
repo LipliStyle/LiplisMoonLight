@@ -8,6 +8,7 @@
 using Assets.Scripts.LiplisSystem.Cif.v60.Req;
 using Assets.Scripts.LiplisSystem.Msg;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts.Utils
 {
@@ -38,6 +39,34 @@ namespace Assets.Scripts.Utils
             }
         }
 
+        /// <summary>
+        /// リクエストを生成する
+        /// </summary>
+        /// <returns></returns>
+        public static ReqTopic CreateReqTopic()
+        {
+            ReqTopic result = new ReqTopic();
+
+            result.VersionInfo = ((int)Application.platform).ToString();
+
+            return result;
+        }
+        public static ReqTopicVoice CreateReqTopicVoice()
+        {
+            ReqTopicVoice result = new ReqTopicVoice();
+
+            result.VersionInfo = ((int)Application.platform).ToString();
+
+            return result;
+        }
+        public static ReqTopicVoiceOndemand CreateReqTopicVoiceOndemand()
+        {
+            ReqTopicVoiceOndemand result = new ReqTopicVoiceOndemand();
+
+            result.VersionInfo = ((int)Application.platform).ToString();
+
+            return result;
+        }
 
         /// <summary>
         /// レックトピックを生成する
@@ -46,11 +75,59 @@ namespace Assets.Scripts.Utils
         /// <returns></returns>
         public static ReqTopic CreateReqTopic(List<string> toneUrlList)
         {
-            ReqTopic result = new ReqTopic();
+            ReqTopic result = CreateReqTopic();
 
             result.ToneUrlList = toneUrlList;
 
             return result;
         }
+        public static ReqTopic CreateReqTopic(List<string> toneUrlList, string DataKey,string NewsSource)
+        {
+            ReqTopic result = CreateReqTopic();
+
+            result.DataKey = DataKey;
+            result.NewsSource = NewsSource;
+            result.ToneUrlList = toneUrlList;
+
+            return result;
+        }
+
+        /// <summary>
+        /// 音声データ要求メッセージを生成する
+        /// </summary>
+        /// <param name="DataKey"></param>
+        /// <param name="SubId"></param>
+        /// <param name="NewsSource"></param>
+        /// <returns></returns>
+        public static ReqTopicVoice CreateReqTopicVoice(string DataKey,int SubId, string NewsSource)
+        {
+            ReqTopicVoice result = CreateReqTopicVoice();
+
+            result.DataKey = DataKey;
+            result.SubId = SubId.ToString();
+            result.NewsSource = NewsSource;
+
+            return result;
+        }
+
+        /// <summary>
+        /// 音声データ要求メッセージを生成する
+        /// </summary>
+        /// <param name="DataKey"></param>
+        /// <param name="SubId"></param>
+        /// <param name="NewsSource"></param>
+        /// <returns></returns>
+        public static ReqTopicVoiceOndemand CreateReqTopicVoiceOndemand(string Sentence, int AllocationId)
+        {
+            ReqTopicVoiceOndemand result = CreateReqTopicVoiceOndemand();
+
+            result.Sentence = Sentence;
+            result.AllocationId = AllocationId;
+            result.Bitrate = 64;
+
+            return result;
+        }
+
+
     }
 }

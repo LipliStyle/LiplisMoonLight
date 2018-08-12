@@ -5,12 +5,14 @@
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
-using Assets.Scripts.LiplisSystem.Com;
-using Assets.Scripts.LiplisSystem.UI;
-using Assets.Scripts.Utils;
+using Assets.Scripts.Data;
+using Assets.Scripts.Define;
+using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.LiplisSystem.Web;
 using SpicyPixel.Threading;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,31 +20,24 @@ public class ImageWindow : ConcurrentBehaviour
 {
     ///=============================
     ///画面制御
-    Texture2D tex;      //最大表示テクスチャ
-    Texture2D texMin;   //サムネイルテクスチャ
-    Sprite sprite;      //最大表示スプライト
-    Sprite spriteMin;   //サムネイルスプライト
-    float MaxWidth = 0;    //幅
-    float MaxHeight = 0;   //高さ
-    float MaxLocationX = 0;   //マックス時X座標
-    public float TexWidth = 0;    //幅
-    public float TexHeight = 0;   //高さ
+    private int SelectedThumbnailIndex;             //選択インデックス
+    private List<MsgThumbnailData> thumbnailList;   //サムネリスト
 
     ///=============================
-    ///子イメージ名
-    private const string TOPIC_IMAGE = "TopicImage";
+    ///子コンポーネント名
+    private const string CHILD_COMPONENT_IMAGE_TOPIC = "TopicImage";
+    private const string CHILD_COMPONENT_TEXT_TITLE = "TextTitle";
 
     ///=============================
     ///計算用定数
-    private const float ASPECT_RATIO_BOUNDARY = 0.5625f; // アスペクト比境界値 9/16の値 
-    private const float 
-        _FRAME = 30f;
+    private const float _FRAME = 30f;
 
     ///=============================
     ///子要素インスタンス
     RectTransform rect;
-    Image image;
-    Image baseImage;
+    RawImage image;
+    RawImage baseImage;
+    Text textTitle;
 
     ///=============================
     ///親ウインドウ
@@ -52,6 +47,10 @@ public class ImageWindow : ConcurrentBehaviour
     ///=============================
     ///移動先位置
     public Vector3 TargetPosition { get; set; }
+
+    ///=============================
+    ///親ウインドウ座標
+    public Vector3 ParentLocalPosition { get; set; }
 
     ///=============================
     ///移動先
@@ -115,11 +114,13 @@ public class ImageWindow : ConcurrentBehaviour
     void init()
     {
         //レクト取得
-        this.rect = GameObject.Find(TOPIC_IMAGE).GetComponent<RectTransform>();
+        this.rect = GameObject.Find(CHILD_COMPONENT_IMAGE_TOPIC).GetComponent<RectTransform>();
 
         //イメージインスタンス取得
-        this.image = GameObject.Find(TOPIC_IMAGE).GetComponent<Image>();
-       // this.baseImage = GetComponent<Image>();
+        this.image = GameObject.Find(CHILD_COMPONENT_IMAGE_TOPIC).GetComponent<RawImage>();
+
+        //タイトルテキスト取得
+        this.textTitle = GameObject.Find(CHILD_COMPONENT_TEXT_TITLE).GetComponent<Text>();
 
         this.moveTargetWidth = IMAGE_SIZE_DEFAULT_WIDTH;
         this.moveTargetHeight = IMAGE_SIZE_DEFAULT_HEIGTH;
@@ -285,7 +286,7 @@ public class ImageWindow : ConcurrentBehaviour
         this.movingLocationY += this.moveTargetIncrimentalValLocationY;
 
         //ターゲットによる場合分け
-        if (this.moveTargetWidth != TexWidth)
+        if (this.moveTargetWidth != GetTextureWidth())
         {
             //移動完了チェック
             if(this.movingWidth <= this.moveTargetWidth)
@@ -321,11 +322,14 @@ public class ImageWindow : ConcurrentBehaviour
             }
         }
 
+        //サイズ設定
         this.rect.sizeDelta = new Vector2(this.movingWidth, this.movingHeight);
+
+        //画像位置設定
         this.rect.localPosition = new Vector3(this.movingLocationX, this.movingLocationY, 0);
 
         //スプライト設定
-        this.image.GetComponent<Image>().sprite = sprite;
+        this.image.texture = GetTextureSprite();
     }
 
 
@@ -335,10 +339,11 @@ public class ImageWindow : ConcurrentBehaviour
     /// </summary>
     public void OnPointerClick()
     {
-        //Vector3 mousePosition = Input.mousePosition;
-        //Vector3 loc =ParentWindowRect.localPosition;
-
-        SetMoveTarget();
+        if (this.moveTargetWidth != GetTextureWidth())
+        {
+            flgMoving = true;
+            SetMoveTargetMin();
+        }
     }
 
 
@@ -349,7 +354,7 @@ public class ImageWindow : ConcurrentBehaviour
     {
         flgMoving = true;
 
-        if (this.moveTargetWidth != TexWidth)
+        if (this.moveTargetWidth != GetTextureWidth())
         {
             SetMoveTargetMin();
         }
@@ -360,37 +365,68 @@ public class ImageWindow : ConcurrentBehaviour
     }
 
     /// <summary>
+    /// ウインドウを移動する
+    /// </summary>
+    /// <param name="TargetPosition"></param>
+    public void SetMoveTarget(Vector3 TargetPosition)
+    {
+        this.ParentWindow.transform.localPosition = TargetPosition;
+        SetFirstPicture();
+    }
+
+    /// <summary>
+    /// 表示位置の初期化
+    /// </summary>
+    public void InitLocation()
+    {
+        float windowLocationX = ParentWindowRect.sizeDelta.x / 2;
+        float windowLocationY = -ParentWindowRect.sizeDelta.y / 2 + 450;
+
+        if (540 - ParentWindowRect.sizeDelta.y / 2 < windowLocationY)
+        {
+            windowLocationY = (540 - ParentWindowRect.sizeDelta.y / 2);
+        }
+
+        ParentWindowRect.anchoredPosition = new Vector2(windowLocationX, windowLocationY);
+    }
+
+    /// <summary>
     /// 最小表示
     /// </summary>
-    void SetMoveTargetMin()
+    public void SetMoveTargetMin()
     {
-        this.moveTargetWidth = TexWidth;
-        this.moveTargetHeight = TexHeight;
+        this.moveTargetWidth = GetTextureWidth();
+        this.moveTargetHeight = GetTextureHeight() - 10;
         this.moveTargetLocationX = 0;
-        this.moveTargetLocationY = 0;
+        this.moveTargetLocationY = -18;
+
+        this.ParentWindow.transform.localPosition = this.ParentLocalPosition;
     }
 
     /// <summary>
     /// 最大表示
     /// </summary>
-    void SetMoveTargetMax()
+    public void SetMoveTargetMax()
     {
-        this.moveTargetWidth = MaxWidth;
-        this.moveTargetHeight = MaxHeight;
-        this.moveTargetLocationX = MaxLocationX;
+        this.moveTargetWidth = GetTextureMaxWidth();
+        this.moveTargetHeight = GetTextureMaxHeight();
+        this.moveTargetLocationX = 0;
         this.moveTargetLocationY = 0;
+
+        this.ParentLocalPosition = this.ParentWindow.transform.localPosition;
+        this.ParentWindow.transform.localPosition = new Vector3(this.movingLocationX, this.movingLocationY, 0);
     }
 
     /// <summary>
     /// 最大表示になっている場合、サイズ是正する
     /// </summary>
-    void FixPicture()
+    public void FixPicture()
     {
         //一旦元に戻す
-        this.moveTargetWidth = TexWidth;
-        this.moveTargetHeight = TexHeight;
+        this.moveTargetWidth = GetTextureWidth();
+        this.moveTargetHeight = GetTextureHeight()- 10;
         this.moveTargetLocationX = 0;
-        this.moveTargetLocationY = -0;
+        this.moveTargetLocationY = -18;
 
         this.movingWidth = this.moveTargetWidth;
         this.movingHeight = this.moveTargetHeight;
@@ -401,13 +437,12 @@ public class ImageWindow : ConcurrentBehaviour
         this.rect.localPosition = new Vector3(this.movingLocationX, this.movingLocationY, 0);
 
         //ウインドウレクトセット
-        ParentWindowRect.sizeDelta = new Vector2(TexWidth + 30, TexHeight + 40);
+        ParentWindowRect.sizeDelta = new Vector2(GetTextureWidth() + 8, GetTextureHeight() + 36);
 
-        //ウインドウ位置設定
-        //ParentWindowRect.transform.position = new Vector3(0, (Screen.width / 4 - TexWidth / 2), -100);
-        //ParentWindow.transform.position = new Vector3((TexWidth/ 100), 0, 100);
+        //ウインドウ座標設定
+        SetIMageWindowLocation();
 
-        if (this.moveTargetWidth != TexWidth)
+        if (this.moveTargetWidth != GetTextureWidth())
         {
             //最大化
             SetMoveTargetMax();
@@ -415,20 +450,63 @@ public class ImageWindow : ConcurrentBehaviour
         }
     }
 
+    public void SetIMageWindowLocation()
+    {
+        //あんカードロケーション取得
+        float windowLocationX = ParentWindowRect.anchoredPosition.x;
+        float windowLocationY = ParentWindowRect.anchoredPosition.y;
+
+        //初期位置なら調整
+        if (windowLocationX == -999 && windowLocationY == -999)
+        {
+            windowLocationX = ParentWindowRect.sizeDelta.x/2;
+            windowLocationY = -ParentWindowRect.sizeDelta.y / 2 + 450;
+        }
+
+        if(540 - ParentWindowRect.sizeDelta.y / 2< windowLocationY)
+        {
+            windowLocationY = (540 - ParentWindowRect.sizeDelta.y / 2);
+        }
+
+        //基本的に元の位置設定
+        ParentWindowRect.anchoredPosition = new Vector2(windowLocationX, windowLocationY);
+    }
+
     /// <summary>
     /// 画像セット開始
     /// </summary>
     /// <param name="url"></param>
     /// <returns></returns>
-    public void SetImage(string url)
+    public void SetImage(List<string> urlList)
     {
-        if (url != null && url != "")
+        //現在設定されているテクスチャの破棄
+        DestroyTexThumbnailList();
+
+        if (urlList != null && urlList.Count > 0 )
         {
-            StartCoroutine(SetImageIE(url));
+            //サムネイルリスト初期化
+            foreach (string url in urlList)
+            {
+                thumbnailList.Add(new MsgThumbnailData(url));
+            }
+
+            //インデックス
+            int idx = 0;
+
+            //非同期ダウンロード
+            foreach (MsgThumbnailData ThumbnailData in thumbnailList)
+            {
+                //ダウンロード処理
+                StartCoroutine(SetImageIE(ThumbnailData, idx == 0));
+
+                //カウントアップ
+                idx++;
+            }
         }
         else
         {
-            this.image.sprite = null;
+            //仮コメント
+            //Destroy(this.image.texture);
         }       
     }
 
@@ -437,204 +515,283 @@ public class ImageWindow : ConcurrentBehaviour
     /// </summary>
     /// <param name="url"></param>
     /// <returns></returns>
-    public IEnumerator SetImageIE(string url)
+    public IEnumerator SetImageIE(MsgThumbnailData ThumbnailData, bool FlgFirst )
     {
         //データダウンロード
-        WWW www = new WWW(url);
-
-        // 画像ダウンロード完了を待機
-        yield return www;
-
-        //画像ダウンロードエラーチェック
-        if (!string.IsNullOrEmpty(www.error))
+        using (WWW www = new WWW(CreateUrl(ThumbnailData)))
         {
-            Debug.Log(www.error);
-            yield break;
+            // 画像ダウンロード完了を待機
+            yield return www;
+
+            //タイトル設定
+            this.textTitle.text = ThumbnailData.thumbnailUrl;
+
+            //画像ダウンロードエラーチェック
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                Debug.Log(www.error);
+                yield break;
+            }
+
+            try
+            {
+                int width = www.texture.width;
+                int height = www.texture.height;
+
+                //テクスチャ生成
+                ThumbnailData.CreateTex(www.texture);
+
+                //最初のデータならウインドウ表示
+                if(FlgFirst)
+                {
+                    SetFirstPicture();
+                }
+
+                //WEBのテクスチャ解放
+                Destroy(www.texture);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log(ex);
+            }
         }
+    }
 
-        try
+    /// <summary>
+    /// URLを生成する
+    /// </summary>
+    /// <param name="ThumbnailData"></param>
+    /// <returns></returns>
+    private string CreateUrl(MsgThumbnailData ThumbnailData)
+    {
+        if (LiplisSetting.Instance.Setting.GraphicLevel == GRAPHIC_LEVEL.GraphicLevel_Low)
         {
-            int width = www.texture.width;
-            int height = www.texture.height;
-
-            //テクスチャ生成
-            CreateTex(www.texture);
-
-            //縮小用テクスチャ作成
-            CreateTexMin();
+            //ローレベル リストURL
+            return ThumbnailUrl.CreateListThumbnailUrl(ThumbnailData.thumbnailUrl);
+        }
+        else if (LiplisSetting.Instance.Setting.GraphicLevel == GRAPHIC_LEVEL.GraphicLevel_Middle)
+        {
+            //普通　スモールURL
+            return ThumbnailUrl.CreateThumbnailSmallUrl(ThumbnailData.thumbnailUrl);
+        }
+        else if (LiplisSetting.Instance.Setting.GraphicLevel == GRAPHIC_LEVEL.GraphicLevel_Heigh)
+        {
+            //高い 生データURL
+            return ThumbnailUrl.CreateThumbnailUrl(ThumbnailData.thumbnailUrl);
+        }
+        else
+        {
+            //それ以外はスモールURLリストURL
+            return ThumbnailUrl.CreateThumbnailSmallUrl(ThumbnailData.thumbnailUrl);
+        }
+    }
+   
+    /// <summary>
+    /// ファーストピクチャーをセットする
+    /// </summary>
+    private void SetFirstPicture()
+    {
+        //未追加なら0番目セットし、表示
+        if (thumbnailList.Count > 0)
+        {
+            //選択インデックスを0に初期化
+            this.SelectedThumbnailIndex = 0;
 
             //スプライト設定
-            this.image.GetComponent<Image>().sprite = spriteMin;
+            this.image.texture = thumbnailList[0].tex;
 
             //サイズ是正
             FixPicture();
         }
-        catch (Exception ex)
+    }
+
+    //====================================================================
+    //
+    //                       テクスチャリスト操作
+    //                         
+    //====================================================================
+    #region テクスチャリスト操作
+
+    /// <summary>
+    /// 現在選択中のサムネイルデータを取得する
+    /// </summary>
+    /// <returns></returns>
+    private MsgThumbnailData GetNowSelectedThumbnail()
+    {
+        if(thumbnailList == null)
         {
-            Debug.Log(ex);
+            return null;
+        }
+
+        if(thumbnailList.Count == 0)
+        {
+            return null;
+        }
+
+        if(SelectedThumbnailIndex < thumbnailList.Count)
+        {
+
+            return thumbnailList[SelectedThumbnailIndex];
+        }
+        else
+        {
+            return null;
         }
     }
 
     /// <summary>
-    /// テクスチャ生成
+    /// テクスチャサイズを返す
     /// </summary>
-    /// <param name="tex"></param>
-    private void CreateTex(Texture2D tex)
+    /// <returns></returns>
+    private float GetTextureWidth()
     {
-        try
+        MsgThumbnailData thumbnail = GetNowSelectedThumbnail();
+
+        if(thumbnail != null)
         {
-            if(!UnityNullCheck.IsNull(this.tex))
-            {
-                Destroy(this.tex);
-            }
-
-            if(!UnityNullCheck.IsNull(this.sprite))
-            {
-                Destroy(this.sprite);
-            }
-
-            //テクスチャのロード
-            this.tex = tex;
-            this.TexWidth = tex.width;
-            this.TexHeight = tex.height;
-
-            //比率
-            float rate = 0;
-
-            //画像のアスペクト比取得
-            float texAspectRate = ((float)tex.width / (float)tex.height);
-
-            //アスペクト比境界から縦、横どちらに合わせるか決定
-
-            //マックス値の計算
-            //if (texAspectRate <= ASPECT_RATIO_BOUNDARY)
-            //{
-            //    //スクリーン高さ
-            //    float screanHeight = Screen.height;
-
-            //    //縦に合わせる
-            //    rate = screanHeight / (float)tex.height;
-
-            //    //求めた比率から横算出
-            //    this.MaxWidth = (float)tex.width * rate;
-
-            //    //高さ固定
-            //    this.MaxHeight = screanHeight;
-            //}
-            //else
-            //{
-            //    //スクリーン幅の半分取得
-            //    float screanWidthHerf = Screen.width / 2;
-
-            //    //横に合わせる
-            //    rate = screanWidthHerf / (float)tex.width;
-
-            //    //横固定 スクリーン幅の半分に固定
-            //    this.MaxWidth = screanWidthHerf;
-
-            //    //求めた比率から高さ算出
-            //    this.MaxHeight = (float)tex.height * rate;
-            //}
-
-
-            //マックス値の計算
-            //-----------------------------------------
-            //スクリーン高さ
-            float maxScreanHeight = Screen.height;
-
-            //縦に合わせる
-            rate = maxScreanHeight / (float)tex.height;
-
-            //求めた比率から横算出
-            this.MaxWidth = (float)tex.width * rate;
-
-            //高さ固定
-            this.MaxHeight = maxScreanHeight;
-            //-----------------------------------------
-
-            
-            if (texAspectRate < 1)
-            {
-                //縦長なら そのままの座標にする
-                MaxLocationX = 0;
-            }
-            else
-            {
-                //横長なら 0に調整
-                MaxLocationX = -Screen.width / 6;
-            }
-
-            //表示サイズの計算
-            if (texAspectRate >= ASPECT_RATIO_BOUNDARY)
-            {
-                //スクリーン幅の33%
-                float screanWidt = Screen.width / 3;
-
-                //横に合わせる
-                rate = screanWidt / (float)tex.width;
-
-                //横固定 スクリーン幅の半分に固定
-                this.TexWidth = screanWidt;
-
-                //求めた比率から高さ算出
-                this.TexHeight = (float)tex.height * rate;
-            }
-            else
-            {
-                //スクリーン高さの半分取得
-                float screanHeight = Screen.height;
-
-                //縦に合わせる
-                rate = screanHeight / (float)tex.height;
-
-                //求めた比率から横算出
-                this.TexWidth = (float)tex.width * rate;
-
-                //高さ固定
-                this.TexHeight = screanHeight;
-            }
-
-            //サイズ調整
-            TextureScale.Bilinear(this.tex, (int)MaxWidth, (int)MaxHeight);
-
-            //スプライト生成
-            sprite = Sprite.Create(this.tex, new Rect(0, 0, (int)MaxWidth, (int)MaxHeight), Vector2.zero);
+            return thumbnail.TexWidth;
         }
-        catch (Exception ex)
+        else
         {
-            Debug.Log(ex);
+            return 0;
+        }
+    }
+    private float GetTextureHeight()
+    {
+        MsgThumbnailData thumbnail = GetNowSelectedThumbnail();
+
+        if (thumbnail != null)
+        {
+            return thumbnail.TexHeight;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    private float GetTextureMaxWidth()
+    {
+        MsgThumbnailData thumbnail = GetNowSelectedThumbnail();
+
+        if (thumbnail != null)
+        {
+            return thumbnail.MaxWidth;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    private float GetTextureMaxHeight()
+    {
+        MsgThumbnailData thumbnail = GetNowSelectedThumbnail();
+
+        if (thumbnail != null)
+        {
+            return thumbnail.MaxHeight;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    private Texture GetTextureSprite()
+    {
+        MsgThumbnailData thumbnail = GetNowSelectedThumbnail();
+
+        if (thumbnail != null)
+        {
+            return thumbnail.tex;
+        }
+        else
+        {
+            return null;
         }
     }
 
     /// <summary>
-    /// ミニテクスチャ生成
+    /// テクスチャをクリアする
     /// </summary>
-    private void CreateTexMin()
+    private void DestroyTexThumbnailList()
     {
-        try
+        if(thumbnailList != null)
         {
-            if (!UnityNullCheck.IsNull(this.texMin))
+            if(thumbnailList.Count > 0)
             {
-                Destroy(this.texMin);
+                foreach (var thumbnail in thumbnailList)
+                {
+                    Destroy(thumbnail.tex);
+
+                    thumbnail.tex =null;
+                }
             }
 
-            if (!UnityNullCheck.IsNull(this.spriteMin))
-            {
-                Destroy(this.spriteMin);
-            }
-
-            //縮小用テクスチャ作成
-            this.texMin = GameObjectUtils.Clone(tex);
-
-            //サイズ調整
-            TextureScale.Bilinear(texMin, (int)tex.width, (int)tex.height);
-
-            //スプライト生成
-            this.spriteMin = Sprite.Create(texMin, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
+            //リストクリア
+            thumbnailList.Clear();
         }
-        catch (Exception ex)
+        else
         {
-            Debug.Log(ex);
+            thumbnailList = new List<MsgThumbnailData>();
         }
+       
     }
+#endregion
+
+    //====================================================================
+    //
+    //                         更新処理  UI操作
+    //                         
+    //====================================================================
+    #region 更新処理  UI操作
+
+    /// <summary>
+    /// 右へクリック
+    /// </summary>
+    public void Btn_Right_Click()
+    {
+        if (SelectedThumbnailIndex >= thumbnailList.Count - 1)
+        {
+            SelectedThumbnailIndex = thumbnailList.Count - 1;
+            return;
+        }
+
+        SelectedThumbnailIndex++;
+
+        //スプライト設定
+        this.image.texture= GetTextureSprite();
+
+        //サイズ是正
+        FixPicture();
+
+    }
+
+    /// <summary>
+    /// 左へクリック
+    /// </summary>
+    public void Btn_Left_Click()
+    {
+        if (SelectedThumbnailIndex < 1)
+        {
+            SelectedThumbnailIndex = 0;
+            return;
+        }
+
+        SelectedThumbnailIndex--;
+
+
+        //スプライト設定
+        this.image.texture = GetTextureSprite();
+
+        //サイズ是正
+        FixPicture();
+    }
+
+    /// <summary>
+    /// Maxクリック
+    /// </summary>
+    public void Btn_Max_Click()
+    {
+        SetMoveTarget();
+    }
+    #endregion
 }

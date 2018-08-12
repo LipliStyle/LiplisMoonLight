@@ -24,7 +24,7 @@ namespace Assets.Scripts.DataChar.Rabiits
 
         //葉月 Y座標
         //public const float CARACTER_LOCATION_Y = -2.0f;
-        public const float CARACTER_LOCATION_Y = -140f;
+        public const float CARACTER_LOCATION_Y = -93;
 
         //葉月デフォルト位置
         public MST_CARACTER_POSITION DEFAULT_POSITION = MST_CARACTER_POSITION.Center;
@@ -35,7 +35,7 @@ namespace Assets.Scripts.DataChar.Rabiits
         /// <returns></returns>
         public CharacterData CreateCharData()
         {
-            return base.CreateCharData(LIVE2D_CANVAS.L2DC_Kuroha_F, LIVE2D_CANVAS.L2DC_Kuroha_R, LIVE2D_CANVAS.L2DC_Kuroha_L, ALLOCATION_ID, DEFAULT_POSITION, PREFAB_NAMES.WINDOW_TALK_3, CARACTER_LOCATION_Y);
+            return base.CreateCharData(LIVE2D_CANVAS.L2DC_Kuroha_F, LIVE2D_CANVAS.L2DC_Kuroha_R, LIVE2D_CANVAS.L2DC_Kuroha_L, ALLOCATION_ID, DEFAULT_POSITION, PREFAB_NAMES.WINDOW_TALK_S_4, CARACTER_LOCATION_Y);
         }
 
         /// <summary>

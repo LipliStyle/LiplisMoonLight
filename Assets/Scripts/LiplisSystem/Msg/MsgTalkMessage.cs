@@ -1,4 +1,11 @@
-﻿using Assets.Scripts.LiplisSystem.Com;
+﻿//=======================================================================
+//  ClassName : MsgTalkMessage
+//  概要      : トークメッセージ
+//
+//  LiplisLive2D
+//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//=======================================================================﻿
+using Assets.Scripts.LiplisSystem.Com;
 using System;
 using System.Collections.Generic;
 using System.Text;

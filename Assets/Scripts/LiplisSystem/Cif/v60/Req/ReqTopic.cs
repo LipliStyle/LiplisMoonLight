@@ -15,10 +15,12 @@ namespace Assets.Scripts.LiplisSystem.Cif.v60.Req
     {
         ///=============================
         /// 設定
+        public string DataKey;
+        public string NewsSource;   //MenuUiManager.ContentCategolyに準拠
+        public string VersionInfo;
 
         ///=============================
         /// トーンURLリスト
         public List<string> ToneUrlList = new List<string>();
-
     }
 }

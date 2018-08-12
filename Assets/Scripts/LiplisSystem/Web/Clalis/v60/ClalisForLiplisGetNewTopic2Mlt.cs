@@ -6,7 +6,6 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //====================================================================
-using Assets.Scripts.LiplisSystem.Cif.v60.Req;
 using Assets.Scripts.LiplisSystem.Cif.v60.Res;
 using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.Utils;

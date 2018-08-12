@@ -21,22 +21,17 @@ namespace Assets.Scripts.LiplisSystem.UI
         ///=============================
         ///サイズ、表示位置
         public float heightImg { get; set; }
-        public float heightText { get; set; }
-        public float posTextY { get; set; }
-
         /// <summary>
         /// コンストラクター
         /// </summary>
         /// <param name="Window"></param>
-        public LiplisTitleWindow(GameObject Window, float heightImg, float heightText, float posTextY)
+        public LiplisTitleWindow(GameObject Window, float heightImg)
         {
             //ウインドウ取得
             //this.Window = Window;
 
             //初期表示位置
             this.heightImg = heightImg;
-            this.heightText = heightText;
-            this.posTextY = posTextY;
 
             //ウインドウインスタンス取得
             imgWindow = Window.GetComponent<InfoWindow>();

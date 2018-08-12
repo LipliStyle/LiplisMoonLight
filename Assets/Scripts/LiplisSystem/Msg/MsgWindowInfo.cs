@@ -14,7 +14,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
     {
         public GameObject windowInstances;
         public GameObject window;
-        public GameObject windowText;
+        public SpeechBubbleCtrl sbc;
         public Transform canvasParent;
     }
 }

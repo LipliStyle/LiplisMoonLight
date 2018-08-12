@@ -27,8 +27,8 @@ public class MenuPageScrollViewController : ScrollViewController, IBeginDragHand
     [SerializeField] private float key1OutTangent = 0.1f;
     [SerializeField] private float key2InTangent = 0.0f;
     [SerializeField] private float key2OutTangent = 0.0f;
-    [SerializeField] private int MAX_ICON_NUM = 17;
-    [SerializeField] private int FIX_LENGTH = 31;
+    [SerializeField] private int MAX_ICON_NUM = 10;//17
+    [SerializeField] private int FIX_LENGTH = 0;//31
 
     ///=============================
     /// 制御用プロパティ
@@ -140,8 +140,11 @@ public class MenuPageScrollViewController : ScrollViewController, IBeginDragHand
         }
         else if (pageIndex > grid.transform.childCount - MAX_ICON_NUM)
         {
-            pageIndex = grid.transform.childCount - MAX_ICON_NUM;
-            fixLength = FIX_LENGTH;
+            //pageIndex = grid.transform.childCount - MAX_ICON_NUM;
+            //fixLength = FIX_LENGTH;
+            pageIndex = 0;
+            fixLength = 0;
+
         }
 
         prevPageIndex = pageIndex;  // 現在のページのインデックスを保持しておく

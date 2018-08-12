@@ -65,13 +65,15 @@ namespace Assets.Scripts.Data
         /// </summary>
         public void DataLoad()
         {
-            if (this.InfoLocation    == null) { this.InfoLocation = new DatLocation(); }
-            if (this.InfoWether      == null) {this.InfoWether = new DatWether(); }
-            if (this.NewTopic        == null) { this.NewTopic = new　DatNewTopic(); }
-            if (this.InfoAnniversary == null) { this.InfoAnniversary = new DatAnniversaryDays(); }
-            if (this.EnvironmentInfo == null) { this.EnvironmentInfo = new DatEnvironmentInfomation(); }
-            if (this.CharDataList    == null) { this.CharDataList = new CharacterDataList(); }
-            if (this.NewsList        == null) { this.NewsList = new DatNewsList(); }
+            if (this.InfoLocation     == null) { this.InfoLocation = new DatLocation(); }
+            if (this.InfoWether       == null) {this.InfoWether = new DatWether(); }
+            if (this.NewTopic         == null) { this.NewTopic = new　DatNewTopic(); }
+            if (this.InfoAnniversary  == null) { this.InfoAnniversary = new DatAnniversaryDays(); }
+
+            if (this.CharDataList     == null) { this.CharDataList = new CharacterDataList(); }
+            if (this.NewsList         == null) { this.NewsList = new DatNewsList(); }
+
+            this.EnvironmentInfo = new DatEnvironmentInfomation();
         }
 
         #endregion
@@ -79,10 +81,11 @@ namespace Assets.Scripts.Data
         //環境情報
         public DatEnvironmentInfomation EnvironmentInfo;
 
+
+
         //キャラクターデータ
         public CharacterDataList CharDataList;
 
-        //会話履歴
         //最終挨拶
         //最終ニュース
         public DatNewTopic NewTopic;
@@ -111,9 +114,7 @@ namespace Assets.Scripts.Data
         //ニュースリスト
         public DatNewsList NewsList;
 
-        public string testText;
-
-
-
+        //リソース解放最終日時
+        public DateTime LastRunReleaseProcessing;
     }
 }

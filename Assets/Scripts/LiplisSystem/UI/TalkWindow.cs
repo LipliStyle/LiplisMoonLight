@@ -5,7 +5,10 @@
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
+using Assets.Scripts.Data;
 using System;
+using System.Collections;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +23,7 @@ public class TalkWindow : MonoBehaviour {
     ///透明度制御
     public float alfa;
     float speedFaidIn = 0.05f;
-    float speedFaidOut = 0.02f;
+    float speedFaidOut = 0.1f;
 
     ///=============================
     ///制御フラグ
@@ -34,7 +37,6 @@ public class TalkWindow : MonoBehaviour {
 
     ///=============================
     ///毎テキスト
-    Text TxtTalkText = null;
     Image image { get; set; }
 
     ///=============================
@@ -45,28 +47,59 @@ public class TalkWindow : MonoBehaviour {
     ///移動先位置
     public Vector3 TargetPosition { get; set; }
 
-
-    //================================
-    //  文字制御関連プロパティ                 
-    //================================
-
-    float intervalForCharacterDisplay = 0.05f;
-
+    //おしゃべり中フラグ
     public bool FlgTalking = false;
+
+    //スキップフラグ
+    private bool FlgSkip = false;
+
+    //================================
+    //  新　文字制御関連プロパティ                 
+    //================================
     private string currentText = string.Empty;
     private float timeUntilDisplay = 0;
-    private float timeElapsed = 1;
-    private int currentLine = 0;
     private int lastUpdateCharacter = -1;
-
     private float LipValue = 0;                 //口パク量
 
+    [SerializeField]
+    public BubbleTextCtrl _bubbleText;
+
+    [SerializeField]
+    float _maxImageWidth = 0f; // zero to inf
+    public float maxImageWidth { set { _maxImageWidth = value; } get { return _maxImageWidth; } }
+
+    [SerializeField]
+    float _maxImageHeight = 0f;
+    public float maxImageHeight { set { _maxImageHeight = value; } get { return _maxImageHeight; } }
+
+    [SerializeField]
+    float _printSpeed = 0.1f;
+    public float printSpeed { set { _printSpeed = value; } get { return _printSpeed; } }
+
+    [SerializeField]
+    bool _isSayToClear;
+    public bool isSayToClear { set { _isSayToClear = value; } get { return _isSayToClear; } }
+
+    LayoutElement _layoutElement;
+    public LayoutElement layoutElement { get { return _layoutElement; } }
+
+    ContentSizeFitter _contentSizeFitter;
+    public ContentSizeFitter contentSizeFitter { get { return _contentSizeFitter; } }
+
+    StringBuilder _builder = new StringBuilder();
+    public bool isTextPrinting { private set; get; }
+
+    //====================================================================
+    //
+    //                         ウインドウ制御
+    //                         
+    //====================================================================
+    #region ウインドウ制御
     /// <summary>
     /// 破棄
     /// </summary>
     private void OnDestroy()
     {
-        TxtTalkText = null;
         image = null;
         ParentWindow = null;
     }
@@ -104,13 +137,49 @@ public class TalkWindow : MonoBehaviour {
         //イメージ取得
         image = GetComponent<Image>();
 
-        //テキスト取得
-        TxtTalkText = this.transform.Find("TxtTalkText").GetComponent<Text>();
-
         //アルファ値を0セット
         SetAlfa();
 
         this.flgOn = true;
+
+        //テキスト関連
+        isTextPrinting = false;
+        _layoutElement = GetComponent<LayoutElement>();
+        _contentSizeFitter = GetComponent<ContentSizeFitter>();
+
+        //タイマースタート
+        startTimer();
+    }
+
+
+    /// <summary>
+    /// タイマースタート
+    /// </summary>
+    void startTimer()
+    {
+        StartCoroutine(UpdateTick());
+    }
+
+    private const float UPDATE_INTERVAL = 0.1f;
+
+    /// <summary>
+    /// ウインドウメンテループ　
+    /// 1秒周期で実行
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator UpdateTick()
+    {
+        while (true)
+        {
+            //トーク処理
+            if (!FlgSkip)
+            {
+                Talk();
+            }
+
+            //非同期待機
+            yield return new WaitForSeconds(LiplisSetting.Instance.Setting.GetTalkSpeed());
+        }
     }
 
     /// <summary>
@@ -130,8 +199,13 @@ public class TalkWindow : MonoBehaviour {
         //位置の更新
         UpdatePosition();
 
-        //トーク処理
-        talk();
+        //リップシンク
+        LipSync();
+
+        if (FlgSkip)
+        {
+            Skip();
+        }
     }
 
     /// <summary>
@@ -213,9 +287,8 @@ public class TalkWindow : MonoBehaviour {
     /// <summary>
     /// ウインドウを破棄する
     /// </summary>
-    private void DestroyWindow()
+    public void DestroyWindow()
     {
-        Destroy(TxtTalkText);
         Destroy(image);
         Destroy(ParentWindow);
     }
@@ -232,7 +305,7 @@ public class TalkWindow : MonoBehaviour {
     {
         try
         {
-            TxtTalkText.color = new Color(0, 0, 0, alfa);
+            //TxtTalkText.color = new Color(0, 0, 0, alfa);
         }
         catch
         {
@@ -338,29 +411,55 @@ public class TalkWindow : MonoBehaviour {
 
     }
 
+    #endregion
+
+    //====================================================================
+    //
+    //                         会話関連処理
+    //                         
+    //====================================================================
+    #region 会話関連処理
+
     /// <summary>
     /// トーク処理
     /// </summary>
-    private void talk()
+    private void Talk()
     {
-        int displayCharacterCount = (int)(Mathf.Clamp01((Time.time - timeElapsed) / timeUntilDisplay) * currentText.Length);
-        if (displayCharacterCount != lastUpdateCharacter)
+        //終了チェック
+        if (!this.FlgTalking || (currentText.Length <= lastUpdateCharacter))
         {
-            //テキスト送り
-            TxtTalkText.text = currentText.Substring(0, displayCharacterCount);
-
-            //送りカウント
-            lastUpdateCharacter = displayCharacterCount;
-
-            //リップシンク
-            LAppLive2DManager.Instance.SetLip(TargetModelName, (float)Math.Sin(LipValue * (Math.PI / 180)));
-
-            //リップシンク送り
-            LipValue = LipValue + 45f;
+            return;
         }
 
+        try
+        {
+            //テキスト送り
+
+            if (currentText == "")
+            {
+                return;
+            }
+
+            if (lastUpdateCharacter == -1)
+            {
+                //最初はなにもしない
+            }
+            else
+            {
+                setText(currentText.Substring(lastUpdateCharacter, 1));
+            }
+
+            //送りカウント
+            lastUpdateCharacter++;
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex);
+        }
+
+
         //終了チェック
-        if (currentText.Length == lastUpdateCharacter && this.FlgTalking)
+        if (currentText.Length <= lastUpdateCharacter && this.FlgTalking)
         {
             //口を閉じる
             LAppLive2DManager.Instance.StopTalking(TargetModelName);
@@ -368,6 +467,60 @@ public class TalkWindow : MonoBehaviour {
             //おしゃべり終了
             this.FlgTalking = false;
         }
+    }
+
+    //リップシンク
+    private void LipSync()
+    {
+        if(LAppLive2DManager.Instance.IsPlaying(TargetModelName))
+        {
+
+        }
+        else
+        {
+            //終了チェック
+            if (!this.FlgTalking || (currentText.Length <= lastUpdateCharacter))
+            {
+                if(LipValue != 0)
+                {
+                    //0セット
+                    LipValue = 0;
+
+                    //口を閉じる
+                    LAppLive2DManager.Instance.StopTalking(TargetModelName);
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+
+
+        //リップシンク
+        LAppLive2DManager.Instance.SetLip(TargetModelName, (float)Math.Sin(LipValue * (Math.PI / 180)));
+
+        //リップシンク送り
+        LipValue = LipValue + 45f;
+    }
+
+    /// <summary>
+    /// スキップ
+    /// </summary>
+    private void Skip()
+    {
+        if(!this.FlgTalking)
+        {
+            return;
+        }
+
+        if (currentText == "")
+        {
+            return;
+        }
+
+        //トークを高速で進める
+        Talk();
     }
 
     /// <summary>
@@ -378,15 +531,6 @@ public class TalkWindow : MonoBehaviour {
     {
         //メッセージ設定
         currentText = message;
-
-        //時刻単位設定
-        timeUntilDisplay = currentText.Length * intervalForCharacterDisplay;
-
-        //タイムタイム初期化
-        timeElapsed = Time.time;
-
-        //ラインインクリメント
-        currentLine++;
 
         //最終更新文字初期化
         lastUpdateCharacter = -1;
@@ -409,23 +553,44 @@ public class TalkWindow : MonoBehaviour {
     }
 
     /// <summary>
-    /// 文字の表示が終了しているかどうか
-    /// </summary>
-    public bool IsCompleteDisplayText
-    {
-        get { return Time.time > timeElapsed + timeUntilDisplay; }
-    }
-
-    /// <summary>
     /// スキップ処理
     /// </summary>
-    public void Skip()
+    public void SetSkip()
     {
-        // 完了してないなら文字をすべて表示する
-        if (!IsCompleteDisplayText)
+        FlgSkip = true;
+    }
+    
+    /// <summary>
+    /// 非同期送り
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="delay"></param>
+    /// <returns></returns>
+    public void setText(string text)
+    {
+        _bubbleText.text.text = _builder.Append(text).ToString();
+        if (_bubbleText.text.preferredWidth + 100 < _maxImageWidth)
         {
-            timeUntilDisplay = 0;
+            _layoutElement.preferredWidth = _bubbleText.text.preferredWidth + 100;
+        }
+
+        if (_bubbleText.text.preferredHeight + 42 < _maxImageHeight)
+        {
+            _layoutElement.preferredHeight = _bubbleText.text.preferredHeight + 42;
+        }
+        else
+        {
+            _layoutElement.preferredHeight = _bubbleText.text.preferredHeight;
         }
     }
 
+    /// <summary>
+    /// バブルテキストを初期化する
+    /// </summary>
+    public void cleanBubbleText()
+    {
+        _bubbleText.text.text = string.Empty;
+    }
+
+    #endregion
 }

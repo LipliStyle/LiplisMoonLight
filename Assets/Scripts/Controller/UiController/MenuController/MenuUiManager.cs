@@ -11,24 +11,38 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using UnityEngine.UI;
+using Assets.Scripts.Data;
+using Assets.Scripts.Define;
 
 public class MenuUiManager : MonoBehaviour
 {
-    ///=============================
-    /// 制御用プロパティ
+    //=============================
+    // 制御用プロパティ
     //フェード時に暗転させるUI
     [SerializeField] private CoverUI coverUI;
 
+    //=============================
     //現在選択中のページ
     [SerializeField] private ContentCategoly CurrentContentCategoly = ContentCategoly.home;
 
+    //=============================
     //コンテントリスト
     [SerializeField] private ContentController[] ContentsPage;
+
+    //=============================
+    //モード表示テキスト
+    [SerializeField] Text TxtTalkMode;
+    [SerializeField] Image ImgMode;
+
+    //=============================
+    // レンダリングUIキャッシュ
+    public GameObject UiRenderingFront;
 
     ///=============================
     /// フェード制御プロパティ
     /// ここでメニューのフェードアニメーションの速さを設定する
-     
+
     // フェードインインターバル
     private float DURATION_FAID_IN = 0.1f;
 
@@ -42,21 +56,6 @@ public class MenuUiManager : MonoBehaviour
     //                         
     //====================================================================
     #region コンテンツ定義
-
-    /// <summary>
-    /// コンテンツ定義
-    /// 
-    /// ここで設定するインデックスは、Unity上に設定したページの順番と揃える必要あり！
-    /// </summary>
-    public enum ContentCategoly
-    {
-        home = 0,
-        omakase = 1,
-        news = 2 ,
-        matome =3,
-        retweet = 4,
-        hotPicture = 5
-    }
 
     #endregion
 
@@ -74,6 +73,7 @@ public class MenuUiManager : MonoBehaviour
     {
         foreach (var content in ContentsPage)
         {
+            content.gameObject.SetActive(true);
             content.gameObject.SetActive(false);
         }
     }
@@ -83,6 +83,16 @@ public class MenuUiManager : MonoBehaviour
     /// </summary>
     void Start () {
         StartCoroutine(SwitchContent(CurrentContentCategoly));
+
+        initWindow();
+    }
+
+    /// <summary>
+    /// ウインドウの初期化
+    /// </summary>
+    private void initWindow()
+    {
+        TxtTalkMode.text = "おまかせ";
     }
 
     #endregion
@@ -103,23 +113,40 @@ public class MenuUiManager : MonoBehaviour
     {
         if (CurrentContentCategoly != nextContent)
         {
+            //フェードアウト
             coverUI.FadeOut(DURATION_FAID_OUT);
             yield return new WaitForSeconds(DURATION_FAID_OUT);
 
+            //現在のオブジェクトを無効にする
             ContentsPage[(int)CurrentContentCategoly].gameObject.SetActive(false);
+
+            //モード変更
             CurrentContentCategoly = nextContent;
+            ChangeMode(nextContent);
+
+            //新しくセットしたオブジェクトを有効にする
             ContentsPage[(int)CurrentContentCategoly].gameObject.SetActive(true);
 
+            //フェードイン
             yield return new WaitForSeconds(DURATION_FAID_IN);
             coverUI.FadeIn(DURATION_FAID_IN);
 
         }
         else
         {
-
+            //変更がなければ現在のオブジェクトを有効化
             ContentsPage[(int)CurrentContentCategoly].gameObject.SetActive(true);
             yield break;
         }
+    }
+
+    /// <summary>
+    /// モード変更
+    /// </summary>
+    private void ChangeMode(ContentCategoly nextContent)
+    {
+        TxtTalkMode.text = ContentCategolyText.GetContentText(nextContent);
+        LiplisStatus.Instance.EnvironmentInfo.SelectMode = nextContent;
     }
 
 
@@ -128,17 +155,13 @@ public class MenuUiManager : MonoBehaviour
     /// </summary>
     public void Btn_Home_Click()
     {
-        Debug.Log("GameCtlr BtnHome_Click");
-        StartCoroutine(SwitchContent(ContentCategoly.home));
-    }
+        //フロント画面が非アクティブのときは何もしない
+        if (!UiRenderingFront.gameObject.activeSelf)
+        {
+            return;
+        }
 
-    /// <summary>
-    /// おまかせボタンクリック
-    /// </summary>
-    public void Btn_Omakase_Click()
-    {
-        Debug.Log("GameCtlr BtnOmakase_Click");
-        StartCoroutine(SwitchContent(ContentCategoly.omakase));
+        StartCoroutine(SwitchContent(ContentCategoly.home));
     }
 
     /// <summary>
@@ -146,7 +169,12 @@ public class MenuUiManager : MonoBehaviour
     /// </summary>
     public void Btn_News_Click()
     {
-        Debug.Log("GameCtlr Btn_News_Click");
+        //フロント画面が非アクティブのときは何もしない
+        if (!UiRenderingFront.gameObject.activeSelf)
+        {
+            return;
+        }
+
         StartCoroutine(SwitchContent(ContentCategoly.news));
     }
 
@@ -155,7 +183,12 @@ public class MenuUiManager : MonoBehaviour
     /// </summary>
     public void Btn_Matome_Click()
     {
-        Debug.Log("GameCtlr Btn_Matome_Click");
+        //フロント画面が非アクティブのときは何もしない
+        if (!UiRenderingFront.gameObject.activeSelf)
+        {
+            return;
+        }
+
         StartCoroutine(SwitchContent(ContentCategoly.matome));
     }
 
@@ -164,7 +197,12 @@ public class MenuUiManager : MonoBehaviour
     /// </summary>
     public void Btn_Retweet_Click()
     {
-        Debug.Log("GameCtlr Btn_Retweet_Click");
+        //フロント画面が非アクティブのときは何もしない
+        if (!UiRenderingFront.gameObject.activeSelf)
+        {
+            return;
+        }
+
         StartCoroutine(SwitchContent(ContentCategoly.retweet));
     }
 
@@ -173,8 +211,27 @@ public class MenuUiManager : MonoBehaviour
     /// </summary>
     public void Btn_HotPicture_Click()
     {
-        Debug.Log("GameCtlr Btn_HotPicture_Click");
+        //フロント画面が非アクティブのときは何もしない
+        if (!UiRenderingFront.gameObject.activeSelf)
+        {
+            return;
+        }
+
         StartCoroutine(SwitchContent(ContentCategoly.hotPicture));
+    }
+
+    /// <summary>
+    /// ハッシュボタンクリック
+    /// </summary>
+    public void Btn_TweetHash_Click()
+    {
+        //フロント画面が非アクティブのときは何もしない
+        if (!UiRenderingFront.gameObject.activeSelf)
+        {
+            return;
+        }
+
+        StartCoroutine(SwitchContent(ContentCategoly.hotHash));
     }
     #endregion  
 }

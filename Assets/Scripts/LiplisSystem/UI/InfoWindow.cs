@@ -5,6 +5,7 @@
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
+using Assets.Scripts.LiplisSystem.Web;
 using SpicyPixel.Threading;
 using System;
 using UnityEngine;
@@ -27,10 +28,6 @@ public class InfoWindow : ConcurrentBehaviour
     ///=============================
     ///親ウインドウ
     public GameObject ParentWindow { get; set; }
-
-    ///=============================
-    ///移動先位置
-    public Vector3 TargetPosition { get; set; }
 
     ///=============================
     ///制御フラグ
@@ -69,12 +66,6 @@ public class InfoWindow : ConcurrentBehaviour
     {
         //親ウインドウ設定
         this.ParentWindow = ParentWindow;
-
-        //移動目標の初期化
-        if (ParentWindow != null)
-        {
-            this.TargetPosition = ParentWindow.transform.position;
-        }
     }
 
     // Update is called once per frame
@@ -211,14 +202,13 @@ public class InfoWindow : ConcurrentBehaviour
         this.TitleTalkText.text = title.Trim();
     }
 
+
     /// <summary>
     /// 移動対象を設定する
     /// </summary>
     /// <param name="TargetPosition"></param>
     public void SetMoveTarget(Vector3 TargetPosition)
     {
-        this.TargetPosition = TargetPosition;
+        this.ParentWindow.transform.localPosition = TargetPosition;
     }
-
-
 }

@@ -29,6 +29,8 @@ namespace Assets.Scripts.DataChar
 
         //現在ロード中モデル定義名
         public string NowModelName;
+        //現在ロード中モデル座標
+        public Vector3 NowModelLocation;
         //割り当てID
         public int AllocationId;
         //ウインドウキューリスト
@@ -37,6 +39,8 @@ namespace Assets.Scripts.DataChar
         public LiplisWindow NowTalkWindow;
         //一つ前ウインドウ
         public string WindowName;
+        //ウインドウインスタンス
+        public GameObject WindowInstances;
         //挨拶
         public CharDataGreet Greet;
         //口調
@@ -74,6 +78,12 @@ namespace Assets.Scripts.DataChar
             this.WindowName               = WindowName;
             this.LocationY                = LocationY;
             WindowTalkListQ               = new Queue<LiplisWindow>();
+
+            //位置取得
+            this.NowModelLocation = LAppLive2DManager.Instance.GetModelLocation(this.NowModelName);
+
+            //ウインドウプレハブインスタンス生成
+            this.WindowInstances = (GameObject)Resources.Load(this.WindowName);
 
             //モデル表示の初期化
             InitVisible();
@@ -173,6 +183,9 @@ namespace Assets.Scripts.DataChar
                 selectModelName = this.FrontModelName;
             }
 
+            //前回モデルの座標を取得しておく
+            SetModelLocation(selectModelName);
+
             //選択モデルをセットする
             this.NowModelName = selectModelName;
 
@@ -200,11 +213,26 @@ namespace Assets.Scripts.DataChar
                 selectModelName = this.FrontModelName;
             }
 
+            //前回モデルの座標を取得しておく
+            SetModelLocation(selectModelName);
+
             //選択モデルをセットする
             this.NowModelName = selectModelName;
 
             //モデルビジブル再設定
             SetModelVisible();
+        }
+
+        /// <summary>
+        /// 現在モデルの位置を次のモデルに継承する
+        /// </summary>
+        /// <param name="selectModelName"></param>
+        public void SetModelLocation(string selectModelName)
+        {
+            //前回モデルの座標を取得しておく
+            this.NowModelLocation = LAppLive2DManager.Instance.GetModelLocation(this.NowModelName);
+
+            LAppLive2DManager.Instance.SetMove(selectModelName, this.NowModelLocation);
         }
 
         /// <summary>
@@ -238,7 +266,6 @@ namespace Assets.Scripts.DataChar
             //一旦フェードアウト
             SetModelVisibleAllOff();
 
-
             //移動する
             LAppLive2DManager.Instance.SetMove(this.FrontModelName, MODEL_POS.GetPos(Position, LocationY));
             LAppLive2DManager.Instance.SetMove(this.RightModelName, MODEL_POS.GetPos(Position, LocationY));
@@ -246,6 +273,19 @@ namespace Assets.Scripts.DataChar
 
             //現在ロード中のモデルのビジブルON
             LAppLive2DManager.Instance.SetFadeIn(this.NowModelName,0.01f);
+        }
+        public void MoveTarget(Vector3 pos)
+        {
+            //一旦フェードアウト
+            SetModelVisibleAllOff();
+
+            //移動する
+            LAppLive2DManager.Instance.SetMove(this.FrontModelName,pos);
+            LAppLive2DManager.Instance.SetMove(this.RightModelName,pos);
+            LAppLive2DManager.Instance.SetMove(this.LeftModelName, pos);
+
+            //現在ロード中のモデルのビジブルON
+            LAppLive2DManager.Instance.SetFadeIn(this.NowModelName, 0.01f);
         }
 
         #endregion
@@ -276,30 +316,22 @@ namespace Assets.Scripts.DataChar
             }
         }
 
-
-        //private const float HEIGHT_IMG_3 = 126;
-        //private const float HEIGHT_TXT_3 = 46;
-        //private const float POS_Y_TXT_3 = -5.5f;
-
-        //private const float HEIGHT_IMG_2 = 102;
-        //private const float HEIGHT_TXT_2 = 33;
-        //private const float POS_Y_TXT_2 = -7.0f;
-
-        //private const float HEIGHT_IMG_1 = 70;
-        //private const float HEIGHT_TXT_1 = 20;
-        //private const float POS_Y_TXT_1 = -4.5f;
-
-        private const float HEIGHT_IMG_3 = 116;
+        /// <summary>
+        /// ウインドウサイズ定義
+        /// </summary>
+        private const float HEIGHT_IMG_3 = 120;
         private const float HEIGHT_TXT_3 = 46;
         private const float POS_Y_TXT_3 = -8.0f;
 
-        private const float HEIGHT_IMG_2 = 98;
+        private const float HEIGHT_IMG_2 = 105;
         private const float HEIGHT_TXT_2 = 32;
         private const float POS_Y_TXT_2 = -7.0f;
 
-        private const float HEIGHT_IMG_1 = 60;
+        private const float HEIGHT_IMG_1 = 90;
         private const float HEIGHT_TXT_1 = 16;
         private const float POS_Y_TXT_1 = -5.5f;
+
+        private const float HEIGHT_IMG_FIX = 60; //固定高さ
 
 
         /// <summary>
@@ -308,7 +340,7 @@ namespace Assets.Scripts.DataChar
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public LiplisWindow CreateWindowTalk(string message,  MsgWindowInfo windowInfo)
+        public LiplisWindow CreateWindowTalk(GameObject window, Transform canvasParent,string message)
         {
             try
             {
@@ -339,28 +371,20 @@ namespace Assets.Scripts.DataChar
                     heightText = HEIGHT_TXT_1;
                     posTextY = POS_Y_TXT_1;
                 }
-
+                
                 //ウインドウ名設定
-                windowInfo.window.name = "TalkWindow" + WindowTalkListQ.Count;
+                window.name = "TalkWindow" + WindowTalkListQ.Count;
 
                 //位置設定
-                windowInfo.window.transform.position = WINDOW_POS.GetPos(Position);
+                window.transform.position = WINDOW_POS.GetPos(NowModelLocation);
 
                 //サイズ変更
-                RectTransform windowRect = windowInfo.window.GetComponent<RectTransform>();
+                RectTransform windowRect = window.GetComponent<RectTransform>();
                 windowRect.sizeDelta = new Vector2(width, heightImg);
-
-                //テキスト　サイズ、位置調整
-                Vector3 txtPos = windowInfo.windowText.transform.position;
-                windowInfo.windowText.transform.position = new Vector3(txtPos.x, txtPos.y + posTextY, txtPos.z);
-                RectTransform textRect = windowInfo.windowText.GetComponent<RectTransform>();
-                textRect.sizeDelta = new Vector2(width, (float)(heightText));
-
-                //スケール設定
-                windowInfo.window.transform.localScale = new Vector3(1, 1, 1);
+                windowRect.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
                 //ウインドウインスタンス取得
-                TalkWindow imgWindow = windowInfo.window.GetComponent<TalkWindow>();
+                TalkWindow imgWindow = window.GetComponent<TalkWindow>();
 
                 //モデル設定
                 imgWindow.TargetModelName = NowModelName;
@@ -369,10 +393,10 @@ namespace Assets.Scripts.DataChar
                 imgWindow.SetNextLine(message);
 
                 //親キャンバスに登録
-                windowInfo.window.transform.SetParent(windowInfo.canvasParent, false);
+                window.transform.SetParent(canvasParent, false);
 
                 //結果を返す
-                return new LiplisWindow(windowInfo.window, heightImg, heightText, posTextY);
+                return new LiplisWindow(window, heightImg, heightText, posTextY);
             }
             catch
             {
@@ -416,6 +440,14 @@ namespace Assets.Scripts.DataChar
 
                 //ウインドウ移動量設定
                 SlideWindow(window.heightImg, prvHeight);
+
+                foreach (var w in WindowTalkListQ)
+                {
+                    if(w.imgWindow._bubbleText.text.text=="")
+                    {
+                        Debug.Log("");
+                    }
+                }
             }
 
             //キューに追加
@@ -428,7 +460,7 @@ namespace Assets.Scripts.DataChar
         /// <summary>
         /// ウインドをスライドする
         /// </summary>
-        private const float WINDOW_MOVE_VAL = 50;
+        private const float WINDOW_MOVE_VAL = 100;
         private void SlideWindow(float heightImg, float prvHeight)
         {
             //ウインドウが無ければ動かさない
@@ -452,6 +484,15 @@ namespace Assets.Scripts.DataChar
         }
 
         /// <summary>
+        /// ウインドウ移動量定義
+        /// </summary>
+        private const float MOVE_VAL_2 = 30f;
+        private const float MOVE_VAL_3 = 37.5f;
+        private const float MOVE_VAL_4 = 45f;
+        private const float MOVE_VAL_5 = 52.5f;
+        private const float MOVE_VAL_6 = 60f;
+
+        /// <summary>
         /// ウインドウ移動量を計算する
         /// </summary>
         /// <param name="heightImg"></param>
@@ -464,58 +505,48 @@ namespace Assets.Scripts.DataChar
             //今回動かす先頭ウインドウのサイズをチェック
             if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_1)
             {
-                moveVal = 10.0f * CulcWidthRate();
+                moveVal = MOVE_VAL_2;      //2
             }
-            else if (heightImg == HEIGHT_IMG_2 && prvHeight == HEIGHT_IMG_2)
+            else if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_2)
             {
-                moveVal = 14.0f * CulcWidthRate();
+                moveVal = MOVE_VAL_3;      //3
             }
-            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_3)
+            else if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_3)
             {
-                moveVal = 20.0f * CulcWidthRate();
+                moveVal = MOVE_VAL_4;      //4
             }
 
             else if (heightImg == HEIGHT_IMG_2 && prvHeight == HEIGHT_IMG_1)
             {
-                moveVal = 10.0f * CulcWidthRate();
+                moveVal = MOVE_VAL_3;      //3
             }
-            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_1)
+            else if (heightImg == HEIGHT_IMG_2 && prvHeight == HEIGHT_IMG_2)
             {
-                moveVal = 14.0f * CulcWidthRate();
-            }
-
-            else if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_2)
-            {
-                moveVal = 14.0f * CulcWidthRate();
-            }
-            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_2)
-            {
-                moveVal = 18.5f * CulcWidthRate();
-            }
-
-            else if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_3)
-            {
-                moveVal = 18.5f * CulcWidthRate();
+                moveVal = MOVE_VAL_4;      //4
             }
             else if (heightImg == HEIGHT_IMG_2 && prvHeight == HEIGHT_IMG_3)
             {
-                moveVal = 18.5f * CulcWidthRate();
+                moveVal = MOVE_VAL_5;      //5
             }
+
+            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_1)
+            {
+                moveVal = MOVE_VAL_4;      //4
+            }
+            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_2)
+            {
+                moveVal = MOVE_VAL_5;      //5
+            }
+            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_3)
+            {
+                moveVal = MOVE_VAL_6;      //6
+            }
+
 
 
             return moveVal;
         }
-
-        /// <summary>
-        /// 幅方向比率を取得する
-        /// </summary>
-        /// <returns></returns>
-        private float CulcWidthRate()
-        {
-            return Screen.width / 380.0f;
-        }
-
-
+        
         /// <summary>
         /// 先頭ウインドウをサクジョする
         /// </summary>

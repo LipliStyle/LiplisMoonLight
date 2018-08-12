@@ -10,6 +10,7 @@ using System;
 
 namespace Assets.Scripts.LiplisSystem.Msg
 {
+    [Serializable]
     public class MsgBaseNewsData
     {
         ///=============================
@@ -21,5 +22,9 @@ namespace Assets.Scripts.LiplisSystem.Msg
         public string TITLE;             //ニュースタイトル
         public string URL;               //ニュースURL
         public string THUMBNAIL_URL;     //サムネURL
+        public int THUMBNAIL_HEIGHT;     //サムネ高さ
+        public int THUMBNAIL_WIDTH;      //サムネ幅
+        public int THUMBNAIL_SIZE;       //サムネサイズ
+        public byte[] THUMBNAIL_DATA;    //サムネデータ
     }
 }

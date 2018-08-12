@@ -9,6 +9,7 @@
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //=======================================================================﻿
 using Assets.Scripts.Data;
+using Assets.Scripts.Define;
 using System.Collections;
 
 public class TabRetweet : TabBaseTopicList
@@ -31,6 +32,8 @@ public class TabRetweet : TabBaseTopicList
     protected override void Start()
     {
         this.Clear();
+        this.Categoly = ContentCategoly.retweet;
+        base.Start();
     }
 
     #endregion

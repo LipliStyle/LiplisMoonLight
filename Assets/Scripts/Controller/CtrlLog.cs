@@ -168,7 +168,7 @@ public class CtrlLog : MonoBehaviour {
     {
         if (empty == null)
         {
-            empty = new Texture();
+            empty = new Texture2D(0, 0);
         }
     }
 

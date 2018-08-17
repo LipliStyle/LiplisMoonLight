@@ -68,7 +68,7 @@ public abstract class TabBaseTopicList : MonoBehaviour
     /// </summary>
     protected void InitClass()
     {
-        empty = new Sprite();
+        empty = Sprite.Create(new Texture2D(0,0),new Rect(),new  Vector2());
 
         this.PrefabNewsPanel = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_NEWS_PANEL);
     }

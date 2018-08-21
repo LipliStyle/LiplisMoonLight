@@ -1,8 +1,5 @@
-﻿using Assets.Scripts.Data;
-using Assets.Scripts.LiplisSystem.Com;
-using Newtonsoft.Json.Serialization;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UiCanvasFront : MonoBehaviour {

@@ -48,6 +48,12 @@ namespace Assets.Scripts.Data
                 if (data == null)
                 {
                     string path = Application.persistentDataPath + "/";
+
+#if UNITY_IOS
+                    //IOSの場合は、バックアップ不可属性を付けておく
+                    UnityEngine.iOS.Device.SetNoBackupFlag(path);
+#endif
+
                     string fileName = Application.companyName + "." + Application.productName + ".savedata.json";
                     data = new SaveDataBase(path, fileName);
                 }

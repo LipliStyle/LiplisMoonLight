@@ -173,7 +173,7 @@ PlayerSettings:
   keepLoadedShadersAlive: 0
   StripUnusedMeshComponents: 0
   VertexChannelCompressionMask: 214
-  iPhoneSdkVersion: 988
+  iPhoneSdkVersion: 989
   iOSTargetOSVersionString: 8.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
@@ -662,11 +662,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: LiplisLunaLeafProto03
   metroPackageVersion: 1.0.0.0
-  metroCertificatePath: 
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: LipliStyle
+  metroCertificateIssuer: LipliStyle
+  metroCertificateNotAfter: 00a3841e4e58d501
   metroApplicationDescription: LiplisLunaLeafProto03
   wsaImages: {}
   metroTileShortName: 

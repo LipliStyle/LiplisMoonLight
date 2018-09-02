@@ -7,7 +7,6 @@
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //====================================================================
 using Assets.Scripts.DataChar.CharacterTalk;
-using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.LiplisSystem.Mst;
 using Assets.Scripts.LiplisSystem.UI;
 using System;

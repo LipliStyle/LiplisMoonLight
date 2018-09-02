@@ -19,6 +19,7 @@ namespace Assets.Scripts.DataChar
 {
     public class CharacterDataList
     {
+        //キャラクターデータ管理
         public Dictionary<string, CharacterData> CharDataList { get; set; }
         public Dictionary<int, CharacterData> CharIdList { get; set; }
         public List<CharacterData> CharList { get; set; }
@@ -63,7 +64,10 @@ namespace Assets.Scripts.DataChar
             return LAppLive2DManager.Instance.GetModel(CharIdList[AllocationId].NowModelName);
         }
 
-
+        /// <summary>
+        /// ランダムにキャラクターを取得する
+        /// </summary>
+        /// <returns></returns>
         public CharacterData GetCharacterRandam()
         {
             //シャッフルする

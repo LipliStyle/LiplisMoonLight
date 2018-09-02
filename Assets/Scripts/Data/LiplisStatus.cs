@@ -81,8 +81,6 @@ namespace Assets.Scripts.Data
         //環境情報
         public DatEnvironmentInfomation EnvironmentInfo;
 
-
-
         //キャラクターデータ
         public CharacterDataList CharDataList;
 

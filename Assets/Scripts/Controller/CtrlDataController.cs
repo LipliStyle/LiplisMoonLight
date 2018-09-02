@@ -207,11 +207,12 @@ public class CtrlDataController : ConcurrentBehaviour
     /// </summary>
     public void Load()
     {
-        //指定キー「LiplisStatus」でリプリスステータスのインスタンスをロードする
-        LiplisStatus.SetInstance(SaveData.GetClass<LiplisStatus>(LpsDefine.SETKEY_LIPLIS_STATUS, LiplisStatus.Instance));
+        //必ず設定ロードを先に呼ぶ！
+        //指定キー「LiplisStatus」でリプリスセッティングのインスタンスをロードする
+        LiplisSetting.SetInstance(SaveDataSetting.GetClass<LiplisSetting>(LpsDefine.SETKEY_LIPLIS_SETTING, LiplisSetting.Instance));
 
         //指定キー「LiplisStatus」でリプリスステータスのインスタンスをロードする
-        LiplisSetting.SetInstance(SaveDataSetting.GetClass<LiplisSetting>(LpsDefine.SETKEY_LIPLIS_SETTING, LiplisSetting.Instance));
+        LiplisStatus.SetInstance(SaveData.GetClass<LiplisStatus>(LpsDefine.SETKEY_LIPLIS_STATUS, LiplisStatus.Instance));
 
         //キャッシュインスタンス化
         LiplisCache c = LiplisCache.Instance;

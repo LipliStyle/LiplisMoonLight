@@ -16,5 +16,6 @@ namespace Assets.Scripts.DataChar
 {
     interface CharacterDataInterface
     {
+
     }
 }

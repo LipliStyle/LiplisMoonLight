@@ -1,4 +1,12 @@
-﻿using UnityEngine;
+﻿//=======================================================================
+//  ClassName : HyphenationJpn
+//  概要      : 禁則処理
+//
+// http://answers.unity3d.com/questions/424874/showing-a-textarea-field-for-a-string-variable-in.html
+//  LiplisLive2DSystem
+//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//=======================================================================﻿
+using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
@@ -8,7 +16,7 @@ using System;
 
 public class HyphenationJpn : UIBehaviour
 {
-    // http://answers.unity3d.com/questions/424874/showing-a-textarea-field-for-a-string-variable-in.html
+   
     [TextArea(3, 10), SerializeField]
     private string text;
 

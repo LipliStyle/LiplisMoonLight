@@ -8,11 +8,10 @@
 //====================================================================
 using Assets.Scripts.DataChar.Rabiits;
 using Assets.Scripts.Define;
+using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.LiplisSystem.Web.Clalis.v40;
 using System.Collections.Generic;
-using Assets.Scripts.LiplisSystem.Com;
-using Assets.Scripts.LiplisSystem.Mst;
 using UnityEngine;
 
 namespace Assets.Scripts.DataChar

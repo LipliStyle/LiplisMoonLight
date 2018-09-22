@@ -10,7 +10,6 @@ using Assets.Scripts.Common;
 using Assets.Scripts.DataChar.CharacterTalk;
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Msg;
-using Assets.Scripts.LiplisSystem.Mst;
 
 namespace Assets.Scripts.DataChar.Rabiits
 {

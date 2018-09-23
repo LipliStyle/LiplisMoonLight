@@ -90,7 +90,7 @@ namespace Assets.Scripts.Utils
 
                     ImgThumbnail.texture = www.texture;
                 }
-                catch (Exception ex)
+                catch
                 {
                     ImgThumbnail.texture = empty;
                 }

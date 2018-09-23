@@ -36,7 +36,6 @@ namespace Assets.Scripts.LiplisUi
             {
                 image.color = new Color(image.color.r, image.color.g, image.color.b, 0);
             }
-            
         }
 
         /// <summary>

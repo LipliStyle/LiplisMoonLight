@@ -25,8 +25,8 @@ using UnityEngine.UI;
 
 public class CtrlTalk : ConcurrentBehaviour
 {
-    ///=============================
-    /// ウインドウ保持時間
+    //=============================
+    // ウインドウ保持時間
     private const int WINDOW_LIFESPAN_TIME = 60;            //ウインドウの寿命
     private const int TALK_WAIT_DEFAULT = 7;
     private const int TALK_WAIT_NEUTRAL_DEFAULT = 5;

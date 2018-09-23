@@ -17,6 +17,7 @@ namespace Assets.Scripts.DataChar
 {
     public class CharacterData
     {
+        //=============================
         //現在ロード中モデル定義名
         public string ModelName;
 
@@ -34,9 +35,9 @@ namespace Assets.Scripts.DataChar
         public int AllocationId;
         //ウインドウキューリスト
         public Queue<LiplisWindow> WindowTalkListQ;
-        //一つ前ウインドウ
+        //現在おしゃべりウインドウ
         public LiplisWindow NowTalkWindow;
-        //一つ前ウインドウ
+        //ウインドウ名
         public string WindowName;
         //ウインドウインスタンス
         public GameObject WindowInstances;

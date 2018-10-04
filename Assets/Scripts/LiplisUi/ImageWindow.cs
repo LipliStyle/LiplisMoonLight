@@ -24,6 +24,10 @@ public class ImageWindow : ConcurrentBehaviour
     private List<MsgThumbnailData> thumbnailList;   //サムネリスト
 
     ///=============================
+    ///画面制御
+    public DateTime CreateTime { get; set; }
+
+    ///=============================
     ///子コンポーネント名
     private const string CHILD_COMPONENT_IMAGE_TOPIC = "TopicImage";
     private const string CHILD_COMPONENT_TEXT_TITLE = "TextTitle";
@@ -144,6 +148,23 @@ public class ImageWindow : ConcurrentBehaviour
         {
             this.TargetPosition = ParentWindow.transform.position;
         }
+    }
+
+    /// <summary>
+    /// ウインドウ生成時刻をセットする
+    /// </summary>
+    /// <param name="CreateTime"></param>
+    public void SetCreateTime(DateTime CreateTime)
+    {
+        this.CreateTime = CreateTime;
+    }
+
+    /// <summary>
+    /// フェードイン
+    /// </summary>
+    public void FaidIn()
+    {
+        this.flgOn = true;
     }
 
     /// <summary>
@@ -603,6 +624,15 @@ public class ImageWindow : ConcurrentBehaviour
             //サイズ是正
             FixPicture();
         }
+    }
+
+
+    /// <summary>
+    /// ウインドウを閉じる
+    /// </summary>
+    public void CloseWindow()
+    {
+        this.flgEnd = true;
     }
 
     //====================================================================

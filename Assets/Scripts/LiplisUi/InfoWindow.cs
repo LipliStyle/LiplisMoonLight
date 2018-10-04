@@ -30,6 +30,10 @@ public class InfoWindow : ConcurrentBehaviour
     public GameObject ParentWindow { get; set; }
 
     ///=============================
+    ///登録オブジェクト
+    public DateTime CreateTime { get; set; }
+
+    ///=============================
     ///制御フラグ
     public bool flgOn;
     public bool flgFadeTrans;

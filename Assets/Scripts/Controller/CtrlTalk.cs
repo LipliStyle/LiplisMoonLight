@@ -37,13 +37,13 @@ public class CtrlTalk : ConcurrentBehaviour
     ///=============================
     /// ウインドウインスタンス
     private Queue<LiplisTitleWindow> WindowTitleListQ;
-    private Queue<LiplisImageWindow> WindowImageListQ;
+    private Queue<ImageWindow> WindowImageListQ;
 
     ///=============================
     /// 現在処理中ウインドウインスタンス
     private TalkWindow NowTalkWindow;
     private LiplisTitleWindow NowTitleWindow;
-    private LiplisImageWindow NowImageWindow;
+    private ImageWindow NowImageWindow;
 
     ///=============================
     /// 現在ロードトピック
@@ -155,7 +155,7 @@ public class CtrlTalk : ConcurrentBehaviour
     void init()
     {
         if (this.WindowTitleListQ == null) { WindowTitleListQ = new Queue<LiplisTitleWindow>(); }
-        if (this.WindowImageListQ == null) { WindowImageListQ = new Queue<LiplisImageWindow>(); }
+        if (this.WindowImageListQ == null) { WindowImageListQ = new Queue<ImageWindow>(); }
         instance = this;
 
         //なうセンテンスカウント 初期化
@@ -1584,7 +1584,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// <summary>
     /// ウインドウを作成する
     /// </summary>
-    private LiplisImageWindow CreateWindowImage()
+    private ImageWindow CreateWindowImage()
     {
         //ウインドウのプレハブからインスタンス生成
         InitImageWindowInstanse();
@@ -1595,9 +1595,6 @@ public class CtrlTalk : ConcurrentBehaviour
         //ウインドウ名設定
         window.name = "ImageWindow" + WindowImageListQ.Count;
 
-        //ウインドウ生成
-        LiplisImageWindow lpsWindow = new LiplisImageWindow(window);
-
         //位置設定
         //window.transform.position = new Vector3(LpsDefine.SCREAN_DEFAULT_WIDTH / 6, IMAGE_POS_Y, IMAGE_POS_Z);
         window.transform.position = new Vector3(-999, -999, 0);
@@ -1607,6 +1604,15 @@ public class CtrlTalk : ConcurrentBehaviour
 
         //親キャンバスに登録
         window.transform.SetParent(UiRenderingBack.transform, false);
+
+        //ウインドウ生成
+        ImageWindow lpsWindow = window.GetComponent<ImageWindow>();
+
+        //親ウインドウ登録
+        lpsWindow.SetParentWindow(window);
+
+        //生成時刻登録
+        lpsWindow.SetCreateTime(DateTime.Now);
 
         //結果を返す
         return lpsWindow;

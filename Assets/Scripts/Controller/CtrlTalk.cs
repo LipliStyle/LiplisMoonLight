@@ -36,13 +36,13 @@ public class CtrlTalk : ConcurrentBehaviour
 
     ///=============================
     /// ウインドウインスタンス
-    private Queue<LiplisTitleWindow> WindowTitleListQ;
+    private Queue<InfoWindow> WindowTitleListQ;
     private Queue<ImageWindow> WindowImageListQ;
 
     ///=============================
     /// 現在処理中ウインドウインスタンス
     private TalkWindow NowTalkWindow;
-    private LiplisTitleWindow NowTitleWindow;
+    private InfoWindow NowTitleWindow;
     private ImageWindow NowImageWindow;
 
     ///=============================
@@ -154,7 +154,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     void init()
     {
-        if (this.WindowTitleListQ == null) { WindowTitleListQ = new Queue<LiplisTitleWindow>(); }
+        if (this.WindowTitleListQ == null) { WindowTitleListQ = new Queue<InfoWindow>(); }
         if (this.WindowImageListQ == null) { WindowImageListQ = new Queue<ImageWindow>(); }
         instance = this;
 
@@ -1337,7 +1337,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="z"></param>
-    private LiplisTitleWindow CreateWindowTitle(float x, float y, float z, string message, string url)
+    private InfoWindow CreateWindowTitle(float x, float y, float z, string message, string url)
     {
         message = message.Trim().Replace("\n", "");
 
@@ -1389,6 +1389,12 @@ public class CtrlTalk : ConcurrentBehaviour
         //親キャンバスに登録
         window.transform.SetParent(UiRenderingFront.transform, false);
 
+        //親ウインドウ登録
+        imgWindow.SetParentWindow(window);
+
+        //生成時刻セット
+        imgWindow.SetCreateTime(DateTime.Now);
+
         //クリックイベント
         try
         {
@@ -1401,8 +1407,9 @@ public class CtrlTalk : ConcurrentBehaviour
             Debug.Log(ex.Message);
         }
 
+
         //結果を返す
-        return new LiplisTitleWindow(window, heightImg);
+        return imgWindow;
     }
 
 
@@ -1454,17 +1461,17 @@ public class CtrlTalk : ConcurrentBehaviour
         float z = TITLE_POS_Z;
 
         //ウインドウ生成
-        LiplisTitleWindow window = null;
+        InfoWindow window = null;
 
         if (WindowTitleListQ.Count >= 1)
         {
             //1個前のウインドウ取得
-            LiplisTitleWindow LastWindow = WindowTitleListQ.Dequeue();
+            InfoWindow LastWindow = WindowTitleListQ.Dequeue();
 
             //現在ウインドウXYZ取得
-            x = LastWindow.imgWindow.ParentWindow.transform.localPosition.x;
-            y = LastWindow.imgWindow.ParentWindow.transform.localPosition.y;
-            z = LastWindow.imgWindow.ParentWindow.transform.localPosition.z;
+            x = LastWindow.ParentWindow.transform.localPosition.x;
+            y = LastWindow.ParentWindow.transform.localPosition.y;
+            z = LastWindow.ParentWindow.transform.localPosition.z;
 
             //ウインドウ生成
             window = CreateWindowTitle(x, y, z, message, url);

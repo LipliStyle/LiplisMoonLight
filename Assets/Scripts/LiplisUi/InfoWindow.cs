@@ -72,6 +72,15 @@ public class InfoWindow : ConcurrentBehaviour
         this.ParentWindow = ParentWindow;
     }
 
+    /// <summary>
+    /// ウインドウ生成時刻をセットする
+    /// </summary>
+    /// <param name="CreateTime"></param>
+    public void SetCreateTime(DateTime CreateTime)
+    {
+        this.CreateTime = CreateTime;
+    }
+
     // Update is called once per frame
     void Update () {
         //フェードイン処理
@@ -214,5 +223,13 @@ public class InfoWindow : ConcurrentBehaviour
     public void SetMoveTarget(Vector3 TargetPosition)
     {
         this.ParentWindow.transform.localPosition = TargetPosition;
+    }
+
+    /// <summary>
+    /// ウインドウを閉じる
+    /// </summary>
+    public void CloseWindow()
+    {
+        this.flgEnd = true;
     }
 }

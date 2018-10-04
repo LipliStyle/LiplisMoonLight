@@ -7,7 +7,7 @@
 //　　　　　　　　　　　　　→開放処理をCtrlGameControllerに移動
 //
 //  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
 using Assets.Scripts.Data;
 using Assets.Scripts.Data.SubData;

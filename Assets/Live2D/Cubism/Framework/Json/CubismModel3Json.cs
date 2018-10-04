@@ -256,12 +256,17 @@ namespace Live2D.Cubism.Framework.Json
 #endif
 
 
-            // Create renderers.
+            // CubismRenderControllerアタッチ
             var rendererController = model.gameObject.AddComponent<CubismRenderController>();
+
+            //レンダラー取得
             var renderers = rendererController.Renderers;
 
+            //ドローエイブル取得
             var drawables = model.Drawables;
 
+            //オーディオソースアタッチ
+            model.gameObject.AddComponent<AudioSource>();
 
             // Initialize materials.
             for (var i = 0; i < renderers.Length; ++i)
@@ -280,7 +285,6 @@ namespace Live2D.Cubism.Framework.Json
             // Initialize groups.
             var parameters = model.Parameters;
 
-
             for (var i = 0; i < parameters.Length; ++i)
             {
                 if (IsParameterInGroup(parameters[i], "EyeBlink"))
@@ -288,8 +292,15 @@ namespace Live2D.Cubism.Framework.Json
                     if (model.gameObject.GetComponent<CubismEyeBlinkController>() == null)
                     {
                         model.gameObject.AddComponent<CubismEyeBlinkController>();
-                    }
 
+                        //上書きモードに設定
+                        model.gameObject.GetComponent<CubismEyeBlinkController>().BlendMode = CubismParameterBlendMode.Override;
+                    }
+                    //まばたきが存在したら、瞬きコントローラ追加
+                    if (model.gameObject.GetComponent<CubismAutoEyeBlinkInput>() == null)
+                    {
+                        model.gameObject.AddComponent<CubismAutoEyeBlinkInput>();
+                    }
 
                     parameters[i].gameObject.AddComponent<CubismEyeBlinkParameter>();
                 }
@@ -301,12 +312,20 @@ namespace Live2D.Cubism.Framework.Json
                     if (model.gameObject.GetComponent<CubismMouthController>() == null)
                     {
                         model.gameObject.AddComponent<CubismMouthController>();
+
+                        //上書きモードに設定
+                        model.gameObject.GetComponent<CubismMouthController>().BlendMode = CubismParameterBlendMode.Override;
+                    }
+                    if (model.gameObject.GetComponent<CubismAutoMouthInput>() == null)
+                    {
+                        model.gameObject.AddComponent<CubismAutoMouthInput>();
                     }
 
 
                     parameters[i].gameObject.AddComponent<CubismMouthParameter>();
                 }
             }
+
 
 
             // Add mask controller if required.

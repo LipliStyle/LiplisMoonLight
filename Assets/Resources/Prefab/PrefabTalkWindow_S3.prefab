@@ -23,8 +23,8 @@ GameObject:
   - component: {fileID: 114762586585693530}
   - component: {fileID: 114364050338001760}
   - component: {fileID: 114327602247366388}
-  - component: {fileID: 114977533545438154}
-  - component: {fileID: 114139012065938006}
+  - component: {fileID: 114588871213266440}
+  - component: {fileID: 114963633794657526}
   m_Layer: 5
   m_Name: PrefabTalkWindow_S3
   m_TagString: Untagged
@@ -50,28 +50,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &114139012065938006
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1271886704210180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a9ed8acb4facc341a499c1d23e19165, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  alfa: 0
-  flgOn: 0
-  flgFadeTrans: 0
-  flgEnd: 0
-  TargetModelName: 
-  FlgTalking: 0
-  _bubbleText: {fileID: 114253430183527974}
-  _maxImageWidth: 300
-  _maxImageHeight: 200
-  _printSpeed: 0.1
-  _isSayToClear: 0
 --- !u!114 &114253430183527974
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -150,6 +128,28 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
+--- !u!114 &114588871213266440
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1271886704210180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dbdfcaf830b13448b07929d624f2e2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  alfa: 0
+  flgOn: 0
+  flgFadeTrans: 0
+  flgEnd: 0
+  FlgTalking: 0
+  _bubbleText: {fileID: 114853004142031954, guid: ec2458affb51371418db3f3e33000ade,
+    type: 2}
+  _maxImageWidth: 0
+  _maxImageHeight: 0
+  _printSpeed: 0.1
+  _isSayToClear: 0
 --- !u!114 &114762586585693530
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -177,7 +177,7 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114977533545438154
+--- !u!114 &114963633794657526
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -185,7 +185,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1271886704210180}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 335a2de14e6b4e74f9c1fd7fd7f0b9f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e9d5cfbe2d6d2148a0266d73958fccf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!222 &222242916072325216

@@ -1,0 +1,361 @@
+﻿{
+  "ModelName": "Kuroha",
+  "ModelType": 0,
+  "ModelList": [
+    {
+      "FileName": "Hazuki_Right.model3.json",
+      "MotionList": [
+        {
+          "FileName": "MOTION_COMMON_NORMAL_03.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_04.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_PEACE_M_01.motion3.json",
+          "Emotion": -3
+        },
+        {
+          "FileName": "MOTION_COMMON_RAGE_P_01.motion3.json",
+          "Emotion": 6
+        },
+        {
+          "FileName": "MOTION_IDLE_01.motion3.json",
+          "Emotion": 99
+        },
+        {
+          "FileName": "MOTION_IDLE_02.motion3.json",
+          "Emotion": 99
+        },
+        {
+          "FileName": "MOTION_JOY_M_01.motion3.json",
+          "Emotion": -1
+        },
+        {
+          "FileName": "MOTION_JOY_P_01.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_JOY_P_02.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_JOY_P_03.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_NORMAL_01.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_PEACE_P_01.motion3.json",
+          "Emotion": 3
+        },
+        {
+          "FileName": "MOTION_PROUD_M_01.motion3.json",
+          "Emotion": -10
+        },
+        {
+          "FileName": "MOTION_PROUD_P_01.motion3.json",
+          "Emotion": 10
+        },
+        {
+          "FileName": "MOTION_RAGE_P_01.motion3.json",
+          "Emotion": 6
+        },
+        {
+          "FileName": "MOTION_AMAZEMENT_P_01.motion3.json",
+          "Emotion": 5
+        },
+        {
+          "FileName": "MOTION_COMMON_ADMIRATION_M_01.motion3.json",
+          "Emotion": -2
+        },
+        {
+          "FileName": "MOTION_COMMON_INTEREST_M_02.motion3.json",
+          "Emotion": -7
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_01.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_02.motion3.json",
+          "Emotion": 0
+        }
+      ],
+      "Direction": 1
+    },
+    {
+      "FileName": "Hazuki_Front.model3.json",
+      "MotionList": [
+        {
+          "FileName": "MOTION_COMMON_NORMAL_03.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_04.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_PEACE_M_01.motion3.json",
+          "Emotion": -3
+        },
+        {
+          "FileName": "MOTION_COMMON_RAGE_P_01.motion3.json",
+          "Emotion": 6
+        },
+        {
+          "FileName": "MOTION_IDLE_01.motion3.json",
+          "Emotion": 99
+        },
+        {
+          "FileName": "MOTION_IDLE_02.motion3.json",
+          "Emotion": 99
+        },
+        {
+          "FileName": "MOTION_JOY_M_01.motion3.json",
+          "Emotion": -1
+        },
+        {
+          "FileName": "MOTION_JOY_P_01.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_JOY_P_02.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_JOY_P_03.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_NORMAL_01.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_PEACE_P_01.motion3.json",
+          "Emotion": 3
+        },
+        {
+          "FileName": "MOTION_PROUD_M_01.motion3.json",
+          "Emotion": -10
+        },
+        {
+          "FileName": "MOTION_PROUD_P_01.motion3.json",
+          "Emotion": 10
+        },
+        {
+          "FileName": "MOTION_RAGE_P_01.motion3.json",
+          "Emotion": 6
+        },
+        {
+          "FileName": "MOTION_AMAZEMENT_P_01.motion3.json",
+          "Emotion": 5
+        },
+        {
+          "FileName": "MOTION_COMMON_ADMIRATION_M_01.motion3.json",
+          "Emotion": -2
+        },
+        {
+          "FileName": "MOTION_COMMON_INTEREST_M_02.motion3.json",
+          "Emotion": -7
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_01.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_02.motion3.json",
+          "Emotion": 0
+        }
+      ],
+      "Direction": 0
+    },
+    {
+      "FileName": "Hazuki_Left.model3.json",
+      "MotionList": [
+        {
+          "FileName": "MOTION_COMMON_NORMAL_01.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_02.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_03.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_NORMAL_04.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_COMMON_PEACE_M_01.motion3.json",
+          "Emotion": -3
+        },
+        {
+          "FileName": "MOTION_COMMON_RAGE_P_01.motion3.json",
+          "Emotion": 6
+        },
+        {
+          "FileName": "MOTION_IDLE_01.motion3.json",
+          "Emotion": 99
+        },
+        {
+          "FileName": "MOTION_IDLE_02.motion3.json",
+          "Emotion": 99
+        },
+        {
+          "FileName": "MOTION_JOY_M_01.motion3.json",
+          "Emotion": -1
+        },
+        {
+          "FileName": "MOTION_JOY_P_01.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_JOY_P_02.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_JOY_P_03.motion3.json",
+          "Emotion": 1
+        },
+        {
+          "FileName": "MOTION_NORMAL_01.motion3.json",
+          "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_PEACE_P_01.motion3.json",
+          "Emotion": 3
+        },
+        {
+          "FileName": "MOTION_PROUD_M_01.motion3.json",
+          "Emotion": -10
+        },
+        {
+          "FileName": "MOTION_PROUD_P_01.motion3.json",
+          "Emotion": 10
+        },
+        {
+          "FileName": "MOTION_RAGE_P_01.motion3.json",
+          "Emotion": 6
+        },
+        {
+          "FileName": "MOTION_AMAZEMENT_P_01.motion3.json",
+          "Emotion": 5
+        },
+        {
+          "FileName": "MOTION_COMMON_ADMIRATION_M_01.motion3.json",
+          "Emotion": -2
+        },
+        {
+          "FileName": "MOTION_COMMON_INTEREST_M_02.motion3.json",
+          "Emotion": -7
+        }
+      ],
+      "Direction": 2
+    }
+  ],
+  "ExpressionList": [
+    {
+      "FileName": "EMOTION_02_ADMIRATION_P_02.motion3.json",
+      "Emotion": 2
+    },
+    {
+      "FileName": "EMOTION_03_PEACE_M_01.motion3.json",
+      "Emotion": -3
+    },
+    {
+      "FileName": "EMOTION_03_PEACE_P_01.motion3.json",
+      "Emotion": 3
+    },
+    {
+      "FileName": "EMOTION_04_ECSTASY_M_01.motion3.json",
+      "Emotion": -4
+    },
+    {
+      "FileName": "EMOTION_04_ECSTASY_P_01.motion3.json",
+      "Emotion": 4
+    },
+    {
+      "FileName": "EMOTION_05_AMAZEMENT_M_01.motion3.json",
+      "Emotion": -5
+    },
+    {
+      "FileName": "EMOTION_05_AMAZEMENT_P_01.motion3.json",
+      "Emotion": 5
+    },
+    {
+      "FileName": "EMOTION_06_RAGE_M_01.motion3.json",
+      "Emotion": -6
+    },
+    {
+      "FileName": "EMOTION_06_RAGE_P_01.motion3.json",
+      "Emotion": 6
+    },
+    {
+      "FileName": "EMOTION_07_INTETEST_M_01.motion3.json",
+      "Emotion": -7
+    },
+    {
+      "FileName": "EMOTION_07_INTETEST_P_01.motion3.json",
+      "Emotion": 7
+    },
+    {
+      "FileName": "EMOTION_08_RESPECT_M_01.motion3.json",
+      "Emotion": -8
+    },
+    {
+      "FileName": "EMOTION_08_RESPECT_P_01.motion3.json",
+      "Emotion": 8
+    },
+    {
+      "FileName": "EMOTION_09_CLAMLY_M_01.motion3.json",
+      "Emotion": -9
+    },
+    {
+      "FileName": "EMOTION_09_CLAMLY_P_01.motion3.json",
+      "Emotion": 9
+    },
+    {
+      "FileName": "EMOTION_10_PROUD_M_01.motion3.json",
+      "Emotion": -10
+    },
+    {
+      "FileName": "EMOTION_10_PROUD_P_01.motion3.json",
+      "Emotion": 10
+    },
+    {
+      "FileName": "EMOTION_00_NORMAL_01.motion3.json",
+      "Emotion": 0
+    },
+    {
+      "FileName": "EMOTION_01_JOY_M_01.motion3.json",
+      "Emotion": -1
+    },
+    {
+      "FileName": "EMOTION_01_JOY_P_01.motion3.json",
+      "Emotion": 1
+    },
+    {
+      "FileName": "EMOTION_01_JOY_P_02.motion3.json",
+      "Emotion": 1
+    },
+    {
+      "FileName": "EMOTION_02_ADMIRATION_M_01.motion3.json",
+      "Emotion": -2
+    },
+    {
+      "FileName": "EMOTION_02_ADMIRATION_P_01.motion3.json",
+      "Emotion": 2
+    }
+  ],
+  "IconCharacter": "IconCharacter.png",
+  "LiplisTalkWindow": "LiplisTalkWindow.png",
+  "LiplisTalkWindowLog": "LiplisTalkWindowLog.png"
+}

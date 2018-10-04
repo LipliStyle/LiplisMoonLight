@@ -91,9 +91,9 @@ GameObject:
   - component: {fileID: 224141962070360688}
   - component: {fileID: 222566831039527024}
   - component: {fileID: 114356547278497342}
-  - component: {fileID: 114575392468639338}
-  - component: {fileID: 114670242302128304}
-  - component: {fileID: 114855211874593922}
+  - component: {fileID: 114610380156941020}
+  - component: {fileID: 114131105474431184}
+  - component: {fileID: 114526498916716584}
   m_Layer: 0
   m_Name: PrefabImageWindow
   m_TagString: Untagged
@@ -201,6 +201,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114131105474431184
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1615637376806614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9d5cfbe2d6d2148a0266d73958fccf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114205968477181300
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -278,7 +289,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114575392468639338}
+      - m_Target: {fileID: 0}
         m_MethodName: 
         m_Mode: 1
         m_Arguments:
@@ -330,7 +341,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114575392468639338}
+      - m_Target: {fileID: 0}
         m_MethodName: Btn_Right_Click
         m_Mode: 1
         m_Arguments:
@@ -424,6 +435,18 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114526498916716584
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1615637376806614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfa5442ab48214e42b9ae8251e0f2815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_rectTransform: {fileID: 224141962070360688}
 --- !u!114 &114532910859769618
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -440,7 +463,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 114575392468639338}
+        - m_Target: {fileID: 0}
           m_MethodName: OnPointerClick
           m_Mode: 1
           m_Arguments:
@@ -454,7 +477,7 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
---- !u!114 &114575392468639338
+--- !u!114 &114610380156941020
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -462,24 +485,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1615637376806614}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f810d271825c6745988fc7442400aa4, type: 3}
+  m_Script: {fileID: 11500000, guid: 48e7efa3a3753c242a7d3f89a11b1fea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   alfa: 0
   flgOn: 0
   flgFadeTrans: 0
   flgEnd: 0
---- !u!114 &114670242302128304
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1615637376806614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 335a2de14e6b4e74f9c1fd7fd7f0b9f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114748578044847308
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -519,7 +531,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114575392468639338}
+      - m_Target: {fileID: 0}
         m_MethodName: Btn_Left_Click
         m_Mode: 1
         m_Arguments:
@@ -559,18 +571,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114855211874593922
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1615637376806614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c02f8b078e419ed44984b77ace0053c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_rectTransform: {fileID: 224141962070360688}
 --- !u!114 &114856902124507828
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -697,7 +697,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114575392468639338}
+      - m_Target: {fileID: 0}
         m_MethodName: Btn_Max_Click
         m_Mode: 1
         m_Arguments:
@@ -749,7 +749,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114575392468639338}
+      - m_Target: {fileID: 0}
         m_MethodName: Btn_Left_Click
         m_Mode: 1
         m_Arguments:

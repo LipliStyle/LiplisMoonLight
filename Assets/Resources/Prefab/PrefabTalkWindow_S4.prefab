@@ -23,8 +23,8 @@ GameObject:
   - component: {fileID: 114811041934901916}
   - component: {fileID: 114438906817023170}
   - component: {fileID: 114350621705398710}
-  - component: {fileID: 114413315455076168}
-  - component: {fileID: 114222078873275064}
+  - component: {fileID: 114497970646694998}
+  - component: {fileID: 114695036993208522}
   m_Layer: 5
   m_Name: PrefabTalkWindow_S4
   m_TagString: Untagged
@@ -83,28 +83,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
---- !u!114 &114222078873275064
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1216219756380282}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a9ed8acb4facc341a499c1d23e19165, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  alfa: 0
-  flgOn: 0
-  flgFadeTrans: 0
-  flgEnd: 0
-  TargetModelName: 
-  FlgTalking: 0
-  _bubbleText: {fileID: 114853004142031954}
-  _maxImageWidth: 300
-  _maxImageHeight: 200
-  _printSpeed: 0.1
-  _isSayToClear: 0
 --- !u!114 &114350621705398710
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -118,17 +96,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
---- !u!114 &114413315455076168
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1216219756380282}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 335a2de14e6b4e74f9c1fd7fd7f0b9f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114438906817023170
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -148,6 +115,38 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &114497970646694998
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1216219756380282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dbdfcaf830b13448b07929d624f2e2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  alfa: 0
+  flgOn: 0
+  flgFadeTrans: 0
+  flgEnd: 0
+  FlgTalking: 0
+  _bubbleText: {fileID: 0}
+  _maxImageWidth: 0
+  _maxImageHeight: 0
+  _printSpeed: 0.1
+  _isSayToClear: 0
+--- !u!114 &114695036993208522
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1216219756380282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9d5cfbe2d6d2148a0266d73958fccf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114811041934901916
 MonoBehaviour:
   m_ObjectHideFlags: 1

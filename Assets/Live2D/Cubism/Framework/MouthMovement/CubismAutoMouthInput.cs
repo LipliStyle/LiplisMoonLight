@@ -68,6 +68,11 @@ namespace Live2D.Cubism.Framework.MouthMovement
                 return;
             }
 
+            //TimeScale0に設定されたら、口パクストップと判断
+            if(Timescale == 0)
+            {
+                return;
+            }
 
             // Progress time.
             T += (Time.deltaTime * Timescale);
@@ -78,5 +83,23 @@ namespace Live2D.Cubism.Framework.MouthMovement
         }
 
         #endregion
+
+        /// <summary>
+        /// リップシンクをONにする
+        /// </summary>
+        public void LipSyncOn()
+        {
+            Timescale = 10;
+        }
+
+        /// <summary>
+        /// リップシンクをOFFにする
+        /// </summary>
+        public void LipSyncOff()
+        {
+            Timescale  = 0;
+            this.Controller.MouthOpening = 0;
+            this.Controller.Refresh();
+        }
     }
 }

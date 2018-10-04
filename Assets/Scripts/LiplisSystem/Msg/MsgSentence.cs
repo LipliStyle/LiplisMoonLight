@@ -6,8 +6,7 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
-using Assets.Scripts.DataChar.CharacterTalk;
-using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.LiplisSystem.Model;
 using System;
 using UnityEngine;
 
@@ -54,7 +53,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
         /// モード1:口調変換しない 
         /// </summary>
         /// <param name="BaseSentence"></param>
-        public MsgSentence(CharDataTone Tone, string BaseSentence, int Emotion, int Point, int Mode)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, int Emotion, int Point, int Mode)
         {
             this.BaseSentence = BaseSentence;
             this.Emotion = Emotion;
@@ -63,7 +62,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
 
             ToneConvert(Tone);
         }
-        public MsgSentence(CharDataTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge)
         {
             this.BaseSentence = BaseSentence;
             this.Emotion = Emotion;
@@ -73,7 +72,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
 
             ToneConvert(Tone);
         }
-        public MsgSentence(CharDataTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge, int AllocationId)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge, int AllocationId)
         {
             this.BaseSentence = BaseSentence;
             this.Emotion = Emotion;
@@ -84,7 +83,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
 
             ToneConvert(Tone);
         }
-        public MsgSentence(CharDataTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode)
         {
             this.BaseSentence = BaseSentence;
             this.TalkSentence = TalkSentence;
@@ -95,7 +94,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
             ToneConvert(Tone);
         }
 
-        public MsgSentence(CharDataTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode, int AllocationId)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode, int AllocationId)
         {
             this.BaseSentence = BaseSentence;
             this.TalkSentence = TalkSentence;
@@ -110,7 +109,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
         /// <summary>
         /// トーンコンバートする
         /// </summary>
-        public void ToneConvert(CharDataTone Tone)
+        public void ToneConvert(LiplisTone Tone)
         {
             if (Mode != 1)
             {

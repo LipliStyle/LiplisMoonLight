@@ -678,7 +678,7 @@ namespace Live2D.Cubism.Rendering
         private void TryInitializeMesh()
         {
             // Only create mesh if necessary.
-            // HACK 'Mesh.vertex > 0' makes sure mesh is recreated in case of runtime instantiation.
+            // HACKA 'Mesh.vertex > 0' makes sure mesh is recreated in case of runtime instantiation.
             if (Meshes != null && Mesh.vertexCount > 0)
             {
                 return;

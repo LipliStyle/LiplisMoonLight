@@ -409,7 +409,7 @@ public class LogNewsList : MonoBehaviour {
 
                 ImgThumbnail.texture = www.texture;
             }
-            catch (Exception ex)
+            catch
             {
                 CreateEmpty();
 

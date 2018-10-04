@@ -455,7 +455,7 @@ public class CtrlLog : MonoBehaviour {
 
                 ImgThumbnail.texture = www.texture;
             }
-            catch (Exception ex)
+            catch
             {
                 CreateEmpty();
 

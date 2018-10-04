@@ -21,9 +21,9 @@ GameObject:
   - component: {fileID: 224267769669452414}
   - component: {fileID: 222707006468820546}
   - component: {fileID: 114850305898058772}
-  - component: {fileID: 114470041085096428}
-  - component: {fileID: 114771533669907206}
-  - component: {fileID: 114392003607179000}
+  - component: {fileID: 114495889802111924}
+  - component: {fileID: 114562358263536778}
+  - component: {fileID: 114654512276611378}
   m_Layer: 0
   m_Name: PrefabInfoWindow
   m_TagString: Untagged
@@ -48,7 +48,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &114392003607179000
+--- !u!114 &114495889802111924
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -56,25 +56,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1434062578956746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c02f8b078e419ed44984b77ace0053c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_rectTransform: {fileID: 224267769669452414}
---- !u!114 &114470041085096428
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1434062578956746}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 885a775f5fbc4ad48803d7f55937a81b, type: 3}
+  m_Script: {fileID: 11500000, guid: b7192d43e1afec048992e894783564d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   alfa: 0
   flgOn: 0
   flgFadeTrans: 0
   flgEnd: 0
+--- !u!114 &114562358263536778
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1434062578956746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9d5cfbe2d6d2148a0266d73958fccf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114612237800771218
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -108,7 +107,7 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Text
---- !u!114 &114771533669907206
+--- !u!114 &114654512276611378
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,9 +115,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1434062578956746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 335a2de14e6b4e74f9c1fd7fd7f0b9f6, type: 3}
+  m_Script: {fileID: 11500000, guid: bfa5442ab48214e42b9ae8251e0f2815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_rectTransform: {fileID: 224267769669452414}
 --- !u!114 &114850305898058772
 MonoBehaviour:
   m_ObjectHideFlags: 1

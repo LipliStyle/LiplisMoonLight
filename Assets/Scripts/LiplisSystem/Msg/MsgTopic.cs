@@ -6,8 +6,8 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
-using Assets.Scripts.DataChar.CharacterTalk;
 using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.LiplisSystem.Model;
 using System;
 using System.Collections.Generic;
 
@@ -48,23 +48,23 @@ namespace Assets.Scripts.LiplisSystem.Msg
         /// <summary>
         /// コンストラクター
         /// </summary>
-        public MsgTopic(CharDataTone Tone,string BaseSentence, int Emotion, int Point)
+        public MsgTopic(LiplisTone Tone,string BaseSentence, int Emotion, int Point)
         {
             TalkSentenceList = new List<MsgSentence>();
             TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, Emotion, Point, 1));
         }
-        public MsgTopic(CharDataTone Tone, string BaseSentence,string TalkSentence, int Emotion, int Point)
+        public MsgTopic(LiplisTone Tone, string BaseSentence,string TalkSentence, int Emotion, int Point)
         {
             TalkSentenceList = new List<MsgSentence>();
             TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, TalkSentence, Emotion, Point, 1));
         }
-        public MsgTopic(CharDataTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode)
+        public MsgTopic(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode)
         {
             TalkSentenceList = new List<MsgSentence>();
             TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, TalkSentence, Emotion, Point, Mode));
         }
 
-        public MsgTopic(CharDataTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode, int AllocationId)
+        public MsgTopic(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode, int AllocationId)
         {
             TalkSentenceList = new List<MsgSentence>();
             TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, TalkSentence, Emotion, Point, Mode,AllocationId));

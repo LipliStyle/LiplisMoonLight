@@ -1,0 +1,9 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Hazuki_Right.moc3",
+		"Textures": [
+			"Hazuki.2048/texture_Right.png"
+		]
+	}
+}

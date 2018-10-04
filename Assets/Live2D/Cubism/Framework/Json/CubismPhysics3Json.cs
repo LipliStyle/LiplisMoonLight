@@ -178,7 +178,7 @@ namespace Live2D.Cubism.Framework.Json
         public SerializableMeta Meta;
 
         /// <summary>
-        /// TODO Document.
+        /// 
         /// </summary>
         [SerializeField]
         public SerializablePhysicsSettings[] PhysicsSettings;
@@ -203,7 +203,7 @@ namespace Live2D.Cubism.Framework.Json
 
 
         /// <summary>
-        /// TODO Document.
+        /// 
         /// </summary>
         [Serializable]
         public struct SerializableNormalizationValue
@@ -249,7 +249,7 @@ namespace Live2D.Cubism.Framework.Json
 
 
         /// <summary>
-        /// TODO Document.
+        /// 
         /// </summary>
         [Serializable]
         public struct SerializableInput
@@ -273,7 +273,7 @@ namespace Live2D.Cubism.Framework.Json
             public string Type;
 
             /// <summary>
-            /// TODO Document.
+            ///
             /// </summary>
             [SerializeField]
             public bool Reflect;
@@ -281,7 +281,7 @@ namespace Live2D.Cubism.Framework.Json
 
 
         /// <summary>
-        /// TODO Document.
+        /// 
         /// </summary>
         [Serializable]
         public struct SerializableOutput
@@ -317,7 +317,7 @@ namespace Live2D.Cubism.Framework.Json
             public string Type;
 
             /// <summary>
-            /// TODO Document.
+            /// 
             /// </summary>
             [SerializeField]
             public bool Reflect;
@@ -363,7 +363,7 @@ namespace Live2D.Cubism.Framework.Json
 
 
         /// <summary>
-        /// TODO Document.
+        /// 
         /// </summary>
         [Serializable]
         public struct SerializableNormalization
@@ -389,7 +389,7 @@ namespace Live2D.Cubism.Framework.Json
         public struct SerializablePhysicsSettings
         {
             /// <summary>
-            /// TODO Document.
+            /// 
             /// </summary>
             [SerializeField]
             public string Id;
@@ -451,7 +451,7 @@ namespace Live2D.Cubism.Framework.Json
             public int TotalVertexCount;
 
             /// <summary>
-            /// TODO Document.
+            /// 
             /// </summary>
             [SerializeField]
             public SerializableEffectiveForces EffectiveForces;
@@ -459,7 +459,7 @@ namespace Live2D.Cubism.Framework.Json
 
 
         /// <summary>
-        /// TODO Document.
+        /// 
         /// </summary>
         [Serializable]
         public struct SerializableEffectiveForces

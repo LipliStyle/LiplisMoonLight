@@ -29,7 +29,7 @@ namespace Assets.Scripts.Define
         /// <param name="position"></param>
         /// <param name="charLocationY"></param>
         /// <returns></returns>
-        public static Vector3 GetPos(MST_CARACTER_POSITION position, float charLocationY)
+        public static Vector3 GetPosLive2d20(MST_CARACTER_POSITION position, float charLocationY)
         {
             //指定された位置から、配置すべき位置を示すベクターを返す
             if(position == MST_CARACTER_POSITION.Right)
@@ -51,6 +51,32 @@ namespace Assets.Scripts.Define
             {
                 //司会配置
                 return new Vector3(LOCATION_X_MODERATOR, charLocationY, LOCATION_Z);
+            }
+        }
+
+
+        public static Vector3 GetPosLive2d30(MST_CARACTER_POSITION position, float charLocationY)
+        {
+            //指定された位置から、配置すべき位置を示すベクターを返す
+            if (position == MST_CARACTER_POSITION.Right)
+            {
+                //右配置
+                return new Vector3(-0.9f, charLocationY, 100F);
+            }
+            else if (position == MST_CARACTER_POSITION.Center)
+            {
+                //真ん中配置
+                return new Vector3(-3.8F, charLocationY, 100F);
+            }
+            else if (position == MST_CARACTER_POSITION.Left)
+            {
+                //左配置
+                return new Vector3(-6.7F, charLocationY, 100F);
+            }
+            else
+            {
+                //司会配置
+                return new Vector3(6.6F, charLocationY, 100F);
             }
         }
     }

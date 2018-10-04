@@ -37,8 +37,12 @@ public class TalkWindow : MonoBehaviour {
     public IfsLiplisModel TargetModel;
 
     ///=============================
-    ///毎テキスト
+    ///マイテキスト
     Image image { get; set; }
+
+    ///=============================
+    ///ウインドウ生成時刻
+    public DateTime CreateTime { get; set; }
 
     ///=============================
     ///親ウインドウ
@@ -53,6 +57,10 @@ public class TalkWindow : MonoBehaviour {
 
     //スキップフラグ
     private bool FlgSkip = false;
+
+    ///=============================
+    ///サイズ、表示位置
+    public float heightImg { get; set; }
 
     //================================
     //  新　文字制御関連プロパティ                 
@@ -130,6 +138,25 @@ public class TalkWindow : MonoBehaviour {
         this.TargetPosition = TargetPosition;
     }
 
+
+    /// <summary>
+    /// 高さ設定
+    /// </summary>
+    /// <param name="heightImg"></param>
+    public void SetHeightImg(float heightImg)
+    {
+        this.heightImg = heightImg;
+    }
+
+    /// <summary>
+    /// 生成時刻を設定する
+    /// </summary>
+    /// <param name="targetDate"></param>
+    public void SetCreateTime(DateTime targetDate)
+    {
+        this.CreateTime = targetDate;
+    }
+
     /// <summary>
     /// 開始時処理
     /// </summary>
@@ -159,6 +186,14 @@ public class TalkWindow : MonoBehaviour {
     void startTimer()
     {
         StartCoroutine(UpdateTick());
+    }
+
+    /// <summary>
+    /// ウインドウを閉じる
+    /// </summary>
+    public void CloseWindow()
+    {
+        this.flgEnd = true;
     }
 
     private const float UPDATE_INTERVAL = 0.1f;

@@ -41,7 +41,7 @@ public class CtrlTalk : ConcurrentBehaviour
 
     ///=============================
     /// 現在処理中ウインドウインスタンス
-    private LiplisWindow NowTalkWindow;
+    private TalkWindow NowTalkWindow;
     private LiplisTitleWindow NowTitleWindow;
     private LiplisImageWindow NowImageWindow;
 
@@ -319,7 +319,7 @@ public class CtrlTalk : ConcurrentBehaviour
         {
             if (NowTalkWindow.CreateTime.AddSeconds(WINDOW_LIFESPAN_TIME) < DateTime.Now)
             {
-                NowTalkWindow.imgWindow.FlgTalking = false;
+                NowTalkWindow.FlgTalking = false;
                 NowTalkWindow.CloseWindow();
             }
         }
@@ -356,7 +356,7 @@ public class CtrlTalk : ConcurrentBehaviour
 
             if (!UnityNullCheck.IsNull(NowTalkWindow))
             {
-                if (!NowTalkWindow.imgWindow.FlgTalking)
+                if (!NowTalkWindow.FlgTalking)
                 {
 
                     if (NowLoadTopic != null)
@@ -1156,7 +1156,7 @@ public class CtrlTalk : ConcurrentBehaviour
         if (modelController.GetWindowQCount() > 0)
         {
             //ウインドウがあれば、先頭ウインドウのおしゃべり中フラグを調べる
-            return this.NowTalkWindow.imgWindow.FlgTalking;
+            return this.NowTalkWindow.FlgTalking;
         }
         else
         {
@@ -1170,7 +1170,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     private void SkipWindow()
     {
-        this.NowTalkWindow.imgWindow.SetSkip();
+        this.NowTalkWindow.SetSkip();
     }
 
 

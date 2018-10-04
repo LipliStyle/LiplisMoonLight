@@ -51,8 +51,8 @@ namespace Assets.Scripts.LiplisSystem.Model
 
         //=============================
         //ウインドウキューリスト
-        public Queue<LiplisWindow> WindowTalkListQ;
-        public LiplisWindow NowTalkWindow;          //現在おしゃべりウインドウ
+        public Queue<TalkWindow> WindowTalkListQ;
+        public TalkWindow NowTalkWindow;          //現在おしゃべりウインドウ
         public string WindowName;                   //ウインドウ名
 
         //=============================
@@ -152,7 +152,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         private void InitTalkWindow()
         {
-            WindowTalkListQ = new Queue<LiplisWindow>();
+            WindowTalkListQ = new Queue<TalkWindow>();
 
             this.WindowName = PREFAB_NAMES.WINDOW_TALK_S_1;
 
@@ -612,7 +612,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public LiplisWindow CreateWindowTalk(string message, Transform parentTransform)
+        public TalkWindow CreateWindowTalk(string message, Transform parentTransform)
         {
             //向き変更
             this.ChengeDirectionRandam();
@@ -621,7 +621,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             GameObject window = UnityEngine.Object.Instantiate(WindowInstances) as GameObject;
 
             //ウインドウ生成
-            LiplisWindow lpsWindow = CreateWindowTalk(window, parentTransform, message);
+            TalkWindow lpsWindow = CreateWindowTalk(window, parentTransform, message);
 
             //NULLでなければウインドウセット
             if (lpsWindow != null)
@@ -633,7 +633,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             //ウインドウ
             return lpsWindow;
         }
-        public LiplisWindow CreateWindowTalk(GameObject window, Transform canvasParent, string message)
+        public TalkWindow CreateWindowTalk(GameObject window, Transform canvasParent, string message)
         {
             try
             {
@@ -676,20 +676,30 @@ namespace Assets.Scripts.LiplisSystem.Model
                 windowRect.sizeDelta = new Vector2(width, heightImg);
                 windowRect.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
-                //ウインドウインスタンス取得
-                TalkWindow imgWindow = window.GetComponent<TalkWindow>();
-
-                //モデル設定
-                imgWindow.TargetModel = ActiveModel;
-
-                //テキスト設定
-                imgWindow.SetNextLine(message);
-
                 //親キャンバスに登録
                 window.transform.SetParent(canvasParent, false);
 
+                //ウインドウインスタンス取得
+                TalkWindow talkWindow = window.GetComponent<TalkWindow>();
+
+                //モデル設定
+                talkWindow.TargetModel = ActiveModel;
+
+                //テキスト設定
+                talkWindow.SetNextLine(message);
+
+                //ペアレント設定
+                talkWindow.SetParentWindow(window);
+
+                //高さ設定
+                talkWindow.SetHeightImg(heightImg);
+
+                //生成時刻設定
+                talkWindow.SetCreateTime(DateTime.Now);
+
                 //結果を返す
-                return new LiplisWindow(window, heightImg, heightText, posTextY);
+                //return new LiplisWindow(window, heightImg, heightText, posTextY);
+                return talkWindow;
             }
             catch
             {
@@ -702,15 +712,15 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// ウインドウをセットする
         /// </summary>
-        /// <param name="window"></param>
+        /// <param name="talkWindow"></param>
         /// <param name="AllocationId"></param>
-        public void SetWindow(LiplisWindow window, int AllocationId)
+        public void SetWindow(TalkWindow talkWindow, int AllocationId)
         {
             //ターゲットモデルセット
-            window.imgWindow.TargetModel = ActiveModel;
+            talkWindow.TargetModel = ActiveModel;
 
             //ウインドウを追加する
-            AddWindow(window);
+            AddWindow(talkWindow);
 
             //ウインドウ
             DestroyWindow();
@@ -723,7 +733,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="message"></param>
-        private void AddWindow(LiplisWindow window)
+        private void AddWindow(TalkWindow talkWindow)
         {
             //1個以上ならスライドする
             if (WindowTalkListQ.Count >= 1)
@@ -732,11 +742,11 @@ namespace Assets.Scripts.LiplisSystem.Model
                 float prvHeight = this.NowTalkWindow.heightImg;
 
                 //ウインドウ移動量設定
-                SlideWindow(window.heightImg, prvHeight);
+                SlideWindow(talkWindow.heightImg, prvHeight);
 
                 foreach (var w in WindowTalkListQ)
                 {
-                    if (w.imgWindow._bubbleText.text.text == "")
+                    if (w._bubbleText.text.text == "")
                     {
                         Debug.Log("");
                     }
@@ -744,10 +754,10 @@ namespace Assets.Scripts.LiplisSystem.Model
             }
 
             //キューに追加
-            this.WindowTalkListQ.Enqueue(window);
+            this.WindowTalkListQ.Enqueue(talkWindow);
 
             //現在おしゃべりウインドウ設置
-            this.NowTalkWindow = window;
+            this.NowTalkWindow = talkWindow;
         }
 
         /// <summary>
@@ -766,12 +776,12 @@ namespace Assets.Scripts.LiplisSystem.Model
             float moveVal = GetMoveValue(heightImg, prvHeight);
 
             //回してスライド
-            foreach (var WindowData in WindowTalkListQ)
+            foreach (var talkWindow in WindowTalkListQ)
             {
-                if (!WindowData.imgWindow.flgEnd)
+                if (!talkWindow.flgEnd)
                 {
                     //移動目標設定
-                    WindowData.SetMoveTarget(new Vector3(WindowData.imgWindow.ParentWindow.transform.position.x, WindowData.imgWindow.ParentWindow.transform.position.y + moveVal, WindowData.imgWindow.ParentWindow.transform.position.z));
+                    talkWindow.SetMoveTarget(new Vector3(talkWindow.ParentWindow.transform.position.x, talkWindow.ParentWindow.transform.position.y + moveVal, talkWindow.ParentWindow.transform.position.z));
                 }
             }
         }
@@ -845,7 +855,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         private void DestroyWindow()
         {
-            Queue<LiplisWindow> bufQ = new Queue<LiplisWindow>();
+            Queue<TalkWindow> bufQ = new Queue<TalkWindow>();
 
             //カウントチェック
             if (WindowTalkListQ.Count < 1)
@@ -857,16 +867,16 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //まわして、範囲内のものはバッファキューに、範囲外のものは削除
                 while (WindowTalkListQ.Count > 0)
                 {
-                    LiplisWindow window = WindowTalkListQ.Dequeue();
+                    TalkWindow talkWindow = WindowTalkListQ.Dequeue();
 
                     if (WindowTalkListQ.Count > 2)
                     {
-                        window.CloseWindow();
+                        talkWindow.CloseWindow();
                     }
                     else
                     {
                         //1個取り出し、削除
-                        bufQ.Enqueue(window);
+                        bufQ.Enqueue(talkWindow);
                     }
                 }
 

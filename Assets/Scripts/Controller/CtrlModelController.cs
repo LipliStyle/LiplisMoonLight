@@ -35,6 +35,10 @@ namespace Assets.Scripts.Controller
         //レンダリング階層
         public GameObject CanvasRendering;
 
+        //=============================
+        //会話コントローラー
+        public CtrlTalk ctrlTalk;
+
         //====================================================================
         //
         //                            初期化処理
@@ -195,8 +199,9 @@ namespace Assets.Scripts.Controller
             LiplisMoonlightModel lmm = PrisetModelSettingLoader.LoadMoonlightSetting(modelPathAnderResource + ModelPathDefine.LIPLIS_MODEL_JSON);
             LiplisToneSetting ltn = PrisetModelSettingLoader.LoadLiplisToneSetting(modelPathAnderResource + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_TONE_SETTING);
             LiplisChatSetting lch = PrisetModelSettingLoader.LoadLiplisChatSetting(modelPathAnderResource + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_CHAT_SETTING);
+            
             //モデルを追加する
-            return new LiplisModel(AllocationId, CanvasRendering, modelPath, lmm, ltn, lch);
+            return new LiplisModel(AllocationId, CanvasRendering, modelPath, ctrlTalk.NextTalkOrSkip, lmm, ltn, lch);
         }
 
         /// <summary>
@@ -703,7 +708,7 @@ namespace Assets.Scripts.Controller
         /// <param name="acVoice"></param>
         public void StartVoice(int AllocationId, AudioClip acVoice)
         {
-            LAppLive2DManager.Instance.GetModel(TableModelId[AllocationId].ModelName).StartVoice(acVoice);
+            TableModelId[AllocationId].ActiveModel.StartVoice(acVoice);
         }
 
         /// <summary>
@@ -713,7 +718,7 @@ namespace Assets.Scripts.Controller
         /// <returns></returns>
         public bool IsPlaying(int AllocationId)
         {
-            return LAppLive2DManager.Instance.GetModel(TableModelId[AllocationId].ModelName).IsPlaying();
+            return TableModelId[AllocationId].ActiveModel.IsPlaying();
         }
         #endregion
     }

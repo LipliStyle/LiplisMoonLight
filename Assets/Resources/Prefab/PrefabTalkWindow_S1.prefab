@@ -67,8 +67,8 @@ MonoBehaviour:
   flgEnd: 0
   FlgTalking: 0
   _bubbleText: {fileID: 114898256866528418}
-  _maxImageWidth: 0
-  _maxImageHeight: 0
+  _maxImageWidth: 300
+  _maxImageHeight: 200
   _printSpeed: 0.1
   _isSayToClear: 0
 --- !u!114 &114058568628340492
@@ -215,8 +215,8 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: -2.3326812, y: 1.4162709}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}

@@ -7,6 +7,7 @@
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //====================================================================
 using Assets.Scripts.Define;
+using Assets.Scripts.LiplisSystem.Model.Event;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,15 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         GameObject ModelObject{get;set;}
 
+        /// <summary>
+        /// 向き
+        /// </summary>
         int Direction { get; set; }
+
+        /// <summary>
+        /// レスポンスを取得したときに呼ぶコールバック
+        /// </summary>
+        ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip { get; set; }
 
         //====================================================================
         //
@@ -80,12 +89,6 @@ namespace Assets.Scripts.LiplisSystem.Model
         bool IsVisble();
 
         /// <summary>
-        /// 移動
-        /// </summary>
-        /// <param name="ModelLocation"></param>
-        void SetMove(Vector3 ModelLocation);
-
-        /// <summary>
         /// トークを開始する
         /// </summary>
         void StartTalking();
@@ -94,6 +97,11 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// トークを終了する
         /// </summary>
         void StopTalking();
+
+        /// <summary>
+        /// 音声おしゃべりを開始する
+        /// </summary>
+        void StartVoice(AudioClip acVoice);
 
         /// <summary>
         /// 再生中かどうかを返す

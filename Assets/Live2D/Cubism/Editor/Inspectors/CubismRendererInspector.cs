@@ -35,6 +35,11 @@ namespace Live2D.Cubism.Editor.Inspectors
                 return;
             }
 
+            //メッシュがNULLでもリターン
+            if(renderer.Mesh == null)
+            {
+                return;
+            }
 
             // Show settings.
             EditorGUILayout.ObjectField("Mesh", renderer.Mesh, typeof(Mesh), false);

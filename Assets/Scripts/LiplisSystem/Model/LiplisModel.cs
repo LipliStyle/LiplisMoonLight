@@ -7,6 +7,8 @@
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
 using Assets.Scripts.Define;
+using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.LiplisSystem.Model.Event;
 using Assets.Scripts.LiplisSystem.Model.Json;
 using Assets.Scripts.LiplisSystem.Model.Setting;
 using Assets.Scripts.LiplisSystem.Msg;
@@ -68,6 +70,10 @@ namespace Assets.Scripts.LiplisSystem.Model
         //ウインドウインスタンス
         public GameObject WindowInstances;
 
+        //=============================
+        //必須イベント
+        public ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip { get; set; }  //スキップコールバック
+
         //====================================================================
         //
         //                             初期化処理
@@ -78,13 +84,16 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// コンストラクター
         /// </summary>
-        public LiplisModel(int AllocationId, GameObject CanvasRendering,string ModelPath)
+        public LiplisModel(int AllocationId, GameObject CanvasRendering,string ModelPath, ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip)
         {
             //アロケーションID設定
             this.AllocationId = AllocationId;
 
             //レンダリング階層取得
             this.CanvasRendering = CanvasRendering;
+
+            //コールバックメソッドの設定
+            this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
 
             //モデル設定を読み込み
             LoadModelSetting(ModelPath);
@@ -95,7 +104,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             //トークウインドウの初期化
             InitTalkWindow();
         }
-        public LiplisModel(int AllocationId, GameObject CanvasRendering,string ModelPath, LiplisMoonlightModel modelSetting, LiplisToneSetting toneSetting,LiplisChatSetting chatSetting)
+        public LiplisModel(int AllocationId, GameObject CanvasRendering,string ModelPath, ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip,  LiplisMoonlightModel modelSetting, LiplisToneSetting toneSetting,LiplisChatSetting chatSetting)
         {
             //アロケーションID設定
             this.AllocationId = AllocationId;
@@ -105,6 +114,9 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //モデル設定を読み込み
             this.ModelPath = ModelPath;
+
+            //コールバックメソッドの設定
+            this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
 
             //モデル設定
             this.modelSetting = modelSetting;
@@ -138,7 +150,6 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //おしゃべり設定の読み込み
             LoadTalkSetting();
-
 
             //アクティブモデルをセットし、モデルを一つ表示する
             SetActiveModel();
@@ -220,15 +231,23 @@ namespace Assets.Scripts.LiplisSystem.Model
             }
             else
             {
-                //Live2dモデルの読み込み
-                IfsLiplisModel model = new LiplisModelLive2d(this.ModelPath, modelData, ModelLocation, Expression);
-
-                //レンダリング階層に移動
-                model.ModelObject.transform.SetParent(CanvasRendering.transform);
-
-                //モデルをリストに追加
-                ListModel.Add(model);
+                //デフォルトはLive2dとする。
+                LoadModelLive2d30(modelData);
             }
+        }
+        private void LoadModelLive2d30(LiplisModelData modelData)
+        {
+            //Live2dモデルの読み込み
+            IfsLiplisModel model = new LiplisModelLive2d(this.ModelPath, 
+                modelData, 
+                CanvasRendering, 
+                ModelLocation, 
+                Expression,
+                CallbackOnNextTalkOrSkip
+                );
+
+            //モデルをリストに追加
+            ListModel.Add(model);
         }
 
         /// <summary>
@@ -317,13 +336,12 @@ namespace Assets.Scripts.LiplisSystem.Model
             }
 
             //デフォルトY座標設定
-            this.LocationY = -2.05F;
+            //this.LocationY = -2.05F;
+            this.LocationY = -90;
 
             //モデルロケーションの設定
-            this.ModelLocation = MODEL_POS.GetPosLive2d30(this.Position, this.LocationY);
+            this.ModelLocation = MODEL_POS.GetPosLive2d20(this.Position, this.LocationY);
         }
-        
-
         #endregion
 
         //====================================================================
@@ -413,126 +431,131 @@ namespace Assets.Scripts.LiplisSystem.Model
         }
 
         /// <summary>
-        /// 向きを変更する
-        /// </summary>
-        public void ChengeDirection(MODELE_DIRECTION Direction)
-        {
-            //TODO LiplisModel ChengeDirection 仕様検討
-            ///☆☆☆☆☆☆☆☆☆仕様要検討☆☆☆☆☆☆☆☆☆
-
-            ////選択モデル
-            //string selectModelName = "";
-
-            //if (Direction == MODELE_DIRECTION.RIGNT)
-            //{
-            //    selectModelName = this.RightModelName;
-            //}
-            //else if (Direction == MODELE_DIRECTION.LEFT)
-            //{
-            //    selectModelName = this.LeftModelName;
-            //}
-            //else
-            //{
-            //    selectModelName = this.FrontModelName;
-            //}
-
-            ////選択名がからなら、フロントをセットする
-            //if (selectModelName == "")
-            //{
-            //    selectModelName = this.FrontModelName;
-            //}
-
-            ////前回モデルの座標を取得しておく
-            //SetModelLocation(selectModelName);
-
-            ////選択モデルをセットする
-            //this.NowModelName = selectModelName;
-
-            ////モデルビジブル再設定
-            //SetModelVisible();
-        }
-
-        /// <summary>
         /// ランダムに向きを変更する
         /// </summary>
         public void ChengeDirectionRandam()
         {
-            //TODO LiplisModel ChengeDirection 仕様検討
-            ///☆☆☆☆☆☆☆☆☆仕様要検討☆☆☆☆☆☆☆☆☆
+            //現在の座標を保存
+            SetModelLocation();
 
-            ////選択モデル
-            //string selectModelName = "";
+            //選択モデル
+            IfsLiplisModel selectModel = GetDirectionModel(this.Position);
 
-            ////方向インデックスを取得する
-            //int idx = GetDirectionIdx();
+            //選択名が空なら0番目を取得
+            if (selectModel == null)
+            {
+                selectModel = ListModel[0];
+            }
 
-            ////モデル名変更
-            //selectModelName = ListModel[idx];
+            //アクティブモデルを変更
+            this.ActiveModel = selectModel;
 
-            ////選択名がからなら、フロントをセットする
-            //if (selectModelName == "")
-            //{
-            //    selectModelName = this.FrontModelName;
-            //}
-
-            ////前回モデルの座標を取得しておく
-            //SetModelLocation(selectModelName);
-
-            ////選択モデルをセットする
-            //this.NowModelName = selectModelName;
-
-            ////モデルビジブル再設定
-            //SetModelVisible();
+            //モデルビジブル再設定
+            SetModelVisible();
         }
+
+        /// <summary>
+        /// 方向モデルを取得する
+        /// </summary>
+        /// <returns></returns>
+        public IfsLiplisModel GetDirectionModel(MST_CARACTER_POSITION Position)
+        {
+            //候補リスト
+            List<IfsLiplisModel> CandidateModelList = new List<IfsLiplisModel>();
+
+            //設定されたポジションから変更可能な方向を判断する。
+            if (Position == MST_CARACTER_POSITION.Moderator)
+            {
+                //最右端 左向き禁止
+                //変更候補検索
+                foreach (var model in ListModel)
+                {
+                    //左向き以外を候補リストに追加
+                    if(model.Direction != (int)MODELE_DIRECTION.LEFT)
+                    {
+                        CandidateModelList.Add(model);
+                    }
+                }
+            }
+            else if (Position == MST_CARACTER_POSITION.Left)
+            {
+                //最左端 右向き禁止
+                //変更候補検索
+                foreach (var model in ListModel)
+                {
+                    //左向き以外を候補リストに追加
+                    if (model.Direction != (int)MODELE_DIRECTION.RIGNT)
+                    {
+                        CandidateModelList.Add(model);
+                    }
+                }
+            }
+            else
+            {
+                //それ以外はモデルリストすべて対象
+                CandidateModelList.AddRange(ListModel);
+            }
+
+            //候補リストをシャッフルする
+            CandidateModelList.Shuffle();
+
+            //常に0番目を返す
+            return CandidateModelList[0];
+        }
+
+        /// <summary>
+        /// 向きを変更する
+        /// </summary>
+        public void ChengeDirection(MODELE_DIRECTION Direction)
+        {
+            //現在の座標を保存
+            SetModelLocation();
+
+            //候補リスト
+            List<IfsLiplisModel> CandidateModelList = new List<IfsLiplisModel>();
+
+            //対象の向きのモデルを検索
+            foreach (var model in ListModel)
+            {
+                //左向き以外を候補リストに追加
+                if (model.Direction != (int)Direction)
+                {
+                    CandidateModelList.Add(model);
+                }
+            }
+
+            //空なら全対象
+            if(CandidateModelList.Count == 0)
+            {
+                CandidateModelList.AddRange(ListModel);
+            }
+
+            //シャッフルする
+            CandidateModelList.Shuffle();
+
+            //アクティブモデルを変更
+            this.ActiveModel = CandidateModelList[0];
+
+            //モデルビジブル再設定
+            SetModelVisible();
+        }
+
 
         /// <summary>
         /// 現在モデルの位置を次のモデルに継承する
         /// </summary>
         /// <param name="selectModelName"></param>
-        public void SetModelLocation(string selectModelName)
+        public void SetModelLocation()
         {
-            //TODO LiplisModel ChengeDirection 仕様検討
-            ///☆☆☆☆☆☆☆☆☆仕様要検討☆☆☆☆☆☆☆☆☆
-
-            ////前回モデルの座標を取得しておく
-            //this.ModelLocation = LAppLive2DManager.Instance.GetModelLocation(this.NowModelName);
-
-            //LAppLive2DManager.Instance.SetMove(selectModelName, this.NowModelLocation);
-
             this.ModelLocation = this.ActiveModel.ModelObject.transform.localPosition;
         }
-
-
-
-        /// <summary>
-        /// 方向インデックスを取得する
-        /// </summary>
-        /// <returns></returns>
-        public int GetDirectionIdx()
-        {
-            System.Random r = new System.Random();
-
-            if (Position == MST_CARACTER_POSITION.Moderator)
-            {
-                return r.Next(2);
-            }
-            else if (Position == MST_CARACTER_POSITION.Left)
-            {
-                return r.Next(1, 3);
-            }
-            else
-            {
-                return r.Next(3);
-            }
-        }
-
 
         /// <summary>
         /// 対象の位置に移動する
         /// </summary>
         public void MoveTarget()
         {
-            ModelLocation = MODEL_POS.GetPosLive2d30(this.Position,this.LocationY);
+            ModelLocation = MODEL_POS.GetPosLive2d20(this.Position,this.LocationY);
 
             MoveTarget(ModelLocation);
         }
@@ -544,7 +567,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             //移動する
             foreach (var model in ListModel)
             {
-                model.SetMove(pos);
+                model.SetPosition(pos);
             }
 
             //現在ロード中のモデルのビジブルON
@@ -570,41 +593,48 @@ namespace Assets.Scripts.LiplisSystem.Model
         #region ウインドウ操作
 
         /// <summary>
+        /// ウインドウサイズ定義
+        /// </summary>
+        private const float HEIGHT_IMG_3 = 120;
+        private const float HEIGHT_IMG_2 = 105;
+        private const float HEIGHT_IMG_1 = 90;
+
+        /// <summary>
         /// 横幅計算
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
         const float MAX_WIDTH = 140;
-        private float CulcWindowWidth(string message)
+        private Vector2 CulcWindowSize(string message)
         {
             float width = (float)message.Length * 10.0f;
+            float height = HEIGHT_IMG_1;
 
+            //横計算
             if (width >= MAX_WIDTH)
             {
-                return MAX_WIDTH;
+                width = MAX_WIDTH;
+            }
+
+            //以下高さ計算
+            double div = Math.Ceiling(message.Length / 17.0);
+
+            if (div >= 3)
+            {
+                height = HEIGHT_IMG_3;
+            }
+            else if (div == 2)
+            {
+                height = HEIGHT_IMG_2;
             }
             else
             {
-                return width;
+                height = HEIGHT_IMG_1;
             }
+
+            //計算した結果を返す
+            return new Vector2(width, height);
         }
-
-        /// <summary>
-        /// ウインドウサイズ定義
-        /// </summary>
-        private const float HEIGHT_IMG_3 = 120;
-        private const float HEIGHT_TXT_3 = 46;
-        private const float POS_Y_TXT_3 = -8.0f;
-
-        private const float HEIGHT_IMG_2 = 105;
-        private const float HEIGHT_TXT_2 = 32;
-        private const float POS_Y_TXT_2 = -7.0f;
-
-        private const float HEIGHT_IMG_1 = 90;
-        private const float HEIGHT_TXT_1 = 16;
-        private const float POS_Y_TXT_1 = -5.5f;
-
-        private const float HEIGHT_IMG_FIX = 60; //固定高さ
 
         /// <summary>
         /// ウインドウを作成する
@@ -612,7 +642,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public TalkWindow CreateWindowTalk(string message, Transform parentTransform)
+        public TalkWindow CreateWindowTalk(string message)
         {
             //向き変更
             this.ChengeDirectionRandam();
@@ -621,7 +651,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             GameObject window = UnityEngine.Object.Instantiate(WindowInstances) as GameObject;
 
             //ウインドウ生成
-            TalkWindow lpsWindow = CreateWindowTalk(window, parentTransform, message);
+            TalkWindow lpsWindow = CreateWindowTalk(window, message);
 
             //NULLでなければウインドウセット
             if (lpsWindow != null)
@@ -633,51 +663,27 @@ namespace Assets.Scripts.LiplisSystem.Model
             //ウインドウ
             return lpsWindow;
         }
-        public TalkWindow CreateWindowTalk(GameObject window, Transform canvasParent, string message)
+        public TalkWindow CreateWindowTalk(GameObject window, string message)
         {
             try
             {
-                //サイズ計算
-                float width = CulcWindowWidth(message);
-
-                double div = Math.Ceiling(message.Length / 17.0);
-
-                float heightImg = HEIGHT_IMG_1;
-                float heightText = HEIGHT_TXT_1;
-                float posTextY = POS_Y_TXT_1;
-
-                if (div >= 3)
-                {
-                    heightImg = HEIGHT_IMG_3;
-                    heightText = HEIGHT_TXT_3;
-                    posTextY = POS_Y_TXT_3;
-                }
-                else if (div == 2)
-                {
-                    heightImg = HEIGHT_IMG_2;
-                    heightText = HEIGHT_TXT_2;
-                    posTextY = POS_Y_TXT_2;
-                }
-                else
-                {
-                    heightImg = HEIGHT_IMG_1;
-                    heightText = HEIGHT_TXT_1;
-                    posTextY = POS_Y_TXT_1;
-                }
-
                 //ウインドウ名設定
                 window.name = "TalkWindow" + WindowTalkListQ.Count;
 
+                //親キャンバスに登録
+                window.transform.SetParent(CanvasRendering.transform, false);
+
                 //位置設定
-                window.transform.position = WINDOW_POS.GetPos(ModelLocation);
+                window.transform.localPosition = WINDOW_POS.GetPos(ModelLocation);
 
                 //サイズ変更
                 RectTransform windowRect = window.GetComponent<RectTransform>();
-                windowRect.sizeDelta = new Vector2(width, heightImg);
-                windowRect.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
-                //親キャンバスに登録
-                window.transform.SetParent(canvasParent, false);
+                //ウインドウサイズ設定
+                windowRect.sizeDelta = CulcWindowSize(message);
+
+                //ローカルスケール設定
+                windowRect.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
                 //ウインドウインスタンス取得
                 TalkWindow talkWindow = window.GetComponent<TalkWindow>();
@@ -692,13 +698,12 @@ namespace Assets.Scripts.LiplisSystem.Model
                 talkWindow.SetParentWindow(window);
 
                 //高さ設定
-                talkWindow.SetHeightImg(heightImg);
+                talkWindow.SetHeightImg(windowRect.sizeDelta.y);
 
                 //生成時刻設定
                 talkWindow.SetCreateTime(DateTime.Now);
 
                 //結果を返す
-                //return new LiplisWindow(window, heightImg, heightText, posTextY);
                 return talkWindow;
             }
             catch
@@ -741,16 +746,11 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //一つ前のウインドウの高さを取得する
                 float prvHeight = this.NowTalkWindow.heightImg;
 
-                //ウインドウ移動量設定
-                SlideWindow(talkWindow.heightImg, prvHeight);
+                float height = NowTalkWindow.ParentWindow.GetComponent<RectTransform>().sizeDelta.y;
 
-                foreach (var w in WindowTalkListQ)
-                {
-                    if (w._bubbleText.text.text == "")
-                    {
-                        Debug.Log("");
-                    }
-                }
+
+                //ウインドウ移動量設定
+                SlideWindow(talkWindow);
             }
 
             //キューに追加
@@ -763,8 +763,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// ウインドをスライドする
         /// </summary>
-        private const float WINDOW_MOVE_VAL = 100;
-        private void SlideWindow(float heightImg, float prvHeight)
+        private void SlideWindow(TalkWindow newTalkWindow)
         {
             //ウインドウが無ければ動かさない
             if (WindowTalkListQ.Count < 1)
@@ -773,7 +772,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             }
 
             //移動量算出
-            float moveVal = GetMoveValue(heightImg, prvHeight);
+            float moveVal = GetWindowMoveValue(newTalkWindow.GetCurrentText());
 
             //回してスライド
             foreach (var talkWindow in WindowTalkListQ)
@@ -781,74 +780,33 @@ namespace Assets.Scripts.LiplisSystem.Model
                 if (!talkWindow.flgEnd)
                 {
                     //移動目標設定
-                    talkWindow.SetMoveTarget(new Vector3(talkWindow.ParentWindow.transform.position.x, talkWindow.ParentWindow.transform.position.y + moveVal, talkWindow.ParentWindow.transform.position.z));
+                    talkWindow.SetMoveTarget(new Vector3(talkWindow.ParentWindow.transform.localPosition.x, talkWindow.ParentWindow.transform.localPosition.y + moveVal, talkWindow.ParentWindow.transform.localPosition.z));
                 }
             }
         }
 
         /// <summary>
-        /// ウインドウ移動量定義
+        /// これからしゃべる内容から、ウインドウ移動量を計算する
+        /// 
+        /// TODO LiplisModel:GetWindowMoveValue 要調整
         /// </summary>
-        private const float MOVE_VAL_2 = 30f;
-        private const float MOVE_VAL_3 = 37.5f;
-        private const float MOVE_VAL_4 = 45f;
-        private const float MOVE_VAL_5 = 52.5f;
-        private const float MOVE_VAL_6 = 60f;
-
-        /// <summary>
-        /// ウインドウ移動量を計算する
-        /// </summary>
-        /// <param name="heightImg"></param>
-        /// <param name="prvHeight"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        private float GetMoveValue(float heightImg, float prvHeight)
+        private float GetWindowMoveValue(string text)
         {
-            float moveVal = WINDOW_MOVE_VAL;
+            //バイト数取得
+            int lenB = Encoding.UTF8.GetByteCount(text);
 
-            //今回動かす先頭ウインドウのサイズをチェック
-            if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_1)
-            {
-                moveVal = MOVE_VAL_2;      //2
-            }
-            else if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_2)
-            {
-                moveVal = MOVE_VAL_3;      //3
-            }
-            else if (heightImg == HEIGHT_IMG_1 && prvHeight == HEIGHT_IMG_3)
-            {
-                moveVal = MOVE_VAL_4;      //4
-            }
+            //行数計算
+            float rowNum = (float)Math.Ceiling(lenB / 26d);
 
-            else if (heightImg == HEIGHT_IMG_2 && prvHeight == HEIGHT_IMG_1)
-            {
-                moveVal = MOVE_VAL_3;      //3
-            }
-            else if (heightImg == HEIGHT_IMG_2 && prvHeight == HEIGHT_IMG_2)
-            {
-                moveVal = MOVE_VAL_4;      //4
-            }
-            else if (heightImg == HEIGHT_IMG_2 && prvHeight == HEIGHT_IMG_3)
-            {
-                moveVal = MOVE_VAL_5;      //5
-            }
+            //移動量を算出
+            float moveVal = 22.5f + rowNum * 7.5f;
 
-            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_1)
-            {
-                moveVal = MOVE_VAL_4;      //4
-            }
-            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_2)
-            {
-                moveVal = MOVE_VAL_5;      //5
-            }
-            else if (heightImg == HEIGHT_IMG_3 && prvHeight == HEIGHT_IMG_3)
-            {
-                moveVal = MOVE_VAL_6;      //6
-            }
-
-
-
+            //移動量を返す
             return moveVal;
         }
+
 
         /// <summary>
         /// 先頭ウインドウをサクジョする

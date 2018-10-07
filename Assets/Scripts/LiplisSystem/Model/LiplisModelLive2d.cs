@@ -7,6 +7,7 @@
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
 using Assets.Scripts.Define;
+using Assets.Scripts.LiplisSystem.Model.Event;
 using Assets.Scripts.LiplisSystem.Model.Setting;
 using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.Utils;
@@ -15,6 +16,7 @@ using Live2D.Cubism.Core;
 using Live2D.Cubism.Framework;
 using Live2D.Cubism.Framework.Json;
 using Live2D.Cubism.Framework.MouthMovement;
+using Live2D.Cubism.Framework.Raycasting;
 using Live2D.Cubism.Rendering;
 using System;
 using System.Collections.Generic;
@@ -25,20 +27,27 @@ namespace Assets.Scripts.LiplisSystem.Model
     public class LiplisModelLive2d : IfsLiplisModel
     {
         //=============================
+        //描画領域
+        public GameObject CanvasRendering { get; set; }
+
+        //=============================
         //モデルオブジェクト
         public GameObject ModelObject { get; set; }
         public CubismModel model { get; set; }
 
-
         //=============================
         //アタッチオブジェクト
-        public CubismRenderController rendererController { get; set; }
+        public CubismRenderController RendererController { get; set; }
         public CubismAutoEyeBlinkInput EyeBlink { get; set; }
         public CubismMouthController MouthController { get; set; }
         public CubismAutoMouthInput LipSync { get; set; }
-        public Animation animator { get; set; }
-        public AudioSource audio { get; set; }
+        public CubismRaycaster RayCaster { get; set; }
+        public Animation Animator { get; set; }
+        public AudioSource Audio { get; set; }
 
+        //=============================
+        //必須イベント
+        public ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip { get; set; }  //スキップコールバック 体、顔タップ時に呼ぶ
 
         //=============================
         //モーションオブジェクト
@@ -71,12 +80,20 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// コンストラクター
         /// </summary>
         /// <param name="targetPath"></param>
-        public LiplisModelLive2d(string modelPath, LiplisModelData modelData, Vector3 targetPosition, MsgExpression Expression)
+        public LiplisModelLive2d(string modelPath,          //モデルパス
+                                LiplisModelData modelData,  //モデルデータ
+                                GameObject CanvasRendering, //親キャンバス
+                                Vector3 targetPosition,     //ターゲット座標
+                                MsgExpression Expression,   //表情データ
+                                ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip //次へクリックコールバック
+                                )
         {
             //モデルデータ取得
             this.modelData = modelData;
+            this.CanvasRendering = CanvasRendering;
             this.Direction = modelData.Direction;
-
+            this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
+     
             //表情テーブルにデフォルトをセット
             this.TableMotion = Expression.TableExpression;
 
@@ -109,23 +126,33 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.ModelObject = this.model.gameObject;
 
             //アニメーションを取得する
-            this.animator = model.GetComponent<Animation>();
+            this.Animator = model.gameObject.GetComponent<Animation>();
 
             //オーディオソース取得
-            this.audio = model.GetComponent<AudioSource>();
+            this.Audio = model.GetComponent<AudioSource>();
 
             //目パチ制御
-            this.EyeBlink = model.GetComponent<CubismAutoEyeBlinkInput>();
+            this.EyeBlink = model.gameObject.GetComponent<CubismAutoEyeBlinkInput>();
 
             //口パク制御
-            this.MouthController = model.GetComponent<CubismMouthController>();
-            this.LipSync = model.GetComponent<CubismAutoMouthInput>();
+            this.MouthController = model.gameObject.GetComponent<CubismMouthController>();
+            this.LipSync = model.gameObject.GetComponent<CubismAutoMouthInput>();
 
             //レンダラーコントローラの取得
-            this.rendererController = model.gameObject.GetComponent<CubismRenderController>();
+            this.RendererController = model.gameObject.GetComponent<CubismRenderController>();
+
+            //当たり判定クラス取得
+            this.RayCaster = model.gameObject.GetComponent<CubismRaycaster>();
+
+            //当たり判定の設定
+            SetHitArea();
+
+            //レンダリング階層に移動
+            this.ModelObject.transform.SetParent(CanvasRendering.transform);
 
             //サイズの設定
-            this.SetScale(new Vector3(4.55f, 4.55f, 5f));
+            //this.SetScale(new Vector3(4.55f, 4.55f, 5f));
+            this.SetScale(new Vector3(200f, 200f, 200f));
 
             //位置の設定
             this.SetPosition(targetPosition);
@@ -133,7 +160,8 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モーションのロード
             LoadMotion(this.model, modelPath);
 
-            //アイドルモーションを開始しておく。
+            //口パクを初期化
+            StopTalking();
         }
 
         /// <summary>
@@ -144,16 +172,6 @@ namespace Assets.Scripts.LiplisSystem.Model
         {
             this.model.transform.localScale = targetScale;
         }
-
-        /// <summary>
-        /// 位置の設定
-        /// </summary>
-        /// <param name="targetPosition"></param>
-        public void SetPosition(Vector3 targetPosition)
-        {
-            this.model.transform.localPosition = targetPosition;
-        }
-
 
         /// <summary>
         /// モーションのロード
@@ -185,7 +203,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 clip.legacy = true;
 
                 //アニメーターに登録
-                this.animator.AddClip(clip, motion.FileName);
+                this.Animator.AddClip(clip, motion.FileName);
 
                 //モーションテーブル キー追加
                 if(!TableMotion.ContainsKey(motion.Emotion))
@@ -217,9 +235,30 @@ namespace Assets.Scripts.LiplisSystem.Model
                 kv.Value.legacy = true;
 
                 //アニメーターに登録
-                this.animator.AddClip(kv.Value, kv.Key);
+                this.Animator.AddClip(kv.Value, kv.Key);
             }
         }
+
+        /// <summary>
+        /// 当たり判定の設定
+        /// </summary>
+        private void SetHitArea()
+        {
+            //ドローエイブル取得
+            var drawables = this.model.Drawables;
+
+            //ドローエイブルリストを回し、当たり判定クラスをアタッチする。
+            foreach (CubismDrawable drawable in drawables)
+            {
+                //当たり判定の範囲であれば、アタッチ
+                if(drawable.name.StartsWith("D_REF"))
+                {
+                    //レイキャストエイブルをアッドコンポーネント
+                    drawable.gameObject.AddComponent<CubismRaycastable>();
+                }
+            }
+        }
+
         #endregion
 
 
@@ -295,12 +334,12 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <returns></returns>
         public bool IsPlaying()
         {
-            return this.audio.isPlaying;
+            return this.Audio.isPlaying;
         }
 
         public void SetExpression(MOTION ExpressionCode)
         {
-            animator.Blend(GetMotionNameTargetMotionRndam(ExpressionCode));
+            Animator.Blend(GetMotionNameTargetMotionRndam(ExpressionCode));
         }
 
         /// <summary>
@@ -308,6 +347,11 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         public void StartTalking()
         {
+            if (this.LipSync == null)
+            {
+                return;
+            }
+
             this.LipSync.LipSyncOn();
         }
 
@@ -316,6 +360,11 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         public void StopTalking()
         {
+            if(this.LipSync == null)
+            {
+                return;
+            }
+
             this.LipSync.LipSyncOff();
         }
 
@@ -326,7 +375,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="flg"></param>
         public void SetVisible(bool flg)
         {
-            ModelObject.SetActive(flg);
+            this.ModelObject.SetActive(flg);
         }
 
         /// <summary>
@@ -365,12 +414,12 @@ namespace Assets.Scripts.LiplisSystem.Model
         }
 
         /// <summary>
-        /// 指定の座標に移動する。
+        /// 位置の設定
         /// </summary>
-        /// <param name="ModelLocation"></param>
-        public void SetMove(Vector3 ModelLocation)
+        /// <param name="targetPosition"></param>
+        public void SetPosition(Vector3 targetPosition)
         {
-            this.model.transform.position = ModelLocation;
+            this.model.transform.localPosition = targetPosition;
         }
 
         /// <summary>
@@ -379,11 +428,26 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="MotionCode"></param>
         public void StartRandomMotion(MOTION MotionCode)
         {
-            animator.Stop();
-            animator.Play(GetMotionNameTargetMotionRndam(MotionCode));
+            Animator.Stop();
+            Animator.Play(GetMotionNameTargetMotionRndam(MotionCode));
         }
 
-
+        /// <summary>
+        /// 音声の再生
+        /// </summary>
+        /// <param name="pVoice">優先度。使用しないなら0で良い。</param>
+        public void StartVoice(AudioClip pVoice)
+        {
+            if (Audio == null)
+            {
+                Debug.Log("Live2D : AudioSource Component is NULL !");
+                return;
+            }
+            Audio.clip = pVoice;
+            Audio.loop = false;
+            Audio.spatialBlend = 0;
+            Audio.Play();
+        }
         #endregion
 
         //====================================================================
@@ -399,6 +463,12 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //モデルがNULLなら何もしない
             if (model == null) return;
+
+            //当たり判定チェック
+            if (Input.GetMouseButtonDown(0))
+            {
+                HitTest();
+            }
 
             //透明度の調整
             OnRenderObjectOpacity();
@@ -437,8 +507,81 @@ namespace Assets.Scripts.LiplisSystem.Model
             }
 
             //モデルオパシティの更新
-            rendererController.Opacity = modelOpacity;
+            RendererController.Opacity = modelOpacity;
         }
+
+
+        /// <summary>
+        /// 当たり判定
+        /// </summary>
+        void HitTest()
+        {
+            //当たり判定 4点まで許容
+            var results = new CubismRaycastHit[4];
+
+            //マウスポジションレイ取得
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            //当たり判定チェック
+            var hitCount = this.RayCaster.Raycast(ray, results);
+
+            //あたってなければ抜ける
+            if(hitCount < 1)
+            {
+                return;
+            }
+
+            //当たり判定結果
+            int hitTestResult = 0; 
+
+            //判定結果を走査
+            foreach (CubismRaycastHit result in results)
+            {
+                if(result.Drawable == null)
+                {
+                    continue;
+                }
+
+                if (result.Drawable.name == "D_REF_OPPAI")
+                {
+                    hitTestResult = 2;
+                    break;
+                }
+                else if (result.Drawable.name == "D_REF_BODY")
+                {
+                    hitTestResult = 3;
+                    //体は優先度低。続行
+                    continue;
+                }
+                else if (result.Drawable.name == "D_REF_HEAD")
+                {
+                    hitTestResult = 1;
+                    break;
+                }
+            }
+
+            if(hitTestResult == 1)
+            {
+                Debug.Log("頭をタップしました！");
+
+                //次の話題
+                CallbackOnNextTalkOrSkip();
+            }
+            else if (hitTestResult == 2)
+            {
+                Debug.Log("胸をタップしました！");
+            }
+            else if (hitTestResult == 3)
+            {
+                Debug.Log("体をタップしました！");
+
+                //次の話題
+                CallbackOnNextTalkOrSkip();
+            }
+        }
+
+
+
         #endregion
     }
 }

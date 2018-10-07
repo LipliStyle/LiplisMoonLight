@@ -50,7 +50,14 @@ namespace Live2D.Cubism.Framework.MouthMovement
         /// </summary>
         private void Start()
         {
+            //コントローラー取得
             Controller = GetComponent<CubismMouthController>();
+
+            //0で初期化
+            Timescale = 0f;
+
+            //口を閉じておく
+            this.Controller.MouthOpening = 0;
         }
 
 
@@ -97,6 +104,11 @@ namespace Live2D.Cubism.Framework.MouthMovement
         /// </summary>
         public void LipSyncOff()
         {
+            if (Controller == null)
+            {
+                return;
+            }
+
             Timescale  = 0;
             this.Controller.MouthOpening = 0;
             this.Controller.Refresh();

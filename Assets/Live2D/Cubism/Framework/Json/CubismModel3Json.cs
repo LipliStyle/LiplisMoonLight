@@ -14,6 +14,7 @@ using Live2D.Cubism.Framework.Physics;
 using Live2D.Cubism.Framework.UserData;
 using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
+using Live2D.Cubism.Framework.Raycasting;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -239,13 +240,13 @@ namespace Live2D.Cubism.Framework.Json
                 return null;
             }
 
-
+            //キュービズムMoc生成
             var moc = CubismMoc.CreateFrom(mocAsBytes);
 
-
+            //モデル生成
             var model = CubismModel.InstantiateFrom(moc);
 
-
+            //モデル名設定
             model.name = Path.GetFileNameWithoutExtension(FileReferences.Moc);
 
 
@@ -265,26 +266,25 @@ namespace Live2D.Cubism.Framework.Json
             //ドローエイブル取得
             var drawables = model.Drawables;
 
-            //オーディオソースアタッチ
+            // オーディオソースアタッチ
             model.gameObject.AddComponent<AudioSource>();
 
-            // Initialize materials.
+            // マテリアルの初期化
             for (var i = 0; i < renderers.Length; ++i)
             {
                 renderers[i].Material = pickMaterial(this, drawables[i]);
             }
 
-
-            // Initialize textures.
+            // テクスチャの初期化
             for (var i = 0; i < renderers.Length; ++i)
             {
                 renderers[i].MainTexture = pickTexture(this, drawables[i]);
             }
 
-
-            // Initialize groups.
+            // グループの初期化
             var parameters = model.Parameters;
 
+            //パラメーターの読み込み、設定
             for (var i = 0; i < parameters.Length; ++i)
             {
                 if (IsParameterInGroup(parameters[i], "EyeBlink"))
@@ -326,11 +326,11 @@ namespace Live2D.Cubism.Framework.Json
                 }
             }
 
-
-
-            // Add mask controller if required.
+            // 必要があれば、マスクコントローラーを読み込む
             for (var i = 0; i < drawables.Length; ++i)
             {
+
+
                 if (!drawables[i].IsMasked)
                 {
                     continue;
@@ -345,9 +345,8 @@ namespace Live2D.Cubism.Framework.Json
             }
 
 
-            // Initialize physics if JSON exists.
+            // 物理演算ファイルの初期化
             var physics3JsonAsString = Physics3Json;
-
 
             if (!string.IsNullOrEmpty(physics3JsonAsString))
             {
@@ -363,7 +362,7 @@ namespace Live2D.Cubism.Framework.Json
                 physicsController.Initialize(physics3Json.ToRig());
             }
 
-
+            // ユーザーデータの初期化
             var userData3JsonAsString = UserData3Json;
 
 
@@ -394,15 +393,22 @@ namespace Live2D.Cubism.Framework.Json
                 }
             }
 
+            //アニメーターコンポーネントの追加
             if (model.gameObject.GetComponent<Animator>() == null)
             {
                 model.gameObject.AddComponent<Animator>();
             }
 
+            //当たり判定クラスの追加
+            if (model.gameObject.GetComponent<CubismRaycaster>() == null)
+            {
+                model.gameObject.AddComponent<CubismRaycaster>();
+            }
+
             // Make sure model is 'fresh'
             model.ForceUpdateNow();
 
-
+            //モデルを返す
             return model;
         }
 

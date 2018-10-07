@@ -1312,7 +1312,7 @@ public class CtrlTalk : ConcurrentBehaviour
         LiplisModel charData = modelController.GetCharacterModel(AllocationId);
         
         //おしゃべりウインドウ生成し、現在ウインドウ設置
-        this.NowTalkWindow = charData.CreateWindowTalk(message, UiRenderingFront.transform);
+        this.NowTalkWindow = charData.CreateWindowTalk(message);
     }
 
 

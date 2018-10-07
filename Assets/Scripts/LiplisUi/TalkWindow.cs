@@ -125,7 +125,7 @@ public class TalkWindow : MonoBehaviour {
         //移動目標の初期化
         if (ParentWindow != null)
         {
-            this.TargetPosition = ParentWindow.transform.position;
+            this.TargetPosition = ParentWindow.transform.localPosition;
         }
     }
 
@@ -369,14 +369,14 @@ public class TalkWindow : MonoBehaviour {
         }
 
         //判定
-        if (this.TargetPosition.x != this.ParentWindow.transform.position.x ||
-            this.TargetPosition.y != this.ParentWindow.transform.position.y ||
-            this.TargetPosition.z != this.ParentWindow.transform.position.z)
+        if (this.TargetPosition.x != this.ParentWindow.transform.localPosition.x ||
+            this.TargetPosition.y != this.ParentWindow.transform.localPosition.y ||
+            this.TargetPosition.z != this.ParentWindow.transform.localPosition.z)
         {
             //移動量算出
-            float diffX = this.TargetPosition.x - this.ParentWindow.transform.position.x;
-            float diffY = this.TargetPosition.y - this.ParentWindow.transform.position.y;
-            float diffZ = this.TargetPosition.z - this.ParentWindow.transform.position.z;
+            float diffX = this.TargetPosition.x - this.ParentWindow.transform.localPosition.x;
+            float diffY = this.TargetPosition.y - this.ParentWindow.transform.localPosition.y;
+            float diffZ = this.TargetPosition.z - this.ParentWindow.transform.localPosition.z;
 
             float x = 0;
             float y = 0;
@@ -385,57 +385,57 @@ public class TalkWindow : MonoBehaviour {
 
             if (diffX > 0)
             {
-                x = this.ParentWindow.transform.position.x + moveVal;
+                x = this.ParentWindow.transform.localPosition.x + moveVal;
             }
             else if (diffX == 0 || Math.Abs(diffX) < 2)
             {
-                x = this.ParentWindow.transform.position.x;
+                x = this.ParentWindow.transform.localPosition.x;
             }
             else if (diffX < 0)
             {
-                x = this.ParentWindow.transform.position.x;
+                x = this.ParentWindow.transform.localPosition.x;
             }
             else
             {
-                x = this.ParentWindow.transform.position.x - moveVal;
+                x = this.ParentWindow.transform.localPosition.x - moveVal;
             }
 
             if (diffY > 0)
             {
-                y = this.ParentWindow.transform.position.y + moveVal;
+                y = this.ParentWindow.transform.localPosition.y + moveVal;
             }
             else if (diffY == 0 || Math.Abs(diffY) < 2)
             {
-                y = this.ParentWindow.transform.position.y;
+                y = this.ParentWindow.transform.localPosition.y;
             }
             else if (diffY < 0)
             {
-                y = this.ParentWindow.transform.position.y;
+                y = this.ParentWindow.transform.localPosition.y;
             }
             else
             {
-                y = this.ParentWindow.transform.position.y - moveVal;
+                y = this.ParentWindow.transform.localPosition.y - moveVal;
             }
 
             if (diffZ > 0)
             {
-                z = this.ParentWindow.transform.position.z + moveVal;
+                z = this.ParentWindow.transform.localPosition.z + moveVal;
             }
             else if (diffZ == 0 || Math.Abs(diffZ) < 2)
             {
-                z = this.ParentWindow.transform.position.z;
+                z = this.ParentWindow.transform.localPosition.z;
             }
             else if (diffZ < 0)
             {
-                z = this.ParentWindow.transform.position.z;
+                z = this.ParentWindow.transform.localPosition.z;
             }
             else
             {
-                z = this.ParentWindow.transform.position.z - moveVal;
+                z = this.ParentWindow.transform.localPosition.z - moveVal;
             }
 
             //移動
-            ParentWindow.transform.position = new Vector3(x, y, z);
+            ParentWindow.transform.localPosition = new Vector3(x, y, z);
         }
     }
 
@@ -591,6 +591,15 @@ public class TalkWindow : MonoBehaviour {
     public void cleanBubbleText()
     {
         _bubbleText.text.text = string.Empty;
+    }
+
+    /// <summary>
+    /// 現在入力中のテキストを取得する
+    /// </summary>
+    /// <returns></returns>
+    public string GetCurrentText()
+    {
+        return currentText;
     }
 
     #endregion

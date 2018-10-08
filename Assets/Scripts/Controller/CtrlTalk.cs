@@ -349,7 +349,7 @@ public class CtrlTalk : ConcurrentBehaviour
 
 
             //音声再生完了待ち
-            if (LAppLive2DManager.Instance.IsPlaying())
+            if (modelController.IsPlaying())
             {
                 return;
             }
@@ -389,18 +389,6 @@ public class CtrlTalk : ConcurrentBehaviour
                 //おしゃべりウインドウがなければカウントアップ
                 TalkWaitCount++;
             }
-
-            //ニュートラル戻しタイムアウト
-            if (TalkWaitCount == TALK_WAIT_NEUTRAL_DEFAULT)
-            {
-                OnNeutralAll();
-            }
-            if (TalkWaitCount == TALK_WAIT_NEUTRAL_IDLE_DEFAULT)
-            {
-                OnIdleAll();
-            }
-
-
 
             //おしゃべり待ちタイムアウト
             if (TalkWaitCount >= TALK_WAIT_DEFAULT)
@@ -638,21 +626,6 @@ public class CtrlTalk : ConcurrentBehaviour
     }
 
     /// <summary>
-    /// ニュートラル戻し
-    /// </summary>
-    private void OnNeutralAll()
-    {
-        //全登録モデルをニュートラルに戻す
-        modelController.NeutralAll();
-    }
-    private void OnIdleAll()
-    {
-        //全登録モデルをニュートラルに戻す
-        modelController.NeutralAll();
-    }
-
-
-    /// <summary>
     /// 次の文章をセットする
     /// </summary>
     private void SetNextSentence()
@@ -711,7 +684,10 @@ public class CtrlTalk : ConcurrentBehaviour
         }
 
         //表情設定
-        modelController.SetExpression(sentence);
+        StartCoroutine(modelController.SetExpression(sentence));
+
+        //おしゃべりの開始
+        modelController.StartTalking(sentence);
 
         //センテンスカウントインクリメント
         NowSentenceCount++;
@@ -728,8 +704,6 @@ public class CtrlTalk : ConcurrentBehaviour
             if (sentence.VoiceData != null)
             {
                 modelController.StartVoice(sentence.AllocationId, sentence.VoiceData);
-                //audioSourceList[sentence.AllocationId].clip = sentence.VoiceData;
-                //audioSourceList[sentence.AllocationId].Play();
             }
         }
     }
@@ -741,9 +715,6 @@ public class CtrlTalk : ConcurrentBehaviour
     {
         //ウインドウを一旦クリア
         DestroyAllWindow();
-
-        //ニュートラル戻し
-        OnNeutralAll();
 
         //話題取得
         if (LiplisStatus.Instance.NewTopic.TalkTopicList.Count > 0 || LiplisStatus.Instance.NewTopic.InterruptTopicList.Count > 0)

@@ -9,6 +9,7 @@
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Model.Event;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -113,7 +114,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// 表情ををセットする
         /// </summary>
         /// <returns></returns>
-        void SetExpression(MOTION ExpressionCode);
+        IEnumerator SetExpression(MOTION ExpressionCode);
 
         /// <summary>
         /// モーションをセットする

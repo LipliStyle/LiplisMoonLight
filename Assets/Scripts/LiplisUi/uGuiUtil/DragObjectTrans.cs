@@ -22,7 +22,7 @@ namespace Assets.Scripts.LiplisSystem.UI
 
         public void OnDrag(PointerEventData e)
         {
-            m_rectTransform.position += new Vector3(e.delta.x, e.delta.y, 0f);
+            m_rectTransform.localPosition += new Vector3(e.delta.x, e.delta.y, 0f);
             Debug.Log("x:" + e.delta.x + "y:" + e.delta.y + " mouX" + Input.mousePosition.x);
         }
 

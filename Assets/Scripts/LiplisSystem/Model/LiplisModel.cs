@@ -18,6 +18,7 @@ using LiplisMoonlight;
 using LiplisMoonlight.LiplisModel;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -41,7 +42,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         //=============================
         //定義プロパティ
         public string ModelName;                    //モデル名
-        public List<IfsLiplisModel> ListModel;      //モデルリスト
+        public List<IfsLiplisModel> ModelList;      //モデルリスト
 
         //=============================
         //制御プロパティ
@@ -210,7 +211,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         private void LoadModel()
         {
             //モデルリスト初夏
-            ListModel = new List<IfsLiplisModel>();
+            ModelList = new List<IfsLiplisModel>();
 
             //モデルファイルのロード
             foreach (LiplisModelData modelData in modelSetting.ModelList)
@@ -247,7 +248,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 );
 
             //モデルをリストに追加
-            ListModel.Add(model);
+            ModelList.Add(model);
         }
 
         /// <summary>
@@ -288,7 +289,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         private void SetActiveModel()
         {
             //フロントモデルの検索
-            foreach (IfsLiplisModel model in ListModel)
+            foreach (IfsLiplisModel model in ModelList)
             {
                 //正面のモデルが見つかったら採用
                 if(model.Direction == (int)MODELE_DIRECTION.FRONT)
@@ -301,9 +302,10 @@ namespace Assets.Scripts.LiplisSystem.Model
             //フロントモデルが見つからなければ1つ目をアクティブとする。
             if(this.ActiveModel == null)
             {
-                this.ActiveModel = ListModel[0];
+                this.ActiveModel = ModelList[0];
             }
 
+            //ここでビジブル設定すると、初期にアクティブにしたモデル以外動かなくなる。
             //ビジブル設定
             InitVisible();
         }
@@ -353,7 +355,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         public void Update()
         {
             //各モデルのアップデート処理
-            foreach (var model in ListModel)
+            foreach (var model in ModelList)
             {
                 model.Update();
             }
@@ -405,16 +407,16 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="visible"></param>
         private void SetModelVisibleAll(bool visible)
         {
-            foreach (var model in ListModel)
+            foreach (var model in ModelList)
             {
                 model.SetFadeOut();
             }
         }
         private void SetModelOffAll()
         {
-            foreach (var model in ListModel)
+            foreach (var model in ModelList)
             {
-                model.SetVisible(false);
+                model.SetFadeOut(0.8f);
             }
         }
 
@@ -423,9 +425,8 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         public void SetNeutralAll()
         {
-            foreach (var model in ListModel)
+            foreach (var model in ModelList)
             {
-                model.SetExpression(MOTION.MOTION_NORMAL);
                 model.StartRandomMotion(MOTION.MOTION_IDLE);
             }
         }
@@ -433,10 +434,10 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// ランダムに向きを変更する
         /// </summary>
-        public void ChengeDirectionRandam()
+        public void ChangeDirectionRandam()
         {
             //現在の座標を保存
-            SetModelLocation();
+            GetModelLocation();
 
             //選択モデル
             IfsLiplisModel selectModel = GetDirectionModel(this.Position);
@@ -444,11 +445,14 @@ namespace Assets.Scripts.LiplisSystem.Model
             //選択名が空なら0番目を取得
             if (selectModel == null)
             {
-                selectModel = ListModel[0];
+                selectModel = ModelList[0];
             }
 
             //アクティブモデルを変更
             this.ActiveModel = selectModel;
+
+            //位置の復元
+            SetModelLocation();
 
             //モデルビジブル再設定
             SetModelVisible();
@@ -468,7 +472,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 //最右端 左向き禁止
                 //変更候補検索
-                foreach (var model in ListModel)
+                foreach (var model in ModelList)
                 {
                     //左向き以外を候補リストに追加
                     if(model.Direction != (int)MODELE_DIRECTION.LEFT)
@@ -481,7 +485,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 //最左端 右向き禁止
                 //変更候補検索
-                foreach (var model in ListModel)
+                foreach (var model in ModelList)
                 {
                     //左向き以外を候補リストに追加
                     if (model.Direction != (int)MODELE_DIRECTION.RIGNT)
@@ -493,7 +497,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             else
             {
                 //それ以外はモデルリストすべて対象
-                CandidateModelList.AddRange(ListModel);
+                CandidateModelList.AddRange(ModelList);
             }
 
             //候補リストをシャッフルする
@@ -509,13 +513,13 @@ namespace Assets.Scripts.LiplisSystem.Model
         public void ChengeDirection(MODELE_DIRECTION Direction)
         {
             //現在の座標を保存
-            SetModelLocation();
+            GetModelLocation();
 
             //候補リスト
             List<IfsLiplisModel> CandidateModelList = new List<IfsLiplisModel>();
 
             //対象の向きのモデルを検索
-            foreach (var model in ListModel)
+            foreach (var model in ModelList)
             {
                 //左向き以外を候補リストに追加
                 if (model.Direction != (int)Direction)
@@ -527,7 +531,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             //空なら全対象
             if(CandidateModelList.Count == 0)
             {
-                CandidateModelList.AddRange(ListModel);
+                CandidateModelList.AddRange(ModelList);
             }
 
             //シャッフルする
@@ -545,10 +549,19 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// 現在モデルの位置を次のモデルに継承する
         /// </summary>
         /// <param name="selectModelName"></param>
-        public void SetModelLocation()
+        public void GetModelLocation()
         {
             this.ModelLocation = this.ActiveModel.ModelObject.transform.localPosition;
         }
+
+        /// <summary>
+        /// 現在モデルの位置を復元する
+        /// </summary>
+        public void SetModelLocation()
+        {
+           this.ActiveModel.ModelObject.transform.localPosition = this.ModelLocation;
+        }
+
 
         /// <summary>
         /// 対象の位置に移動する
@@ -565,7 +578,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             SetModelVisibleAllOff();
 
             //移動する
-            foreach (var model in ListModel)
+            foreach (var model in ModelList)
             {
                 model.SetPosition(pos);
             }
@@ -580,7 +593,23 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="MotionCode"></param>
         public void StartRandomMotion(MOTION MotionCode)
         {
-            this.ActiveModel.StartRandomMotion(MotionCode);
+            foreach (var model in ModelList)
+            {
+                model.StartRandomMotion(MotionCode);
+            }
+        }
+
+        /// <summary>
+        /// 感情をセットする
+        /// </summary>
+        /// <param name="MotionCode"></param>
+        /// <returns></returns>
+        public IEnumerator SetExpression(MOTION MotionCode)
+        {
+            foreach (var model in ModelList)
+            {
+                yield return model.SetExpression(MotionCode);
+            }
         }
 
         #endregion
@@ -645,7 +674,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         public TalkWindow CreateWindowTalk(string message)
         {
             //向き変更
-            this.ChengeDirectionRandam();
+            this.ChangeDirectionRandam();
 
             //インスタンティエイト
             GameObject window = UnityEngine.Object.Instantiate(WindowInstances) as GameObject;
@@ -893,5 +922,26 @@ namespace Assets.Scripts.LiplisSystem.Model
 
         #endregion
 
+        //====================================================================
+        //
+        //                               音声関連
+        //                         
+        //====================================================================
+        #region 音声関連
+        public bool IsPlaying()
+        {
+            //再生中のモデルを検索
+            foreach (var model in ModelList)
+            {
+                if (model.IsPlaying())
+                {
+                    return true;
+                }
+            }
+
+            //すべてのモデルが再生中でなければFalse
+            return false;
+        }
+        #endregion
     }
 }

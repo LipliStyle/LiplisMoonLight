@@ -10,6 +10,8 @@ using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Model.Event;
 using Assets.Scripts.LiplisSystem.Model.Setting;
 using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.LiplisSystem.UI;
+using Assets.Scripts.LiplisUi.uGuiUtil;
 using Assets.Scripts.Utils;
 using LiplisMoonlight.LiplisModel;
 using Live2D.Cubism.Core;
@@ -19,6 +21,7 @@ using Live2D.Cubism.Framework.MouthMovement;
 using Live2D.Cubism.Framework.Raycasting;
 using Live2D.Cubism.Rendering;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -94,9 +97,6 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.Direction = modelData.Direction;
             this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
      
-            //表情テーブルにデフォルトをセット
-            this.TableMotion = Expression.TableExpression;
-
             //モデルのロード
             LoadModel(modelPath, modelData.FileName, targetPosition);
 
@@ -121,6 +121,7 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //アニメーターアタッチ
             this.model.gameObject.AddComponent<Animation>();
+
 
             //モデルゲームオブジェクトを取得する
             this.ModelObject = this.model.gameObject;
@@ -162,6 +163,19 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //口パクを初期化
             StopTalking();
+
+            //ドラッグオブジェクトのセット
+            SetDragObject();
+        }
+
+        /// <summary>
+        /// ドラッグオブジェクトをセットする
+        /// </summary>
+        private void SetDragObject()
+        {
+            //ドラッグドロップアタッチ
+            this.model.gameObject.AddComponent<CapsuleCollider>();
+            this.model.gameObject.AddComponent<DragGameObject>();
         }
 
         /// <summary>
@@ -182,7 +196,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         private void LoadMotion(CubismModel model, string modelPath)
         {
             //モーションテーブルの初期化
-            TableMotion = new Dictionary<int, List<string>>();
+            this.TableMotion = new Dictionary<int, List<string>>();
 
             //モーションリストを回して登録
             foreach (LiplisMotion motion in modelData.MotionList)
@@ -196,17 +210,28 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //モーションロード
                 AnimationClip clip = model3Json.ToAnimationClip();
 
-                //ワラップモード設定
-                clip.wrapMode = WrapMode.Loop;
-
-                //レガシーアニメーションに設定(この設定は必須)
+                //レガシーに設定
                 clip.legacy = true;
+
+                //ワラップモード設定
+                //アイドルモーションはループ、それ以外はワンスを設定
+                if (motion.FileName.StartsWith("MOTION_IDLE"))
+                {
+                    //アイドルモーションに登録
+                    clip.wrapMode = WrapMode.Loop;
+                }
+                else
+                {
+                    //通常モーションに登録
+                    clip.wrapMode = WrapMode.Once;
+                }
+
 
                 //アニメーターに登録
                 this.Animator.AddClip(clip, motion.FileName);
 
                 //モーションテーブル キー追加
-                if(!TableMotion.ContainsKey(motion.Emotion))
+                if (!TableMotion.ContainsKey(motion.Emotion))
                 {
                     TableMotion.Add(motion.Emotion, new List<string>());
                 }
@@ -215,7 +240,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 TableMotion[motion.Emotion].Add(motion.FileName);
             }
         }
-
+        
         /// <summary>
         /// エクスプレッションをロードする
         /// </summary>
@@ -241,6 +266,8 @@ namespace Assets.Scripts.LiplisSystem.Model
 
         /// <summary>
         /// 当たり判定の設定
+        /// 
+        /// TODO LiplisModelLived2:SetHitArea 当たり判定のパーツの名称を確定させる、デファインに定義
         /// </summary>
         private void SetHitArea()
         {
@@ -256,6 +283,17 @@ namespace Assets.Scripts.LiplisSystem.Model
                     //レイキャストエイブルをアッドコンポーネント
                     drawable.gameObject.AddComponent<CubismRaycastable>();
                 }
+            }
+        }
+
+        /// <summary>
+        /// パラメータの初期化
+        /// </summary>
+        private void InitParamator()
+        {
+            foreach (CubismParameter param in model.Parameters)
+            {
+                param.Value = param.DefaultValue;
             }
         }
 
@@ -276,21 +314,66 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <returns></returns>
         private string GetMotionNameTargetMotionRndam(MOTION MotionCode)
         {
-            //対照勘定のリストを取得
-            List<string> motionList = TableMotion[(int)MotionCode];
-
-            if (motionList.Count != 0)
+            try
             {
-                //取得したリストのカウント値から、ランダムでインデクス生成
-                int targetIdx = UnityEngine.Random.Range(0, motionList.Count);
+                //キーチェック
+                if(!TableMotion.ContainsKey((int)MotionCode))
+                {
+                    Debug.Log("GetMotionNameTargetMotionRndam 存在なし:" + MotionCode);
 
-                //選択されたモーション名を返す
-                return motionList[targetIdx];
+                    //存在しなければNULLを返す
+                    return null;
+                }
+
+                //対照感情のリストを取得
+                List<string> motionList = TableMotion[(int)MotionCode];
+
+                if (motionList.Count != 0)
+                {
+                    //取得したリストのカウント値から、ランダムでインデクス生成
+                    int targetIdx = UnityEngine.Random.Range(0, motionList.Count);
+
+                    //選択されたモーション名を返す
+                    return motionList[targetIdx];
+                }
+                else
+                {
+                    //設定モーションが無い場合はNULLを返す
+                    return null;
+                }
             }
-            else
+            catch(Exception ex)
             {
-                //設定モーションが無い場合はノーマルを返す
-                return TableMotion[(int)MOTION.MOTION_NORMAL][0];
+                Debug.Log(MotionCode);
+                return null;
+            }
+
+        }
+        private string GetMotionNameTargetIdleMotionRndam()
+        {
+            try
+            {
+                //対照勘定のリストを取得
+                List<string> motionList = TableMotion[(int)MOTION.MOTION_IDLE];
+
+                if (motionList.Count != 0)
+                {
+                    //取得したリストのカウント値から、ランダムでインデクス生成
+                    int targetIdx = UnityEngine.Random.Range(0, motionList.Count);
+
+                    //選択されたモーション名を返す
+                    return motionList[targetIdx];
+                }
+                else
+                {
+                    //設定モーションが無い場合はノーマルを返す
+                    return TableMotion[(int)MOTION.MOTION_NORMAL][0];
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("アイドルモーションでエラー");
+                return TableMotion[(int)MOTION.MOTION_IDLE][0];
             }
         }
 
@@ -337,10 +420,64 @@ namespace Assets.Scripts.LiplisSystem.Model
             return this.Audio.isPlaying;
         }
 
-        public void SetExpression(MOTION ExpressionCode)
+        /// <summary>
+        /// エクスプレッションの設定
+        /// </summary>
+        /// <param name="ExpressionCode"></param>
+        public IEnumerator SetExpression(MOTION ExpressionCode)
         {
-            Animator.Blend(GetMotionNameTargetMotionRndam(ExpressionCode));
+            //対照感情のモーション取得
+            string motionName = GetMotionNameTargetMotionRndam(ExpressionCode);
+
+            //取得モーションがNULLでなければ実行する。
+            if(motionName != null)
+            {
+                //モーション実行
+                Animator.Play(motionName);
+
+                //モーション完了待ち
+                yield return new WaitForSeconds(Animator.GetClip(motionName).length);
+
+                //パラメーター初期化
+                InitParamator();
+
+                //表情とアイドル設定
+                Animator.Blend(GetExpressionNameTargetMotionRndam(ExpressionCode));
+                Animator.Blend(GetMotionNameTargetIdleMotionRndam());
+
+            }
+            else
+            {
+                //様子見中
+                //一旦停止
+                //Animator.Stop();
+
+                //パラメーター初期化
+                //InitParamator();
+
+                //表情とアイドル設定
+                Animator.Play(GetExpressionNameTargetMotionRndam(ExpressionCode));
+                Animator.Blend(GetMotionNameTargetIdleMotionRndam());
+            }
+
         }
+        
+        /// <summary>
+        /// 本インスタンスからセットエクスプレッションを呼ぶための目セッド
+        /// </summary>
+        /// <param name="ExpressionCode"></param>
+        public void SetExpressionLocal(MOTION ExpressionCode)
+        {
+            GameObject obj = new GameObject();     // コルーチン実行用オブジェクト作成
+            obj.name = "GlobalCoroutine";
+
+            GlobalCoroutine component = obj.AddComponent<GlobalCoroutine>();
+            if (component != null)
+            {
+                component.StartCoroutine(SetExpression(ExpressionCode));
+            }
+        }
+
 
         /// <summary>
         /// おしゃべりを停止する
@@ -350,7 +487,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             if (this.LipSync == null)
             {
                 return;
-            }
+            }          
 
             this.LipSync.LipSyncOn();
         }
@@ -428,8 +565,23 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="MotionCode"></param>
         public void StartRandomMotion(MOTION MotionCode)
         {
-            Animator.Stop();
-            Animator.Play(GetMotionNameTargetMotionRndam(MotionCode));
+            try
+            {
+                string motionName = GetMotionNameTargetMotionRndam(MotionCode);
+
+                if(motionName == null)
+                {
+                    return;
+                }
+
+                //Animator.Stop();
+                Animator.Play(motionName);
+            }
+            catch(Exception ex)
+            {
+                Debug.Log(ex);
+            }
+
         }
 
         /// <summary>
@@ -440,7 +592,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         {
             if (Audio == null)
             {
-                Debug.Log("Live2D : AudioSource Component is NULL !");
+                Debug.Log("オーディオがNULL！");
                 return;
             }
             Audio.clip = pVoice;
@@ -570,6 +722,9 @@ namespace Assets.Scripts.LiplisSystem.Model
             else if (hitTestResult == 2)
             {
                 Debug.Log("胸をタップしました！");
+
+                //恥じらいを発動
+               　SetExpressionLocal(MOTION.MOTION_PROUD_M);
             }
             else if (hitTestResult == 3)
             {
@@ -579,9 +734,6 @@ namespace Assets.Scripts.LiplisSystem.Model
                 CallbackOnNextTalkOrSkip();
             }
         }
-
-
-
         #endregion
     }
 }

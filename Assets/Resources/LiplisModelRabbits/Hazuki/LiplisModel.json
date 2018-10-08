@@ -84,6 +84,42 @@
         {
           "FileName": "MOTION_COMMON_NORMAL_02.motion3.json",
           "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_JOY_P_01.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_JOY_P_02.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_JOY_P_03.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_02.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_03.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_01.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ECSTASY_M_01.motion3.json",
+          "Emotion": -4
+        },
+        {
+          "FileName": "MOTION_RAGE_M_01.motion3.json",
+          "Emotion": -6
+        },
+        {
+          "FileName": "MOTION_RESPECT_P_01.motion3.json",
+          "Emotion": 8
         }
       ],
       "Direction": 1
@@ -170,6 +206,30 @@
         {
           "FileName": "MOTION_COMMON_NORMAL_02.motion3.json",
           "Emotion": 0
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_01.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_02.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_03.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ECSTASY_M_01.motion3.json",
+          "Emotion": -4
+        },
+        {
+          "FileName": "MOTION_RAGE_M_01.motion3.json",
+          "Emotion": -6
+        },
+        {
+          "FileName": "MOTION_RESPECT_P_01.motion3.json",
+          "Emotion": 8
         }
       ],
       "Direction": 0
@@ -256,6 +316,30 @@
         {
           "FileName": "MOTION_COMMON_INTEREST_M_02.motion3.json",
           "Emotion": -7
+        },
+        {
+          "FileName": "MOTION_ECSTASY_M_01.motion3.json",
+          "Emotion": -4
+        },
+        {
+          "FileName": "MOTION_RAGE_M_01.motion3.json",
+          "Emotion": -6
+        },
+        {
+          "FileName": "MOTION_RESPECT_P_01.motion3.json",
+          "Emotion": 8
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_01.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_02.motion3.json",
+          "Emotion": 2
+        },
+        {
+          "FileName": "MOTION_ADMIRATION_P_03.motion3.json",
+          "Emotion": 2
         }
       ],
       "Direction": 2

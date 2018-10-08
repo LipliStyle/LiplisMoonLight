@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 224951485269001402}
   - component: {fileID: 222189279544377064}
   - component: {fileID: 114227948179833782}
+  - component: {fileID: 114157244690292160}
   m_Layer: 0
   m_Name: PrefabLogNewsContent
   m_TagString: Untagged
@@ -198,6 +199,17 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 2018/07/01 00:00:00
+--- !u!114 &114157244690292160
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1427171072086896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9d5cfbe2d6d2148a0266d73958fccf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114227948179833782
 MonoBehaviour:
   m_ObjectHideFlags: 1

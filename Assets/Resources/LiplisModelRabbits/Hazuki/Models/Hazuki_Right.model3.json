@@ -3,7 +3,7 @@
 	"FileReferences": {
 		"Moc": "Hazuki_Right.moc3",
 		"Textures": [
-			"Hazuki.2048/texture_Right.png"
+			"Hazuki.2048/Hazuki_Right.png"
 		]
 	},
 	"Groups": [

@@ -533,9 +533,6 @@ public class TalkWindow : MonoBehaviour {
         //最終更新文字初期化
         lastUpdateCharacter = -1;
 
-        //リップシンク有効
-        this.TargetModel.StartTalking();
-
         //おしゃべり中に変更
         this.FlgTalking = true;
     }

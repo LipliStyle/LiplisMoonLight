@@ -20,6 +20,7 @@ using Assets.Scripts.LiplisSystem.Model.Priset;
 using Assets.Scripts.LiplisSystem.Model.Setting;
 using Assets.Scripts.Utils;
 using Assets.Scripts.LiplisSystem.Model.Json;
+using System.Collections;
 
 namespace Assets.Scripts.Controller
 {
@@ -271,7 +272,7 @@ namespace Assets.Scripts.Controller
         /// </summary>
         /// <param name="AllocationId"></param>
         /// <param name="sentence"></param>
-        public void SetExpression(MsgSentence sentence)
+        public IEnumerator SetExpression(MsgSentence sentence)
         {
             int AllocationId = sentence.AllocationId;
 
@@ -280,21 +281,22 @@ namespace Assets.Scripts.Controller
                 AllocationId = 0;
             }
 
-            //TODO 要実装 CtrlModelController SetExpression 対象IDのモデルに表情を設定する処理実装
-            ///☆☆☆☆☆☆☆☆☆要実装☆☆☆☆☆☆☆☆☆
+            //モデルに感情をセットする
+            yield return TableModelId[sentence.AllocationId].ActiveModel.SetExpression(MotionMap.GetMotion(sentence.Emotion,sentence.Point));
+        }
 
-            
+        /// <summary>
+        /// おしゃべり開始
+        /// </summary>
+        public void StartTalking(MsgSentence sentence)
+        {
+            ////リップシンク有効
+            this.TableModelId[sentence.AllocationId].ActiveModel.StartTalking();
 
-            ////一旦モーションをリセットする
-            //LAppLive2DManager.Instance.StartRandomMotion(TableModelId[AllocationId].NowModelName, MOTION.GetDefaultMotion(), LAppDefine.PRIORITY_FORCE);
-            //LAppLive2DManager.Instance.SetExpression(TableModelId[AllocationId].NowModelName, EXPRESSION.Instance.GetDefaultExpresssion());
-
-            ////表情設定
-            //LAppLive2DManager.Instance.SetExpressionNext(TableModelId[AllocationId].NowModelName, EXPRESSION.Instance.GetExpression(sentence.Emotion, sentence.Point));
-
-            ////モーション設定
-            //LAppLive2DManager.Instance.StartRandomMotion(TableModelId[AllocationId].NowModelName, MOTION.GetMotion(sentence.Emotion, sentence.Point), LAppDefine.PRIORITY_FORCE);
-
+            //foreach (var model in TableModelId[sentence.AllocationId].ListModel)
+            //{
+            //    model.StartTalking();
+            //}
         }
 
         /// <summary>
@@ -720,6 +722,30 @@ namespace Assets.Scripts.Controller
         {
             return TableModelId[AllocationId].ActiveModel.IsPlaying();
         }
+        #endregion
+
+        //====================================================================
+        //
+        //                          音声再生関連
+        //                         
+        //====================================================================
+        #region 音声再生関連
+
+        public bool IsPlaying()
+        {
+            //再生中のモデルを検索
+            foreach (var model in ModelList)
+            {
+                if(model.IsPlaying())
+                {
+                    return true;
+                }
+            }
+
+            //すべてのモデルが再生中でなければFalse
+            return false;
+        }
+
         #endregion
     }
 }

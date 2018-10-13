@@ -2,6 +2,8 @@
 //  ClassName : DragGameObject
 //  概要      : ゲームオブジェクトにドラッグ機能を付与する
 //              別途コライダーがアタッチされていることが必要
+//
+//              Live2d 3.0のキャラクターのドラッグ移動は本クラスで行っている。
 //              
 //
 //  LiplisLive2D
@@ -12,10 +14,14 @@ namespace Assets.Scripts.LiplisUi.uGuiUtil
 {
     public class DragGameObject : MonoBehaviour
     {
+        //=============================
         //スタート位置を取得
         private Vector3 StartMousePosition;
         private Vector3 StartPosition;
 
+        //=============================
+        //最低移動量
+        private const float MOVE_VALUE_MIN = 0.2f;
 
         /// <summary>
         /// マウスクリック時、現在座標を記録
@@ -27,11 +33,9 @@ namespace Assets.Scripts.LiplisUi.uGuiUtil
             this.StartPosition = this.transform.position;
         }
 
-        void OnMouseUp()
-        {
-
-        }
-
+        /// <summary>
+        /// ドラッグ移動
+        /// </summary>
         void OnMouseDrag()
         {
             //現在マウス位置取得
@@ -40,12 +44,22 @@ namespace Assets.Scripts.LiplisUi.uGuiUtil
             //z軸座標は保持
             mousePointInWorld.z = this.transform.position.z;
 
-            //移動結果
-            Vector3 result = new Vector3(StartPosition.x + mousePointInWorld.x - StartMousePosition.x,
-                StartPosition.y + mousePointInWorld.y - StartMousePosition.y,
-                this.transform.position.z);
+            //移動量を算出
+            float moveValueX = mousePointInWorld.x - StartMousePosition.x;
+            float moveValueY = mousePointInWorld.y - StartMousePosition.y;
 
-            this.transform.position = result;
+            //閾値でフィルターする理由は、クリックでも動いてしまうこと、
+            //キャラクターの場所入れ替え時、この処理によって座標が上書きされて移動できない場合があるため。
+            //一定以上移動していたら、アタッチされているオブジェクトを移動させる
+            if(Mathf.Abs(moveValueX) > MOVE_VALUE_MIN || Mathf.Abs(moveValueY) > MOVE_VALUE_MIN)
+            {
+                //移動結果
+                Vector3 result = new Vector3(StartPosition.x + moveValueX,
+                                            StartPosition.y + moveValueY,
+                                            this.transform.position.z);
+
+                this.transform.position = result;
+            }
         }
 
         /// <summary>
@@ -54,6 +68,7 @@ namespace Assets.Scripts.LiplisUi.uGuiUtil
         /// <returns></returns>
         private Vector3 GetMousePointInWorld()
         {
+            //スクリーン上のマウスポインター座標を取得　
             Vector3 objectPointInScreen = Camera.main.WorldToScreenPoint(this.transform.position);
 
             //画面上のポイント位置を取得
@@ -63,9 +78,7 @@ namespace Assets.Scripts.LiplisUi.uGuiUtil
                               objectPointInScreen.z);
 
             //マウスポイント座標を変換
-            Vector3 mousePointInWorld = Camera.main.ScreenToWorldPoint(mousePointInScreen);
-
-            return mousePointInWorld;
+            return Camera.main.ScreenToWorldPoint(mousePointInScreen);
         }
     }
 }

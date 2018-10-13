@@ -21,10 +21,13 @@ namespace Assets.Scripts.LiplisSystem.Model.Setting
         public const string EXPRESSIONS         = "/Expressions";
         public const string MOTIONS             = "/Motions";
         public const string SETTINGS            = "/Settings";
+        public const string IMAGES              = "/Images";
         public const string LIPLIS_CHAT_SETTING = "/LiplisChatSetting";
         public const string LIPLIS_TONE_SETTING = "/LiplisToneSetting";
         public const string EXT_MOTION_JSON     = " *.motion3.json";
-
+        public const string IMG_WINDOW          = "/LiplisTalkWindow";
+        public const string IMG_WINDOW_LOG      = "/LiplisTalkWindowLog";
+        public const string IMG_ICON_CHAR       = "/IconCharacter";
 
 
         ///=============================

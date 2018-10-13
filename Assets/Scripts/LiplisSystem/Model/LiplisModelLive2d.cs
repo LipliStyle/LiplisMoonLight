@@ -2,6 +2,7 @@
 //  ClassName : LiplisModelLive2d
 //  概要      : Liplisモデル Live2d
 //              
+//              ドラッグ移動は「DragGameObject」で行っている。インスタンス生成時、アタッチしている。
 //
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
@@ -10,7 +11,6 @@ using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Model.Event;
 using Assets.Scripts.LiplisSystem.Model.Setting;
 using Assets.Scripts.LiplisSystem.Msg;
-using Assets.Scripts.LiplisSystem.UI;
 using Assets.Scripts.LiplisUi.uGuiUtil;
 using Assets.Scripts.Utils;
 using LiplisMoonlight.LiplisModel;
@@ -121,8 +121,7 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //アニメーターアタッチ
             this.model.gameObject.AddComponent<Animation>();
-
-
+            
             //モデルゲームオブジェクトを取得する
             this.ModelObject = this.model.gameObject;
 
@@ -187,6 +186,9 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.model.transform.localScale = targetScale;
         }
 
+        //アイドルモーション先頭
+        public const string MOTION_IDLE_HEAD = "MOTION_IDLE";
+
         /// <summary>
         /// モーションのロード
         /// TODO Exceptionの実装 
@@ -215,7 +217,7 @@ namespace Assets.Scripts.LiplisSystem.Model
 
                 //ワラップモード設定
                 //アイドルモーションはループ、それ以外はワンスを設定
-                if (motion.FileName.StartsWith("MOTION_IDLE"))
+                if (motion.FileName.StartsWith(MOTION_IDLE_HEAD))
                 {
                     //アイドルモーションに登録
                     clip.wrapMode = WrapMode.Loop;

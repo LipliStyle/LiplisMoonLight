@@ -5,9 +5,11 @@
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //=======================================================================﻿
+using Assets.Scripts.Controller;
 using Assets.Scripts.Data;
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.LiplisSystem.Model;
 using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.LiplisSystem.Web;
 using Assets.Scripts.Utils;
@@ -39,18 +41,16 @@ public class CtrlLog : MonoBehaviour {
 	private GameObject PrefabLogNewsContent;
 
 	private GameObject PrefabLogWindowL1;
-	private GameObject PrefabLogWindowL2;
-	private GameObject PrefabLogWindowL3;
-	private GameObject PrefabLogWindowL4;
 	private GameObject PrefabLogWindowR1;
-	private GameObject PrefabLogWindowR2;
-	private GameObject PrefabLogWindowR3;
-	private GameObject PrefabLogWindowR4;
 
 	///=============================
 	///パネルリスト
 	private List<GameObject> PanelList;
 	private List<GameObject> PanelChildList;
+
+	///=============================
+	/// モデルコントローラー
+	public CtrlModelController modelController;
 
 	///=============================
 	///選択キー
@@ -59,7 +59,6 @@ public class CtrlLog : MonoBehaviour {
 	///=============================
 	///コンテンツ
 	private Texture empty;
-
 
 	//====================================================================
 	//
@@ -103,15 +102,8 @@ public class CtrlLog : MonoBehaviour {
 		{
 			this.PrefabLogNewsContent = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_NEWS);
 
-
 			this.PrefabLogWindowL1 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_L1);
-			this.PrefabLogWindowL2 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_L2);
-			this.PrefabLogWindowL3 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_L3);
-			this.PrefabLogWindowL4 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_L4);
 			this.PrefabLogWindowR1 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_R1);
-			this.PrefabLogWindowR2 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_R2);
-			this.PrefabLogWindowR3 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_R3);
-			this.PrefabLogWindowR4 = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_R4);
 		}
 	}
 
@@ -485,7 +477,7 @@ public class CtrlLog : MonoBehaviour {
 		//センテンスリストを回し、チャットを生成する
 		foreach (MsgSentence sentence in SentenceList)
 		{
-			CreateLogTalkUi(sentence, rlBit, idx);
+            CreateLogTalkUi(sentence, rlBit, idx);
 
 			//反転
 			if (prvAllocationId != sentence.AllocationId)
@@ -544,8 +536,9 @@ public class CtrlLog : MonoBehaviour {
 	/// <param name="idx"></param>
 	public void CreateLogTalkUi(MsgSentence sentence, bool rlBit, int idx)
 	{
-		//ウインドウのプレハブからインスタンス生成
-		GameObject panel = CreateCharPanel(sentence.AllocationId, rlBit);
+       
+        //ウインドウのプレハブからインスタンス生成
+        GameObject panel = CreateCharPanel(sentence.AllocationId, rlBit);
 
 		//ウインドウ名設定
 		panel.name = "LiplisTalkLog" + idx;
@@ -572,59 +565,30 @@ public class CtrlLog : MonoBehaviour {
 	/// <returns></returns>
 	private GameObject CreateCharPanel(int AllocationId, bool rlBit)
 	{
-		if (AllocationId == 0)//葉月
-		{
-			if (rlBit)
-			{
-				return Instantiate(this.PrefabLogWindowL1) as GameObject;
-			}
-			else
-			{
-				return Instantiate(this.PrefabLogWindowR1) as GameObject;
-			}
-		}
-		else if (AllocationId == 1)//白葉
-		{
-			if (rlBit)
-			{
-				return Instantiate(this.PrefabLogWindowL2) as GameObject;
-			}
-			else
-			{
-				return Instantiate(this.PrefabLogWindowR2) as GameObject;
-			}
-		}
-		else if (AllocationId == 2)//黒葉
-		{
-			if (rlBit)
-			{
-				return Instantiate(this.PrefabLogWindowL3) as GameObject;
-			}
-			else
-			{
-				return Instantiate(this.PrefabLogWindowR3) as GameObject;
-			}
-		}
-		else if (AllocationId == 3)//桃葉
-		{
-			if (rlBit)
-			{
-				return Instantiate(this.PrefabLogWindowL4) as GameObject;
-			}
-			else
-			{
-				return Instantiate(this.PrefabLogWindowR4) as GameObject;
-			}
-		}
-		else
-		{
-			return null;
-		}
+        //モデル取得
+        LiplisModel model = modelController.TableModelId[AllocationId];
 
+        //パネル
+        GameObject panel;
 
+        //
+        if (rlBit)
+        {
+            panel = Instantiate(this.PrefabLogWindowL1) as GameObject;
+        }
+        else
+        {
+            panel = Instantiate(this.PrefabLogWindowR1) as GameObject;
+        }
 
+        //背景画像設定
+        panel.transform.Find("ImgText").GetComponent<Image>().sprite = model.SpriteLogWindow;
 
-	}
+        //キャラクターアイコン設定
+        panel.transform.Find("ImgChar").GetComponent<Image>().sprite = model.SpriteCharIcon;
+
+        return panel;
+    }
 	#endregion
 
 }

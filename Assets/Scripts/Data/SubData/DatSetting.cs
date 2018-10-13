@@ -63,8 +63,8 @@ namespace Assets.Scripts.Data.SubData
             this.LstModelOnTheStage = new List<string>();
 
             this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.HAZUKI);
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.KUROHA);
             this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.SHIROHA);
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.KUROHA);
             this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.MOMOHA);
         }
 

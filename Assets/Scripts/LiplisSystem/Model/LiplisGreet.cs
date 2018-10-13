@@ -66,7 +66,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.GreetList = new List<MsgGreet>();
 
             //トーン設定を回して1件づつ登録する。
-            foreach (ChatDiscription chat in chatSetting.chat.chatDiscription)
+            foreach (ChatSetting chat in chatSetting.ChatList)
             {
                 //読み出した変換設定を登録する。
                 AddGreetData(new MsgGreet(Tone,chat,AllocationId));

@@ -145,7 +145,7 @@ namespace Assets.Scripts.Controller
         /// <summary>
         /// モデルをロードする
         /// </summary>
-        /// <param name="LstModelOnTheStage"></param>
+        /// <param name="LPS-DB2\浩介"></param>
         private void LoadModel(string ModelSettingPath, int AllocationId)
         {
             //デフォルトモデルの場合は、プレファブから召喚
@@ -200,9 +200,14 @@ namespace Assets.Scripts.Controller
             LiplisMoonlightModel lmm = PrisetModelSettingLoader.LoadMoonlightSetting(modelPathAnderResource + ModelPathDefine.LIPLIS_MODEL_JSON);
             LiplisToneSetting ltn = PrisetModelSettingLoader.LoadLiplisToneSetting(modelPathAnderResource + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_TONE_SETTING);
             LiplisChatSetting lch = PrisetModelSettingLoader.LoadLiplisChatSetting(modelPathAnderResource + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_CHAT_SETTING);
-            
+
+            //ウインドウイメージの読み込み
+            Texture2D TextureWindow = Resources.Load(modelPathAnderResource + ModelPathDefine.IMAGES + ModelPathDefine.IMG_WINDOW) as Texture2D;
+            Texture2D TextureLogWindow = Resources.Load(modelPathAnderResource + ModelPathDefine.IMAGES + ModelPathDefine.IMG_WINDOW_LOG) as Texture2D;
+            Texture2D TextureCharIcon = Resources.Load(modelPathAnderResource + ModelPathDefine.IMAGES + ModelPathDefine.IMG_ICON_CHAR) as Texture2D;
+
             //モデルを追加する
-            return new LiplisModel(AllocationId, CanvasRendering, modelPath, ctrlTalk.NextTalkOrSkip, lmm, ltn, lch);
+            return new LiplisModel(AllocationId, CanvasRendering, modelPath, ctrlTalk.NextTalkOrSkip, lmm, ltn, lch, TextureWindow, TextureLogWindow, TextureCharIcon);
         }
 
         /// <summary>
@@ -691,16 +696,6 @@ namespace Assets.Scripts.Controller
 
             //ショートニュースからトピックを生成する
             return topic;
-        }
-
-        /// <summary>
-        /// ウインドウネームを取得する
-        /// </summary>
-        /// <param name="modelName"></param>
-        /// <returns></returns>
-        public string GetWindowName(string modelName)
-        {
-            return TableModel[modelName].WindowName;
         }
 
         /// <summary>

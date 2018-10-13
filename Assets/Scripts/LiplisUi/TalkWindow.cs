@@ -158,6 +158,17 @@ public class TalkWindow : MonoBehaviour {
     }
 
     /// <summary>
+    /// テクスチャをセットする
+    /// </summary>
+    /// <param name="texture"></param>
+    public void SetWindowImage(Sprite WindowSprite)
+    {
+        var img = this.GetComponent<Image>();
+
+        img.sprite = WindowSprite;
+    }
+
+    /// <summary>
     /// 開始時処理
     /// </summary>
     void Start()

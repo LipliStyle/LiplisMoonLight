@@ -13,20 +13,22 @@ namespace Assets.Scripts.LiplisSystem.Model.Json
 {
     public class LiplisToneSetting
     {
-        public Tone tone { get; set; }
+        public List<ToneSetting> ToneList { get; set; }
+
+        public LiplisToneSetting()
+        {
+            ToneList = new List<ToneSetting>();
+        }
     }
 
-    public class ToneDiscription
+    public class ToneSetting
     {
+        public int id { get; set; }
         public string name { get; set; }
+        public string sentence { get; set; }
         public string befor { get; set; }
         public string after { get; set; }
         public string type { get; set; }
-    }
-
-    public class Tone
-    {
-        public List<ToneDiscription> toneDiscription { get; set; }
     }
 
 }

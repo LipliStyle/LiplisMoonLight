@@ -12,15 +12,12 @@ using Assets.Scripts.LiplisSystem.Model.Event;
 using Assets.Scripts.LiplisSystem.Model.Json;
 using Assets.Scripts.LiplisSystem.Model.Setting;
 using Assets.Scripts.LiplisSystem.Msg;
-using Assets.Scripts.LiplisSystem.UI;
 using Assets.Scripts.Utils;
 using LiplisMoonlight;
 using LiplisMoonlight.LiplisModel;
-using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using UnityEngine;
 
@@ -56,7 +53,12 @@ namespace Assets.Scripts.LiplisSystem.Model
         //ウインドウキューリスト
         public Queue<TalkWindow> WindowTalkListQ;
         public TalkWindow NowTalkWindow;          //現在おしゃべりウインドウ
-        public string WindowName;                   //ウインドウ名
+
+        //=============================
+        //スプライト
+        public Sprite SpriteWindow;
+        public Sprite SpriteLogWindow;
+        public Sprite SpriteCharIcon;
 
         //=============================
         //キャラクター口調設定
@@ -68,8 +70,10 @@ namespace Assets.Scripts.LiplisSystem.Model
         private MsgExpression Expression;
 
         //=============================
-        //ウインドウインスタンス
-        public GameObject WindowInstances;
+        //画像ウインスタンス
+        public GameObject ImageInstanceWindow;
+        public GameObject ImageInstanceLogWindowL;
+        public GameObject ImageInstanceLogWindowR;
 
         //=============================
         //必須イベント
@@ -83,9 +87,13 @@ namespace Assets.Scripts.LiplisSystem.Model
         #region 初期化処理
 
         /// <summary>
-        /// コンストラクター
+        /// ファイルロード コンストラクター
         /// </summary>
-        public LiplisModel(int AllocationId, GameObject CanvasRendering,string ModelPath, ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip)
+        public LiplisModel(int AllocationId, 
+            GameObject CanvasRendering,
+            string ModelPath, 
+            ModelEvents.
+            OnNextTalkOrSkip CallbackOnNextTalkOrSkip)
         {
             //アロケーションID設定
             this.AllocationId = AllocationId;
@@ -99,13 +107,41 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モデル設定を読み込み
             LoadModelSetting(ModelPath);
 
+            //イメージの読み込み
+            LoadImage();
+
+            //プレファブの初期化
+            InitPrefab();
+
             //モデルの初期化
             InitModel();
 
             //トークウインドウの初期化
             InitTalkWindow();
         }
-        public LiplisModel(int AllocationId, GameObject CanvasRendering,string ModelPath, ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip,  LiplisMoonlightModel modelSetting, LiplisToneSetting toneSetting,LiplisChatSetting chatSetting)
+
+        /// <summary>
+        /// プリセットモデルロード コンストラクター
+        /// </summary>
+        /// <param name="AllocationId"></param>
+        /// <param name="CanvasRendering"></param>
+        /// <param name="ModelPath"></param>
+        /// <param name="CallbackOnNextTalkOrSkip"></param>
+        /// <param name="modelSetting"></param>
+        /// <param name="toneSetting"></param>
+        /// <param name="chatSetting"></param>
+        /// <param name="TextureWindow"></param>
+        public LiplisModel(int AllocationId, 
+            GameObject CanvasRendering,
+            string ModelPath, 
+            ModelEvents.OnNextTalkOrSkip 
+            CallbackOnNextTalkOrSkip,  
+            LiplisMoonlightModel modelSetting, 
+            LiplisToneSetting toneSetting,
+            LiplisChatSetting chatSetting, 
+            Texture2D TextureWindow,
+            Texture2D TextureLogWindow,
+            Texture2D TextureCharIcon)
         {
             //アロケーションID設定
             this.AllocationId = AllocationId;
@@ -124,8 +160,16 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.toneSetting = toneSetting;
             this.chatSetting = chatSetting;
 
+            //イメージの読み込み
+            this.SpriteWindow = CreateTalkWindowSprite(TextureWindow);
+            this.SpriteLogWindow = CreateTalkWindowSprite(TextureLogWindow);
+            this.SpriteCharIcon = CreateTalkWindowSprite(TextureCharIcon);
+
             //モデルの初期化
             InitModel();
+
+            //プレファブの初期化
+            InitPrefab();
 
             //トークウインドウの初期化
             InitTalkWindow();
@@ -160,16 +204,22 @@ namespace Assets.Scripts.LiplisSystem.Model
         }
 
         /// <summary>
+        /// プレファブの初期化
+        /// </summary>
+        private void InitPrefab()
+        {
+            //ウインドウプレハブインスタンス生成
+            this.ImageInstanceWindow = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_TALK_S_1);
+            this.ImageInstanceLogWindowL = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_L1);
+            this.ImageInstanceLogWindowR = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_R1);
+        }
+
+        /// <summary>
         /// トークウインドウの初期化
         /// </summary>
         private void InitTalkWindow()
         {
             WindowTalkListQ = new Queue<TalkWindow>();
-
-            this.WindowName = PREFAB_NAMES.WINDOW_TALK_S_1;
-
-            //ウインドウプレハブインスタンス生成
-            this.WindowInstances = (GameObject)Resources.Load(this.WindowName);
         }
 
         /// <summary>
@@ -203,6 +253,19 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //ファイル読み込みに失敗したらエクセプション発生
                 throw new ApplicationException("LiplisModelLive2d:LoadModelSetting:モデルの読み込みに失敗しました！", ex);
             }
+        }
+
+        /// <summary>
+        /// ウインドウイメージをロードする
+        /// </summary>
+        private void LoadImage()
+        {
+            //TODO LiplisModel:LoadImage要実装
+
+            //this.SpriteWindow = CreateTalkWindowSprite(windowTexutre);
+            //this.SpriteLogWindow = CreateTalkWindowSprite(windowTexutre);
+            //this.SpriteCharWindow = CreateTalkWindowSprite(windowTexutre);
+
         }
 
         /// <summary>
@@ -280,7 +343,21 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.Greet = new LiplisGreet(this.Tone, this.AllocationId, chatSetting);
         }
 
+        /// <summary>
+        /// トークウインドウのスプライトを生成する
+        /// </summary>
+        /// <param name="windowTexutre"></param>
+        /// <returns></returns>
+        private Sprite CreateTalkWindowSprite(Texture2D windowTexutre)
+        {
+            //スプライト単位の中心
+            Vector2 pivot = new Vector2(0.5f, 0.5f);
+            Rect rect = new Rect(0, 0, windowTexutre.width, windowTexutre.height);
+            Vector4 border = new Vector4(40, 40, 40, 40);
 
+            //テクスチャをスプライトに変換
+            return Sprite.Create(windowTexutre, rect, pivot, 100.0f, 0, SpriteMeshType.FullRect, border);
+        }
 
         /// <summary>
         /// アクティブモデルをセットし、モデルを一つ表示する
@@ -677,20 +754,10 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.ChangeDirectionRandam();
 
             //インスタンティエイト
-            GameObject window = UnityEngine.Object.Instantiate(WindowInstances) as GameObject;
+            GameObject window = UnityEngine.Object.Instantiate(ImageInstanceWindow) as GameObject;
 
-            //ウインドウ生成
-            TalkWindow lpsWindow = CreateWindowTalk(window, message);
-
-            //NULLでなければウインドウセット
-            if (lpsWindow != null)
-            {
-                //ウインドウセット
-                SetWindow(lpsWindow, AllocationId);
-            }
-   
             //ウインドウ
-            return lpsWindow;
+            return CreateWindowTalk(window, message);
         }
         public TalkWindow CreateWindowTalk(GameObject window, string message)
         {
@@ -731,6 +798,18 @@ namespace Assets.Scripts.LiplisSystem.Model
 
                 //生成時刻設定
                 talkWindow.SetCreateTime(DateTime.Now);
+
+                //ウインドウ画像の設定
+                talkWindow.SetWindowImage(SpriteWindow);
+
+                //NULLでなければウインドウセット
+                if (talkWindow != null)
+                {
+                    //ウインドウセット
+                    SetWindow(talkWindow, AllocationId);
+                }
+
+
 
                 //結果を返す
                 return talkWindow;
@@ -908,18 +987,6 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //LiplisStatus.Instance.CharDataList.DestroyAllWindow();
         }
-
-        /// <summary>
-        /// 自身のウインドウ名を返す
-        /// </summary>
-        /// <returns></returns>
-        public string GetWindowName()
-        {
-            return this.WindowName;
-        }
-
-
-
         #endregion
 
         //====================================================================

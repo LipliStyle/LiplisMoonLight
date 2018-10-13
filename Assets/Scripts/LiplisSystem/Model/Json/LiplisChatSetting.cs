@@ -13,20 +13,41 @@ namespace Assets.Scripts.LiplisSystem.Model.Json
 {
     public class LiplisChatSetting
     {
-        public Chat chat { get; set; }
+        public List<ChatSetting> ChatList { get; set; }
+
+        public LiplisChatSetting()
+        {
+            ChatList = new List<ChatSetting>();
+        }
     }
-    public class ChatDiscription
+    public class ChatSetting
     {
+        public int id { get; set; }
         public string name { get; set; }
         public string type { get; set; }
-        public string discription { get; set; }
-        public int emotion { get; set; }
-        public string prerequisite { get; set; }
-    }
+        public string sentence { get; set; }
+        public string emotion { get; set; }
+        public string rangeStart { get; set; }
+        public string rangeEnd { get; set; }
 
-    public class Chat
-    {
-        public List<ChatDiscription> chatDiscription { get; set; }
+        /// <summary>
+        /// エモーションを取得する
+        /// </summary>
+        /// <returns></returns>
+        public int GetEmotion()
+        {
+            try
+            {
+                return int.Parse(emotion);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+
+
     }
 
 }

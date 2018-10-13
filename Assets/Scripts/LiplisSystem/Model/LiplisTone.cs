@@ -50,7 +50,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.ToneDictionary = new Dictionary<string, List<ToneDefinition>>();
 
             //トーン設定を回して1件づつ登録する。
-            foreach (ToneDiscription tone in toneSetting.tone.toneDiscription)
+            foreach (ToneSetting tone in toneSetting.ToneList)
             {
                 //読み出した変換設定を登録する。
                 AddToneData(tone.befor, tone.after);

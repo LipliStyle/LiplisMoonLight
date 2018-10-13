@@ -26,29 +26,22 @@ namespace Assets.Scripts.LiplisSystem.Msg
         {
 
         }
-        public MsgGreet(LiplisTone Tone, ChatDiscription chat, int AllocationId)
+        public MsgGreet(LiplisTone Tone, ChatSetting chat, int AllocationId)
         {
             try
             {
-                this.message = new MsgTopic(Tone, chat.discription, chat.discription, chat.emotion, chat.emotion, 0, AllocationId);
+                this.message = new MsgTopic(Tone, chat.sentence, chat.sentence, chat.GetEmotion(), chat.GetEmotion(), 0, AllocationId);
 
                 //Chatに設定があれば、時間範囲を設定する
-                if (chat.prerequisite != "")
+                if (chat.rangeStart != "" || chat.rangeEnd != "")
                 {
-                    //コンマ区切りにする
-                    string[] buf = chat.prerequisite.Split(',');
+                    //スタート時刻をセット
+                    string[] start = chat.rangeStart.Split(':');
+                    this.SrtTime = DateUtil.CreateDatetime(int.Parse(start[0]), int.Parse(start[1]), 0);
 
-                    //コンマ区切りで要素が2個の場合のみ処理する
-                    if (buf.Length == 2)
-                    {
-                        //スタート時刻をセット
-                        string[] start = buf[0].Split(':');
-                        this.SrtTime = DateUtil.CreateDatetime(int.Parse(start[0]), int.Parse(start[1]), 0);
-
-                        //終了時刻をセット
-                        string[] end = buf[1].Split(':');
-                        this.EndTime = DateUtil.CreateDatetime(int.Parse(end[0]), int.Parse(end[1]), 0);
-                    }
+                    //終了時刻をセット
+                    string[] end = chat.rangeEnd.Split(':');
+                    this.EndTime = DateUtil.CreateDatetime(int.Parse(end[0]), int.Parse(end[1]), 0);
                 }
             }
             catch

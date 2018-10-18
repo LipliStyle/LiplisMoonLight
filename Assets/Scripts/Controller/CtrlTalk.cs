@@ -674,8 +674,6 @@ public class CtrlTalk : ConcurrentBehaviour
         //ウインドウを表示する
         if (!sentence.FlgAddMessge)
         {
-            Debug.Log(sentence.FlgAddMessge);
-            Debug.Log(sentence.TalkSentence);
             if (sentence.TalkSentence != null)
             {
                 CreateWindow(sentence.TalkSentence, sentence.AllocationId);

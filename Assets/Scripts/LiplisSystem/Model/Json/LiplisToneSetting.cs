@@ -6,7 +6,6 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
-//TODO LiplisToneSetting クラス構造、ファイル構造見直しせよ！
 using System.Collections.Generic;
 
 namespace Assets.Scripts.LiplisSystem.Model.Json

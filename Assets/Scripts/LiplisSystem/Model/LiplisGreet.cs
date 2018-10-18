@@ -190,7 +190,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 }
                 else
                 {
-                    return new MsgTopic(Tone, "こんにちは", 0, 0);
+                    return new MsgTopic(Tone, "こんにちは", "こんにちは", 0, 0, false, 0);
                 }
             }
 
@@ -300,7 +300,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                     }
                     else
                     {
-                        sentence.ToneConvert(Tone);
+                        sentence.ToneConvert();
                     }
 
                     sentenceIdx++;
@@ -380,7 +380,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "寒すぎです・・・！";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, -3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, -3, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -388,7 +388,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "寒いですね～。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 4, -3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 4, -3, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -396,7 +396,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "少し寒いですね。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -404,7 +404,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "涼しいですね。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -412,7 +412,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "これくらいの気温が過ごしやすいですね。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, 3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, 3, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -420,7 +420,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "ちょっと暑いですね～。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 3, -3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 3, -3, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -428,7 +428,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "暑くて溶けてしまいそうです・・・";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 6, -3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 6, -3, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -436,7 +436,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "暑い、暑い、暑いぃぃぃ！";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 6, 3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 6, 3, false, AllocationId);
 
                 q.Add(sentence);
             }
@@ -481,7 +481,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "雨の心配は全く無いですね！";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, 3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, 3, true, AllocationId);
 
                 q.Add(sentence);
             }
@@ -489,7 +489,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "雨が降る可能性は低そうですね～。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 3, 3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 3, 3, true, AllocationId);
 
                 q.Add(sentence);
             }
@@ -497,7 +497,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "雨、降るかもしれませんね。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, true, AllocationId);
 
                 q.Add(sentence);
             }
@@ -505,7 +505,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "うーん、傘は大丈夫ですかね・・・？念のため持って行きますか？";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 0, 0, true, AllocationId);
 
                 q.Add(sentence);
             }
@@ -513,7 +513,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "雨が降るか振らないか、五分五分ですねぇ。";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 3, 3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 3, 3, true, AllocationId);
 
                 q.Add(sentence);
             }
@@ -521,7 +521,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "傘を持っていったほうがいいですね！";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, -3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, -3, true, AllocationId);
 
                 q.Add(sentence);
             }
@@ -529,7 +529,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string msg = "傘を持っていったほうがいいですね！";
 
-                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, 3, 1, AllocationId);
+                MsgSentence sentence = new MsgSentence(Tone, msg, msg, 1, 3, true, AllocationId);
 
                 q.Add(sentence);
             }

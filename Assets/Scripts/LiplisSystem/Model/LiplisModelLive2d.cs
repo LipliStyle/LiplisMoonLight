@@ -37,6 +37,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         //モデルオブジェクト
         public GameObject ModelObject { get; set; }
         public CubismModel model { get; set; }
+        public float ScalseMagnification { get; set; }
 
         //=============================
         //アタッチオブジェクト
@@ -70,8 +71,9 @@ namespace Assets.Scripts.LiplisSystem.Model
 
         //=============================
         //モデルデータ設定
-        LiplisModelData modelData;
+        private LiplisModelData modelData;
         public int Direction { get; set; }
+        private bool flgResource { get; set; }
 
         //====================================================================
         //
@@ -84,7 +86,9 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         /// <param name="targetPath"></param>
         public LiplisModelLive2d(string modelPath,          //モデルパス
+                                bool flgResource,
                                 LiplisModelData modelData,  //モデルデータ
+                                float ScalseMagnification,
                                 GameObject CanvasRendering, //親キャンバス
                                 Vector3 targetPosition,     //ターゲット座標
                                 MsgExpression Expression,   //表情データ
@@ -96,7 +100,9 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.CanvasRendering = CanvasRendering;
             this.Direction = modelData.Direction;
             this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
-     
+            this.flgResource = flgResource;
+            this.ScalseMagnification = ScalseMagnification;
+
             //モデルのロード
             LoadModel(modelPath, modelData.FileName, targetPosition);
 
@@ -105,23 +111,25 @@ namespace Assets.Scripts.LiplisSystem.Model
         }
 
         /// <summary>
-        /// モデルをロードする
-        /// TODO Exceptionの実装 
+        /// モデルロード
         /// </summary>
-        /// <param name="targetSettinPath"></param>
+        /// <param name="modelPath"></param>
+        /// <param name="model3Json"></param>
+        /// <param name="targetPosition"></param>
         public void LoadModel(string modelPath, string targetSettingFileName, Vector3 targetPosition)
         {
             //Load model.
-            var path = modelPath + ModelPathDefine.MODELS + "/" + targetSettingFileName;
+            string path = modelPath + ModelPathDefine.MODELS + "/" + targetSettingFileName;
 
-            var model3Json = CubismModel3Json.LoadAtPath(path, AssetLoader.LoadAsset);
+            //モデル3json
+            CubismModel3Json model3Json = CubismModel3Json.LoadAtPath(path, AssetLoader.LoadAsset);
 
             //モデル生成
             this.model = model3Json.ToModel();
 
             //アニメーターアタッチ
             this.model.gameObject.AddComponent<Animation>();
-            
+
             //モデルゲームオブジェクトを取得する
             this.ModelObject = this.model.gameObject;
 
@@ -151,8 +159,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.ModelObject.transform.SetParent(CanvasRendering.transform);
 
             //サイズの設定
-            //this.SetScale(new Vector3(4.55f, 4.55f, 5f));
-            this.SetScale(new Vector3(200f, 200f, 200f));
+            SetScale();
 
             //位置の設定
             this.SetPosition(targetPosition);
@@ -207,7 +214,8 @@ namespace Assets.Scripts.LiplisSystem.Model
                 var path = modelPath + ModelPathDefine.MOTIONS + "/" + motion.FileName;
 
                 //ModelJsonオブジェクト取得
-                var model3Json = CubismMotion3Json.LoadFrom(AssetLoader.LoadAsset<string>(path));
+                //CubismMotion3Json model3Json = CubismMotion3Json.LoadFrom(AssetLoader.LoadAsset<string>(path));
+                CubismMotion3Json model3Json = LoadMotion(path);
 
                 //モーションロード
                 AnimationClip clip = model3Json.ToAnimationClip();
@@ -228,7 +236,6 @@ namespace Assets.Scripts.LiplisSystem.Model
                     clip.wrapMode = WrapMode.Once;
                 }
 
-
                 //アニメーターに登録
                 this.Animator.AddClip(clip, motion.FileName);
 
@@ -242,7 +249,18 @@ namespace Assets.Scripts.LiplisSystem.Model
                 TableMotion[motion.Emotion].Add(motion.FileName);
             }
         }
-        
+
+
+        /// <summary>
+        /// モデルをロードする
+        /// TODO Exceptionの実装 
+        /// </summary>
+        /// <param name="targetSettinPath"></param>
+        public CubismMotion3Json LoadMotion(string motionPath)
+        {
+            return CubismMotion3Json.LoadFrom(AssetLoader.LoadAsset<string>(motionPath));
+        }
+
         /// <summary>
         /// エクスプレッションをロードする
         /// </summary>
@@ -286,6 +304,14 @@ namespace Assets.Scripts.LiplisSystem.Model
                     drawable.gameObject.AddComponent<CubismRaycastable>();
                 }
             }
+        }
+
+        /// <summary>
+        /// スケールを設定する
+        /// </summary>
+        private void SetScale()
+        {
+            this.SetScale(new Vector3(200f * ScalseMagnification, 200f * ScalseMagnification, 200f));
         }
 
         /// <summary>
@@ -344,7 +370,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                     return null;
                 }
             }
-            catch(Exception ex)
+            catch
             {
                 Debug.Log(MotionCode);
                 return null;
@@ -372,7 +398,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                     return TableMotion[(int)MOTION.MOTION_NORMAL][0];
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 Debug.Log("アイドルモーションでエラー");
                 return TableMotion[(int)MOTION.MOTION_IDLE][0];
@@ -716,22 +742,16 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             if(hitTestResult == 1)
             {
-                Debug.Log("頭をタップしました！");
-
                 //次の話題
                 CallbackOnNextTalkOrSkip();
             }
             else if (hitTestResult == 2)
             {
-                Debug.Log("胸をタップしました！");
-
                 //恥じらいを発動
                　SetExpressionLocal(MOTION.MOTION_PROUD_M);
             }
             else if (hitTestResult == 3)
             {
-                Debug.Log("体をタップしました！");
-
                 //次の話題
                 CallbackOnNextTalkOrSkip();
             }

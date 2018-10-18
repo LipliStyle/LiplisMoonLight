@@ -60,7 +60,6 @@ namespace Assets.Scripts.Controller
 
         #endregion
 
-
         //====================================================================
         //
         //                            更新処理
@@ -108,6 +107,24 @@ namespace Assets.Scripts.Controller
 
             //先頭1つを返す
             return ModelList[0];
+        }
+
+        /// <summary>
+        /// モデル数を返す
+        /// </summary>
+        /// <returns></returns>
+        public int GetModelCount()
+        {
+            return this.TableModelId.Count;
+        }
+
+        /// <summary>
+        /// モデルリストを取得する
+        /// </summary>
+        /// <returns></returns>
+        public List<LiplisModel> GetModelList()
+        {
+            return this.ModelList;
         }
         #endregion
 
@@ -186,6 +203,7 @@ namespace Assets.Scripts.Controller
                 AddModel(CreateModelRabbits(ModelPathDefine.PRISET_MODEL_SETTING_HAZUKI, AllocationId));
             }
         }
+
         /// <summary>
         /// ラビッツモデルを生成する
         /// </summary>
@@ -194,20 +212,21 @@ namespace Assets.Scripts.Controller
         private LiplisModel CreateModelRabbits(string modelPathAnderResource, int AllocationId)
         {
             //モデルパス生成
-            string modelPath = UtilUnityPath.GetResourcesPath() + "/" + modelPathAnderResource;
+            string modelPath = UtilUnityPath.GetStreamingAssetsPath() + "/" + modelPathAnderResource;
 
             //モデル設定を取得する
-            LiplisMoonlightModel lmm = PrisetModelSettingLoader.LoadMoonlightSetting(modelPathAnderResource + ModelPathDefine.LIPLIS_MODEL_JSON);
-            LiplisToneSetting ltn = PrisetModelSettingLoader.LoadLiplisToneSetting(modelPathAnderResource + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_TONE_SETTING);
-            LiplisChatSetting lch = PrisetModelSettingLoader.LoadLiplisChatSetting(modelPathAnderResource + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_CHAT_SETTING);
+            LiplisMoonlightModel lmm = PrisetModelSettingLoader.LoadClassFromJson<LiplisMoonlightModel>(modelPath + ModelPathDefine.LIPLIS_MODEL_JSON);
+            LiplisToneSetting ltn = PrisetModelSettingLoader.LoadClassFromJson<LiplisToneSetting>(modelPath + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_TONE_SETTING);
+            LiplisChatSetting lch = PrisetModelSettingLoader.LoadClassFromJson<LiplisChatSetting>(modelPath + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_CHAT_SETTING);
 
             //ウインドウイメージの読み込み
-            Texture2D TextureWindow = Resources.Load(modelPathAnderResource + ModelPathDefine.IMAGES + ModelPathDefine.IMG_WINDOW) as Texture2D;
-            Texture2D TextureLogWindow = Resources.Load(modelPathAnderResource + ModelPathDefine.IMAGES + ModelPathDefine.IMG_WINDOW_LOG) as Texture2D;
-            Texture2D TextureCharIcon = Resources.Load(modelPathAnderResource + ModelPathDefine.IMAGES + ModelPathDefine.IMG_ICON_CHAR) as Texture2D;
+            Texture2D TextureWindow = PrisetModelSettingLoader.LoadTexture(modelPath + ModelPathDefine.IMAGES + ModelPathDefine.IMG_WINDOW) as Texture2D;
+            Texture2D TextureLogWindow = PrisetModelSettingLoader.LoadTexture(modelPath + ModelPathDefine.IMAGES + ModelPathDefine.IMG_WINDOW_LOG) as Texture2D;
+            Texture2D TextureCharIcon = PrisetModelSettingLoader.LoadTexture(modelPath + ModelPathDefine.IMAGES + ModelPathDefine.IMG_ICON_CHAR) as Texture2D;
 
             //モデルを追加する
             return new LiplisModel(AllocationId, CanvasRendering, modelPath, ctrlTalk.NextTalkOrSkip, lmm, ltn, lch, TextureWindow, TextureLogWindow, TextureCharIcon);
+
         }
 
         /// <summary>
@@ -593,7 +612,6 @@ namespace Assets.Scripts.Controller
 
         #endregion
 
-
         //====================================================================
         //
         //                          トーク関連処理
@@ -692,7 +710,7 @@ namespace Assets.Scripts.Controller
             MsgTalkMessage msg = ClalisShortNews.getShortNews("", "", "");
 
             //トピックを生成
-            MsgTopic topic = new MsgTopic(charData.Tone, msg.sorce, msg.sorce, 0, 0, 0, charData.AllocationId);
+            MsgTopic topic = new MsgTopic(charData.Tone, msg.sorce, msg.sorce, 0, 0, false, charData.AllocationId);
 
             //ショートニュースからトピックを生成する
             return topic;

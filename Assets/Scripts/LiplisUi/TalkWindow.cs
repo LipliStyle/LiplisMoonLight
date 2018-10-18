@@ -5,6 +5,7 @@
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
+#pragma warning disable 649,414
 using Assets.Scripts.Data;
 using Assets.Scripts.LiplisSystem.Model;
 using System;

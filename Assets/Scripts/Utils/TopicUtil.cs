@@ -6,6 +6,7 @@
 //  (c) Live2D Inc.All rights reserved.
 //=======================================================================﻿﻿
 using Assets.Scripts.LiplisSystem.Cif.v60.Req;
+using Assets.Scripts.LiplisSystem.Model;
 using Assets.Scripts.LiplisSystem.Msg;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,20 +19,23 @@ namespace Assets.Scripts.Utils
         /// トピックにアロケーションIDを設定する
         /// </summary>
         /// <param name="topic"></param>
-        public static void SetAllocationId(MsgTopic topic)
+        public static void SetAllocationIdAndTone(MsgTopic topic, List<LiplisModel> ModelList)
         {
             int allocationId = 0;
 
             //アロケーションID設定
             foreach (MsgSentence sentence in topic.TalkSentenceList)
             {
+                //アロケーションID設定
                 sentence.AllocationId = allocationId;
+
+                sentence.SetTone(ModelList[allocationId].Tone);
 
                 //インクリメント
                 allocationId++;
 
                 //先頭に戻す
-                if (allocationId == 4)
+                if (allocationId == ModelList.Count)
                 {
                     allocationId = 0;
                 }

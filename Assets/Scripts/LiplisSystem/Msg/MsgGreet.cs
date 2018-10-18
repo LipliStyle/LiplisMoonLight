@@ -30,7 +30,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
         {
             try
             {
-                this.message = new MsgTopic(Tone, chat.sentence, chat.sentence, chat.GetEmotion(), chat.GetEmotion(), 0, AllocationId);
+                this.message = new MsgTopic(Tone, chat.sentence, chat.sentence, chat.GetEmotion(), chat.GetEmotion(), true, AllocationId);
 
                 //Chatに設定があれば、時間範囲を設定する
                 if (chat.rangeStart != "" || chat.rangeEnd != "")
@@ -48,32 +48,6 @@ namespace Assets.Scripts.LiplisSystem.Msg
             {
                 //エラーでも処理を継続
             }
-        }
-
-        /// <summary>
-        /// グリートのセット
-        /// </summary>
-        /// <param name="SrtTime"></param>
-        /// <param name="EndTime"></param>
-        /// <param name="message"></param>
-        public MsgGreet(DateTime SrtTime,DateTime EndTime,MsgTopic message)
-        {
-            this.SrtTime = SrtTime;
-            this.EndTime = EndTime;
-            this.message = message;
-        }
-
-        /// <summary>
-        /// グリートのセット
-        /// </summary>
-        /// <param name="SrtTime"></param>
-        /// <param name="EndTime"></param>
-        /// <param name="message"></param>
-        public MsgGreet(LiplisTone Tone, DateTime SrtTime, DateTime EndTime, string message, int Emotion, int Point, int AllocationId)
-        {
-            this.SrtTime = SrtTime;
-            this.EndTime = EndTime;
-            this.message = new MsgTopic(Tone,message, message,Emotion,Point,1, AllocationId);
         }
 
         /// <summary>

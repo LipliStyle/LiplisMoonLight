@@ -28,16 +28,16 @@ namespace Assets.Scripts.LiplisSystem.Msg
         public string TalkSentence;     //おしゃべり文章
         public int Emotion;             //エモーション
         public int Point;               //ポイント
-        public int Mode;
+        public bool FlgToneConvertSkip;         //コンバート
         public bool FlgAddMessge;          //追加メッセージ
 
         ///=============================
         /// 音声データ
-        public AudioClip VoiceData; 
+        public AudioClip VoiceData;
 
         ///=============================
-        /// 口調変換するかどうか
-        public bool FlgToneConvert = true;  //トーンコンバートするかどうか
+        /// トーンデータ
+        private LiplisTone Tone;
 
         /// <summary>
         /// デフォルトコンストラクター
@@ -53,68 +53,52 @@ namespace Assets.Scripts.LiplisSystem.Msg
         /// モード1:口調変換しない 
         /// </summary>
         /// <param name="BaseSentence"></param>
-        public MsgSentence(LiplisTone Tone, string BaseSentence, int Emotion, int Point, int Mode)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, bool FlgToneConvertSkip, int AllocationId, bool FlgAddMessge)
         {
             this.BaseSentence = BaseSentence;
             this.Emotion = Emotion;
             this.Point = Point;
-            this.Mode = Mode;
-
-            ToneConvert(Tone);
-        }
-        public MsgSentence(LiplisTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge)
-        {
-            this.BaseSentence = BaseSentence;
-            this.Emotion = Emotion;
-            this.Point = Point;
-            this.Mode = Mode;
-            this.FlgAddMessge = FlgAddMessge;
-
-            ToneConvert(Tone);
-        }
-        public MsgSentence(LiplisTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge, int AllocationId)
-        {
-            this.BaseSentence = BaseSentence;
-            this.Emotion = Emotion;
-            this.Point = Point;
-            this.Mode = Mode;
+            this.FlgToneConvertSkip = FlgToneConvertSkip;
             this.FlgAddMessge = FlgAddMessge;
             this.AllocationId = AllocationId;
-
-            ToneConvert(Tone);
+            this.Tone = Tone;
         }
-        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, bool FlgToneConvertSkip, int AllocationId)
         {
             this.BaseSentence = BaseSentence;
             this.TalkSentence = TalkSentence;
             this.Emotion = Emotion;
             this.Point = Point;
-            this.Mode = Mode;
-
-            ToneConvert(Tone);
-        }
-
-        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode, int AllocationId)
-        {
-            this.BaseSentence = BaseSentence;
-            this.TalkSentence = TalkSentence;
-            this.Emotion = Emotion;
-            this.Point = Point;
-            this.Mode = Mode;
+            this.FlgToneConvertSkip = FlgToneConvertSkip;
             this.AllocationId = AllocationId;
-
-            ToneConvert(Tone);
+            this.FlgAddMessge = false;
+            this.Tone = Tone;
         }
 
         /// <summary>
         /// トーンコンバートする
         /// </summary>
-        public void ToneConvert(LiplisTone Tone)
+        public void ToneConvert()
         {
-            if (Mode != 1)
+            //スキップフラグがOFFでかつ未コンバートの場合
+            if (!FlgToneConvertSkip && (this.TalkSentence == null || this.TalkSentence == ""))
             {
-                this.TalkSentence = Tone.Convert(this.BaseSentence);
+                this.TalkSentence = this.Tone.Convert(this.BaseSentence);
+
+                if(this.TalkSentence == null)
+                {
+                    Debug.Log(this);
+                }
             }
+        }
+
+        /// <summary>
+        /// トーン設定をセットする
+        /// </summary>
+        /// <param name="Tone"></param>
+        public void SetTone(LiplisTone Tone)
+        {
+            this.Tone = Tone;
         }
 
         /// <summary>
@@ -125,16 +109,16 @@ namespace Assets.Scripts.LiplisSystem.Msg
         {
             MsgSentence msg = new MsgSentence();
 
-            msg.CreateTime   = this.CreateTime;
-            msg.DataKey      = this.DataKey;
-            msg.SubId        = this.SubId;
-            msg.AllocationId = this.AllocationId;
-            msg.BaseSentence = this.BaseSentence;    //ベース文章
-            msg.TalkSentence = this.TalkSentence;     //おしゃべり文章
-            msg.Emotion      = this.Emotion;             //エモーション
-            msg.Point        = this.Point;               //ポイント
-            msg.Mode         = this.Mode;
-            msg.FlgAddMessge = this.FlgAddMessge;          //追加メッセージ
+            msg.CreateTime           = this.CreateTime;
+            msg.DataKey              = this.DataKey;
+            msg.SubId                = this.SubId;
+            msg.AllocationId         = this.AllocationId;
+            msg.BaseSentence         = this.BaseSentence;    //ベース文章
+            msg.TalkSentence         = this.TalkSentence;     //おしゃべり文章
+            msg.Emotion              = this.Emotion;             //エモーション
+            msg.Point                = this.Point;               //ポイント
+            msg.FlgToneConvertSkip   = this.FlgToneConvertSkip;
+            msg.FlgAddMessge         = this.FlgAddMessge;          //追加メッセージ
 
             return msg;
     }

@@ -6,10 +6,9 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
-
-using Assets.Scripts.LiplisSystem.Model.Json;
-using LiplisMoonlight;
 using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace Assets.Scripts.LiplisSystem.Model.Priset
@@ -17,50 +16,72 @@ namespace Assets.Scripts.LiplisSystem.Model.Priset
     public class PrisetModelSettingLoader
     {
         /// <summary>
-        /// プリセットモデルの設定を読み出す。
-        /// リソースからの相対パスを指定
+        /// 対象パスのJsonからクラスにロードする
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="pathResources"></param>
-        public static LiplisMoonlightModel LoadMoonlightSetting(string pathResources)
+        /// <returns></returns>
+        public static T LoadClassFromJson<T>(string pathResources)
         {
-            //モデルの設定データをロードする。
-            TextAsset textasset = Resources.Load(pathResources) as TextAsset;
-
-            //デシリアライズ
-            return JsonConvert.DeserializeObject<LiplisMoonlightModel>(textasset.text); ;
+            return JsonConvert.DeserializeObject<T>(LoadText(pathResources));
         }
 
         /// <summary>
-        /// プリセットモデルの口調設定を読み出す
-        /// リソースからの相対パスを指定
+        /// テクスチャロード
         /// </summary>
+        /// <param name="tex"></param>
         /// <param name="pathResources"></param>
         /// <returns></returns>
-        public static LiplisToneSetting LoadLiplisToneSetting(string pathResources)
+        public static Texture2D LoadTexture(string pathResources)
         {
-            //モデルの設定データをロードする。
-            TextAsset textasset = Resources.Load(pathResources) as TextAsset;
-
-            //デシリアライズ
-            return JsonConvert.DeserializeObject<LiplisToneSetting>(textasset.text); ;
+            var tex = new Texture2D(1, 1);
+            tex.LoadImage(LoadBinary(pathResources));
+            return tex;
         }
 
         /// <summary>
-        /// プリセットモデルの固定おしゃべり文章を読み出す
-        /// 理s－スカラの相対パスを指定
+        /// 対象パスからテキストでデータを取得する
         /// </summary>
-        /// <param name="pathResources"></param>
+        /// <param name="filePath"></param>
         /// <returns></returns>
-        public static LiplisChatSetting LoadLiplisChatSetting(string pathResources)
+        public static string LoadText(string filePath)
         {
-            //モデルの設定データをロードする。
-            TextAsset textasset = Resources.Load(pathResources) as TextAsset;
+            if (filePath.Contains(":/"))
+            {
+                WWW www = new WWW(filePath);
 
-            //デシリアライズ
-            return JsonConvert.DeserializeObject<LiplisChatSetting>(textasset.text); ;
+                while (!www.isDone) { }
+
+                string jsonData = Encoding.UTF8.GetString(www.bytes, 3, www.bytes.Length - 3);
+
+                return jsonData;
+            }
+            else
+            {
+                return File.ReadAllText(filePath, Encoding.UTF8);
+            }
         }
 
+        /// <summary>
+        /// 対象パスからバイナリでデータを取得する
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static byte[] LoadBinary(string filePath)
+        {
+            if (filePath.Contains(":/"))
+            {
+                WWW www = new WWW(filePath);
 
+                while (!www.isDone) { }
+
+                return www.bytes;
+            }
+            else
+            {
+                return File.ReadAllBytes(filePath);
+            }
+        }
 
     }
 }

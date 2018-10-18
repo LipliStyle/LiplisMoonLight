@@ -5,6 +5,7 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
+using Assets.Scripts.LiplisSystem.Model.Priset;
 using System;
 using System.IO;
 using UnityEngine;
@@ -35,23 +36,16 @@ namespace Assets.Scripts.Utils
         {
             if (assetType == typeof(byte[]))
             {
-                return File.ReadAllBytes(absolutePath);
+                return PrisetModelSettingLoader.LoadBinary(absolutePath);
             }
             else if (assetType == typeof(string))
             {
-                return File.ReadAllText(absolutePath);
+                return PrisetModelSettingLoader.LoadText(absolutePath);
             }
             else if (assetType == typeof(Texture2D))
             {
-                var texture = new Texture2D(1, 1);
-
-
-                texture.LoadImage(File.ReadAllBytes(absolutePath));
-
-
-                return texture;
+                return PrisetModelSettingLoader.LoadTexture(absolutePath);
             }
-
 
             // Fail hard.
             throw new NotSupportedException();

@@ -57,15 +57,21 @@ namespace Assets.Scripts.Data.SubData
 
         /// <summary>
         /// モデルリスト初期化
+        /// 
+        /// ここで設定した順序は
+        /// LipliStyle.LiplisMoonLight.savedata_setting
+        /// に設定される。
+        /// 
+        /// 以後、保存されたデータが使用される。
         /// </summary>
         private void InitLstModelOnTheStage()
         {
             this.LstModelOnTheStage = new List<string>();
 
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.HAZUKI);
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.SHIROHA);
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.KUROHA);
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.MOMOHA);
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.HAZUKI);   //葉月 アロケーションID 0
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.SHIROHA);  //白葉 アロケーションID 1
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.KUROHA);   //黒葉 アロケーションID 2 
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.MOMOHA);   //桃葉 アロケーションID 3
         }
 
         /// <summary>

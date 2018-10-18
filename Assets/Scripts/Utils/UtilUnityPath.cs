@@ -36,5 +36,14 @@ namespace Assets.Scripts.Utils
             return Application.dataPath + RESOURCES;
         }
 
+        /// <summary>
+        /// リソースパスを返す
+        /// </summary>
+        /// <returns></returns>
+        public static string GetStreamingAssetsPath()
+        {
+            return Application.streamingAssetsPath;
+        }
+
     }
 }

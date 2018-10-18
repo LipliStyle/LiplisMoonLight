@@ -114,7 +114,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             InitPrefab();
 
             //モデルの初期化
-            InitModel();
+            InitModel(false);
 
             //トークウインドウの初期化
             InitTalkWindow();
@@ -133,7 +133,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="TextureWindow"></param>
         public LiplisModel(int AllocationId, 
             GameObject CanvasRendering,
-            string ModelPath, 
+            string ModelPath,
             ModelEvents.OnNextTalkOrSkip 
             CallbackOnNextTalkOrSkip,  
             LiplisMoonlightModel modelSetting, 
@@ -166,7 +166,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.SpriteCharIcon = CreateTalkWindowSprite(TextureCharIcon);
 
             //モデルの初期化
-            InitModel();
+            InitModel(true);
 
             //プレファブの初期化
             InitPrefab();
@@ -178,7 +178,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// モデルの初期化
         /// </summary>
-        private void InitModel()
+        private void InitModel(bool flgResource)
         {
             //モデル名の設定
             this.ModelName = modelSetting.ModelName;
@@ -191,7 +191,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             SetPositionAndLocation();
 
             //モデルの読み込み
-            LoadModel();
+            LoadModel(flgResource);
 
             //おしゃべり設定の読み込み
             LoadTalkSetting();
@@ -271,7 +271,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// モデルの読み込み
         /// </summary>
-        private void LoadModel()
+        private void LoadModel(bool flgResource)
         {
             //モデルリスト初夏
             ModelList = new List<IfsLiplisModel>();
@@ -279,10 +279,10 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モデルファイルのロード
             foreach (LiplisModelData modelData in modelSetting.ModelList)
             {
-                LoadModel(modelData,modelSetting.ModelType);
+                LoadModel(modelData,modelSetting.ModelType, flgResource);
             }
         }
-        private void LoadModel(LiplisModelData modelData ,int ModelType)
+        private void LoadModel(LiplisModelData modelData ,int ModelType, bool flgResource)
         {
             //モデルタイプによってインスタンス化する実装クラスを可変
             if (ModelType == (int)LiplisModelType.VRM)
@@ -296,14 +296,16 @@ namespace Assets.Scripts.LiplisSystem.Model
             else
             {
                 //デフォルトはLive2dとする。
-                LoadModelLive2d30(modelData);
+                LoadModelLive2d30(modelData, flgResource);
             }
         }
-        private void LoadModelLive2d30(LiplisModelData modelData)
+        private void LoadModelLive2d30(LiplisModelData modelData, bool flgResource)
         {
             //Live2dモデルの読み込み
-            IfsLiplisModel model = new LiplisModelLive2d(this.ModelPath, 
-                modelData, 
+            IfsLiplisModel model = new LiplisModelLive2d(this.ModelPath,
+                flgResource,
+                modelData,
+                modelSetting.Scale,
                 CanvasRendering, 
                 ModelLocation, 
                 Expression,
@@ -323,10 +325,10 @@ namespace Assets.Scripts.LiplisSystem.Model
             Expression = new MsgExpression();
 
             //モデルに設定されている表情ファイルを読み込む
-            foreach (LiplisMotion expression in modelSetting.ExpressionList)
-            {
-                Expression.Add(this.ModelPath,expression);
-            }
+            //foreach (LiplisMotion expression in modelSetting.ExpressionList)
+            //{
+            //    Expression.Add(this.ModelPath, expression);
+            //}
 
             //TODO LiplisModel:LoadExpression:1件もExpressionを設定しなかった場合に、正しく動作するかテスト
             //リビルド
@@ -809,13 +811,12 @@ namespace Assets.Scripts.LiplisSystem.Model
                     SetWindow(talkWindow, AllocationId);
                 }
 
-
-
                 //結果を返す
                 return talkWindow;
             }
-            catch
+            catch(Exception ex)
             {
+                Debug.Log(ex);
                 return null;
             }
         }

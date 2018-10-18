@@ -26,29 +26,29 @@ namespace Assets.Scripts.LiplisSystem.Msg
 
         //=============================
         //エモーションファイル定義
-        const string EMOTION_00_NORMAL_01       = "EMOTION_00_NORMAL_01.motion3.json";
-        const string EMOTION_01_JOY_M_01        = "EMOTION_01_JOY_M_01.motion3.json";
-        const string EMOTION_01_JOY_P_01        = "EMOTION_01_JOY_P_01.motion3.json";
-        const string EMOTION_01_JOY_P_02        = "EMOTION_01_JOY_P_02.motion3.json";
-        const string EMOTION_02_ADMIRATION_M_01 = "EMOTION_02_ADMIRATION_M_01.motion3.json";
-        const string EMOTION_02_ADMIRATION_P_01 = "EMOTION_02_ADMIRATION_P_01.motion3.json";
-        const string EMOTION_02_ADMIRATION_P_02 = "EMOTION_02_ADMIRATION_P_02.motion3.json";
-        const string EMOTION_03_PEACE_M_01      = "EMOTION_03_PEACE_M_01.motion3.json";
-        const string EMOTION_03_PEACE_P_01      = "EMOTION_03_PEACE_P_01.motion3.json";
-        const string EMOTION_04_ECSTASY_M_01    = "EMOTION_04_ECSTASY_M_01.motion3.json";
-        const string EMOTION_04_ECSTASY_P_01    = "EMOTION_04_ECSTASY_P_01.motion3.json";
-        const string EMOTION_05_AMAZEMENT_M_01  = "EMOTION_05_AMAZEMENT_M_01.motion3.json";
-        const string EMOTION_05_AMAZEMENT_P_01  = "EMOTION_05_AMAZEMENT_P_01.motion3.json";
-        const string EMOTION_06_RAGE_M_01       = "EMOTION_06_RAGE_M_01.motion3.json";
-        const string EMOTION_06_RAGE_P_01       = "EMOTION_06_RAGE_P_01.motion3.json";
-        const string EMOTION_07_INTETEST_M_01   = "EMOTION_07_INTETEST_M_01.motion3.json";
-        const string EMOTION_07_INTETEST_P_01   = "EMOTION_07_INTETEST_P_01.motion3.json";
-        const string EMOTION_08_RESPECT_M_01    = "EMOTION_08_RESPECT_M_01.motion3.json";
-        const string EMOTION_08_RESPECT_P_01    = "EMOTION_08_RESPECT_P_01.motion3.json";
-        const string EMOTION_09_CLAMLY_M_01     = "EMOTION_09_CLAMLY_M_01.motion3.json";
-        const string EMOTION_09_CLAMLY_P_01     = "EMOTION_09_CLAMLY_P_01.motion3.json";
-        const string EMOTION_10_PROUD_M_01      = "EMOTION_10_PROUD_M_01.motion3.json";
-        const string EMOTION_10_PROUD_P_01      = "EMOTION_10_PROUD_P_01.motion3.json";
+        const string EMOTION_00_NORMAL_01       = "EMOTION_00_NORMAL_01.motion3";
+        const string EMOTION_01_JOY_M_01        = "EMOTION_01_JOY_M_01.motion3";
+        const string EMOTION_01_JOY_P_01        = "EMOTION_01_JOY_P_01.motion3";
+        const string EMOTION_01_JOY_P_02        = "EMOTION_01_JOY_P_02.motion3";
+        const string EMOTION_02_ADMIRATION_M_01 = "EMOTION_02_ADMIRATION_M_01.motion3";
+        const string EMOTION_02_ADMIRATION_P_01 = "EMOTION_02_ADMIRATION_P_01.motion3";
+        const string EMOTION_02_ADMIRATION_P_02 = "EMOTION_02_ADMIRATION_P_02.motion3";
+        const string EMOTION_03_PEACE_M_01      = "EMOTION_03_PEACE_M_01.motion3";
+        const string EMOTION_03_PEACE_P_01      = "EMOTION_03_PEACE_P_01.motion3";
+        const string EMOTION_04_ECSTASY_M_01    = "EMOTION_04_ECSTASY_M_01.motion3";
+        const string EMOTION_04_ECSTASY_P_01    = "EMOTION_04_ECSTASY_P_01.motion3";
+        const string EMOTION_05_AMAZEMENT_M_01  = "EMOTION_05_AMAZEMENT_M_01.motion3";
+        const string EMOTION_05_AMAZEMENT_P_01  = "EMOTION_05_AMAZEMENT_P_01.motion3";
+        const string EMOTION_06_RAGE_M_01       = "EMOTION_06_RAGE_M_01.motion3";
+        const string EMOTION_06_RAGE_P_01       = "EMOTION_06_RAGE_P_01.motion3";
+        const string EMOTION_07_INTETEST_M_01   = "EMOTION_07_INTETEST_M_01.motion3";
+        const string EMOTION_07_INTETEST_P_01   = "EMOTION_07_INTETEST_P_01.motion3";
+        const string EMOTION_08_RESPECT_M_01    = "EMOTION_08_RESPECT_M_01.motion3";
+        const string EMOTION_08_RESPECT_P_01    = "EMOTION_08_RESPECT_P_01.motion3";
+        const string EMOTION_09_CLAMLY_M_01     = "EMOTION_09_CLAMLY_M_01.motion3";
+        const string EMOTION_09_CLAMLY_P_01     = "EMOTION_09_CLAMLY_P_01.motion3";
+        const string EMOTION_10_PROUD_M_01      = "EMOTION_10_PROUD_M_01.motion3";
+        const string EMOTION_10_PROUD_P_01      = "EMOTION_10_PROUD_P_01.motion3";
 
 
         /// <summary>
@@ -147,6 +147,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
             {
                 TabelAnimationClip.Add(EMOTION_01_JOY_P_01, PrisetMotionLoader.Load(Live2D_PrisetExpressionsPath + EMOTION_01_JOY_P_01));
                 TableExpression[(int)MOTION.MOTION_JOY_P].Add(EMOTION_01_JOY_P_01);
+                TabelAnimationClip.Add(EMOTION_01_JOY_P_02, PrisetMotionLoader.Load(Live2D_PrisetExpressionsPath + EMOTION_01_JOY_P_02));
                 TableExpression[(int)MOTION.MOTION_JOY_P].Add(EMOTION_01_JOY_P_02);
             }
             else if (emotion == (int)MOTION.MOTION_JOY_M)
@@ -158,6 +159,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
             {
                 TabelAnimationClip.Add(EMOTION_02_ADMIRATION_P_01, PrisetMotionLoader.Load(Live2D_PrisetExpressionsPath + EMOTION_02_ADMIRATION_P_01));
                 TableExpression[(int)MOTION.MOTION_ADMIRATION_P].Add(EMOTION_02_ADMIRATION_P_01);
+                TabelAnimationClip.Add(EMOTION_02_ADMIRATION_P_02, PrisetMotionLoader.Load(Live2D_PrisetExpressionsPath + EMOTION_02_ADMIRATION_P_02));
                 TableExpression[(int)MOTION.MOTION_ADMIRATION_P].Add(EMOTION_02_ADMIRATION_P_02);
             }
             else if (emotion == (int)MOTION.MOTION_ADMIRATION_M)

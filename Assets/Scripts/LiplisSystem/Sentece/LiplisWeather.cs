@@ -178,7 +178,7 @@ namespace Assets.Scripts.LiplisSystem.Sentece
             MsgEmotion emotion = GetWetherEmotion(wetherCode);
 
             //インスタンス生成
-            MsgSentence sentence = new MsgSentence(Tone, message, emotion.EMOTION, emotion.POINT, 0, addMessage, AllocationId);
+            MsgSentence sentence = new MsgSentence(Tone, message, message, emotion.EMOTION, emotion.POINT, false, AllocationId, addMessage);
 
             //生成したセンテンスを返す
             return sentence;

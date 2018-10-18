@@ -48,26 +48,10 @@ namespace Assets.Scripts.LiplisSystem.Msg
         /// <summary>
         /// コンストラクター
         /// </summary>
-        public MsgTopic(LiplisTone Tone,string BaseSentence, int Emotion, int Point)
+        public MsgTopic(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, bool FlgConvert, int AllocationId)
         {
             TalkSentenceList = new List<MsgSentence>();
-            TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, Emotion, Point, 1));
-        }
-        public MsgTopic(LiplisTone Tone, string BaseSentence,string TalkSentence, int Emotion, int Point)
-        {
-            TalkSentenceList = new List<MsgSentence>();
-            TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, TalkSentence, Emotion, Point, 1));
-        }
-        public MsgTopic(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode)
-        {
-            TalkSentenceList = new List<MsgSentence>();
-            TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, TalkSentence, Emotion, Point, Mode));
-        }
-
-        public MsgTopic(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode, int AllocationId)
-        {
-            TalkSentenceList = new List<MsgSentence>();
-            TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, TalkSentence, Emotion, Point, Mode,AllocationId));
+            TalkSentenceList.Add(new MsgSentence(Tone, BaseSentence, TalkSentence, Emotion, Point, FlgConvert, AllocationId));
         }
 
 

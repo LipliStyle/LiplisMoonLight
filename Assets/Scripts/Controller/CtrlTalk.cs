@@ -13,7 +13,6 @@ using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Model;
 using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.LiplisSystem.Sentece;
-using Assets.Scripts.LiplisSystem.UI;
 using Assets.Scripts.LiplisSystem.Web;
 using Assets.Scripts.LiplisSystem.Web.Clalis.v60;
 using Assets.Scripts.Utils;
@@ -164,7 +163,7 @@ public class CtrlTalk : ConcurrentBehaviour
         //ニュースログ取得
         if (CanvasLog == null)
         {
-            Debug.Log("NULL!");
+            //NULLなら何もしない
         }
         else
         {
@@ -519,7 +518,7 @@ public class CtrlTalk : ConcurrentBehaviour
                 }
                 else
                 {
-                    sentence.ToneConvert(cahrData.Tone);
+                    sentence.ToneConvert();
                 }
 
                 //アロケーションID設定
@@ -543,6 +542,8 @@ public class CtrlTalk : ConcurrentBehaviour
 
     /// <summary>
     /// 天気文章をセットする
+    /// 
+    /// TODO CtrlTalk:SetWetherSentence アロケーションIDの付け方再考
     /// </summary>
     /// <param name="topic"></param>
     public void SetWetherSentence(MsgTopic topic)
@@ -667,12 +668,14 @@ public class CtrlTalk : ConcurrentBehaviour
 
     private void SetNextSentence(MsgSentence sentence)
     {
-        //音声再生
-        VoiceTalk(sentence);
+        //トーンコンバート
+        sentence.ToneConvert();
 
         //ウインドウを表示する
         if (!sentence.FlgAddMessge)
         {
+            Debug.Log(sentence.FlgAddMessge);
+            Debug.Log(sentence.TalkSentence);
             if (sentence.TalkSentence != null)
             {
                 CreateWindow(sentence.TalkSentence, sentence.AllocationId);
@@ -682,6 +685,9 @@ public class CtrlTalk : ConcurrentBehaviour
         {
             this.NowTalkWindow.AddText(sentence.TalkSentence);
         }
+
+        //音声再生
+        VoiceTalk(sentence);
 
         //表情設定
         StartCoroutine(modelController.SetExpression(sentence));
@@ -845,7 +851,7 @@ public class CtrlTalk : ConcurrentBehaviour
     private void SetTopicTalkTopicList()
     {
         //次の話題をロードする
-        this.NowLoadTopic = LiplisStatus.Instance.NewTopic.TopicListDequeue();
+        this.NowLoadTopic = LiplisStatus.Instance.NewTopic.TopicListDequeue(modelController.GetModelList());
 
         //ログ追加
         StartCoroutine(NewsLog.AddLog(this.NowLoadTopic.Clone()));
@@ -923,7 +929,7 @@ public class CtrlTalk : ConcurrentBehaviour
     public void SetTopicTalkFromLastNewsList(string DataKey, ContentCategoly NewsSource)
     {
         //次の話題をロードする
-        MsgTopic topic = LiplisStatus.Instance.NewTopic.SearchTopic(DataKey);
+        MsgTopic topic = LiplisStatus.Instance.NewTopic.SearchTopic(DataKey,modelController.GetModelList());
 
         //Topicが取得できたら、なうろーどに入れて終了
         if (topic != null)
@@ -1093,7 +1099,7 @@ public class CtrlTalk : ConcurrentBehaviour
             topic.FlgNotAddChatted = true;
 
             //アロケーションIDを設定する
-            TopicUtil.SetAllocationId(topic);
+            TopicUtil.SetAllocationIdAndTone(topic, modelController.GetModelList());
         }
 
         //データ追加
@@ -1162,11 +1168,22 @@ public class CtrlTalk : ConcurrentBehaviour
         //音声おしゃべり設定がONなら、音声おしゃべりする
         if (LiplisSetting.Instance.Setting.FlgVoice)
         {
-            //初期データをセット
-            yield return StartCoroutine(ClalisForLiplisGetVoiceMp3.SetVoiceDataStart(NowLoadTopic));
+            if(NowLoadTopic.TalkSentenceList.Count < 0)
+            {
+                //0以下なら何もしない
+            }
+            else
+            {
+                //トーンコンバート
+                NowLoadTopic.TalkSentenceList[0].ToneConvert();
 
-            //以降は順次セット
-            SetVoiceData(this.NowLoadTopic);
+                //初期データをセット
+                //yield return StartCoroutine(ClalisForLiplisGetVoiceMp3.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
+                yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
+
+                //以降は順次セット
+                SetVoiceData(this.NowLoadTopic);
+            }
         }
     }
 
@@ -1184,7 +1201,7 @@ public class CtrlTalk : ConcurrentBehaviour
             {
                 //すでにデータがあれば何もしない
             }
-            else if (sentence.AllocationId < 0 || sentence.AllocationId > 3)
+            else if (sentence.AllocationId < 0 || sentence.AllocationId >= modelController.GetModelCount())
             {
                 //何もしない
             }
@@ -1196,8 +1213,12 @@ public class CtrlTalk : ConcurrentBehaviour
     }
     public IEnumerator SetVoiceData(MsgTopic NowLoadTopic, MsgSentence sentence)
     {
-        var Async = ClalisForLiplisGetVoiceMp3.GetAudioClip(NowLoadTopic, sentence.AllocationId, sentence.SubId);
+        //トーンコンバート
+        sentence.ToneConvert();
 
+        //var Async = ClalisForLiplisGetVoiceMp3.GetAudioClip(NowLoadTopic, sentence.AllocationId, sentence.SubId);
+        var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence,modelController.GetModelCount());
+        
         //非同期実行
         yield return Async;
 
@@ -1215,7 +1236,7 @@ public class CtrlTalk : ConcurrentBehaviour
         if (LiplisSetting.Instance.Setting.FlgVoice)
         {
             //初期データをセット
-            yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic));
+            yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
 
             //以降は順次セット
             SetVoiceDataInterrupt(this.NowLoadTopic);
@@ -1236,7 +1257,7 @@ public class CtrlTalk : ConcurrentBehaviour
             {
                 //すでにデータがあれば何もしない
             }
-            else if (sentence.AllocationId < 0 || sentence.AllocationId > 3)
+            else if (sentence.AllocationId < 0 || sentence.AllocationId >= modelController.GetModelCount())
             {
                 //何もしない
             }
@@ -1248,7 +1269,7 @@ public class CtrlTalk : ConcurrentBehaviour
     }
     public IEnumerator SetVoiceDataInterrupt(MsgSentence sentence)
     {
-        var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence);
+        var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence, modelController.GetModelCount());
 
         //非同期実行
         yield return Async;
@@ -1371,7 +1392,9 @@ public class CtrlTalk : ConcurrentBehaviour
         {
             //テキスト　サイズ、位置調整
             GameObject windowText = window.transform.Find("TitleTalkText").gameObject;
-            windowText.GetComponent<Button>().onClick.AddListener(() => Title_Click(url));
+
+            //TODO CtrlTalk:CreateWindowTitleここでなぜかエラーが出る 要調査
+            //windowText.GetComponent<Button>().onClick.AddListener(() => Title_Click(url));
         }
         catch (Exception ex)
         {

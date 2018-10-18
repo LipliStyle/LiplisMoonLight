@@ -1,0 +1,130 @@
+﻿{
+  "ChatList": [
+    {
+      "id": "1",
+      "name": "1",
+      "sentence": "おはようございます、ご主人様。",
+      "emotion": "1",
+      "rangeStart": "04:00",
+      "rangeEnd": "10:00",
+      "type": "0"
+    },
+    {
+      "id": "2",
+      "name": "2",
+      "sentence": "良い朝ですね！ご主人様。",
+      "emotion": "0",
+      "rangeStart": "04:00",
+      "rangeEnd": "10:00",
+      "type": "0"
+    },
+    {
+      "id": "3",
+      "name": "3",
+      "sentence": "白ちゃんと桃ちゃんは何時まで寝ているのかしら・・・。起きなさい！",
+      "emotion": "6",
+      "rangeStart": "07:00",
+      "rangeEnd": "11:00",
+      "type": "0"
+    },
+    {
+      "id": "4",
+      "name": "4",
+      "sentence": "おはようごうざいます。朝です。もう起きなくてはダメですよ？",
+      "emotion": "6",
+      "rangeStart": "07:00",
+      "rangeEnd": "09:00",
+      "type": "0"
+    },
+    {
+      "id": "5",
+      "name": "5",
+      "sentence": "こんにちは、ご主人様。",
+      "emotion": "1",
+      "rangeStart": "11:00",
+      "rangeEnd": "16:00",
+      "type": "0"
+    },
+    {
+      "id": "6",
+      "name": "6",
+      "sentence": "こんにちは、ご主人様。",
+      "emotion": "0",
+      "rangeStart": "11:00",
+      "rangeEnd": "16:00",
+      "type": "0"
+    },
+    {
+      "id": "7",
+      "name": "7",
+      "sentence": "そろそろお昼ですね。ご主人様。",
+      "emotion": "1",
+      "rangeStart": "11:00",
+      "rangeEnd": "13:00",
+      "type": "0"
+    },
+    {
+      "id": "8",
+      "name": "8",
+      "sentence": "こんばんは、ご主人様。",
+      "emotion": "1",
+      "rangeStart": "17:00",
+      "rangeEnd": "22:00",
+      "type": "0"
+    },
+    {
+      "id": "9",
+      "name": "9",
+      "sentence": "こんばんは、ご主人様。",
+      "emotion": "0",
+      "rangeStart": "17:00",
+      "rangeEnd": "22:00",
+      "type": "0"
+    },
+    {
+      "id": "10",
+      "name": "10",
+      "sentence": "まだお仕事ですか？ご主人様？",
+      "emotion": "-3",
+      "rangeStart": "20:00",
+      "rangeEnd": "23:00",
+      "type": "0"
+    },
+    {
+      "id": "11",
+      "name": "11",
+      "sentence": "夜遅くまでお疲れ様です。",
+      "emotion": "1",
+      "rangeStart": "22:00",
+      "rangeEnd": "04:00",
+      "type": "0"
+    },
+    {
+      "id": "12",
+      "name": "12",
+      "sentence": "夜遅くまでお疲れ様です。",
+      "emotion": "0",
+      "rangeStart": "22:00",
+      "rangeEnd": "04:00",
+      "type": "0"
+    },
+    {
+      "id": "13",
+      "name": "13",
+      "sentence": "1日お疲れ様ね。",
+      "emotion": "1",
+      "rangeStart": "22:00",
+      "rangeEnd": "04:00",
+      "type": "0"
+    },
+    {
+      "id": "14",
+      "name": "14",
+      "sentence": "今日も1日お疲れ様です。",
+      "emotion": "1",
+      "rangeStart": "22:00",
+      "rangeEnd": "04:00",
+      "type": "0"
+    },
+  ]
+}

@@ -16,6 +16,7 @@ using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
 using Live2D.Cubism.Framework.Raycasting;
 using Live2D.Cubism.Framework.LookAt;
+using Newtonsoft.Json;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -92,8 +93,8 @@ namespace Live2D.Cubism.Framework.Json
 
 
             // Deserialize Json.
-            var modelJson = JsonUtility.FromJson<CubismModel3Json>(modelJsonAsset);
-
+            //var modelJson = JsonUtility.FromJson<CubismModel3Json>(modelJsonAsset);
+            var modelJson = JsonConvert.DeserializeObject<CubismModel3Json>(modelJsonAsset);
 
             // Finalize deserialization.
             modelJson.AssetPath = assetPath;

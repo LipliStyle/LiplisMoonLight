@@ -316,11 +316,6 @@ namespace Assets.Scripts.Controller
         {
             ////リップシンク有効
             this.TableModelId[sentence.AllocationId].ActiveModel.StartTalking();
-
-            //foreach (var model in TableModelId[sentence.AllocationId].ListModel)
-            //{
-            //    model.StartTalking();
-            //}
         }
 
         /// <summary>

@@ -464,8 +464,6 @@ public class CtrlDataController : ConcurrentBehaviour
         //キーが無ければ入れる。
         foreach (MsgTopic topic in NewTopic.LastData.topicList)
         {
-
-
             //話題を積む条件は精査必要
             if (!keyList.Contains(topic.DataKey))
             {
@@ -514,23 +512,19 @@ public class CtrlDataController : ConcurrentBehaviour
         {
             NewTopic = new DatNewTopic();
             NewTopic.LastData = new ResLpsTopicList();
-            Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
             Async = ClalisForLiplisGetNewTopic2MltLight.GetNewTopic(new List<string>());
         }
         else if (NewTopic.LastData == null)
         {
             NewTopic.LastData = new ResLpsTopicList();
-            //Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
             Async = ClalisForLiplisGetNewTopic2MltLight.GetNewTopic(new List<string>());
         }
         else if (NewTopic.TalkTopicList.Count <= 25)
         {
-            //Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
             Async = ClalisForLiplisGetNewTopic2MltLight.GetNewTopic(new List<string>());
         }
         else
         {
-            //Async = ClalisForLiplisGetNewTopicMl.GetNewTopic();
             Async = ClalisForLiplisGetNewTopic2Mlt.GetNewTopic(new List<string>());
         }
 

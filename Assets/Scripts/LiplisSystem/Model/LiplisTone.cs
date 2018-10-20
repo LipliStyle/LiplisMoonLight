@@ -347,7 +347,7 @@ namespace Assets.Scripts.LiplisSystem.Model
 
                 return result;
             }
-            catch(Exception ex)
+            catch
             {
                 return target;
             }

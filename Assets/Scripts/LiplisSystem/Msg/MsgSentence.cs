@@ -80,15 +80,19 @@ namespace Assets.Scripts.LiplisSystem.Msg
         /// </summary>
         public void ToneConvert()
         {
-            //スキップフラグがOFFでかつ未コンバートの場合
-            if (!FlgToneConvertSkip && (this.TalkSentence == null || this.TalkSentence == ""))
+            try
             {
-                this.TalkSentence = this.Tone.Convert(this.BaseSentence);
-
-                if(this.TalkSentence == null)
+                //スキップフラグがOFFでかつ未コンバートの場合 
+                //必ずコンバート処理するように変更。理由は、アロケーションIDが変更されている可能性があるから。
+                //if (!FlgToneConvertSkip && (this.TalkSentence == null || this.TalkSentence == ""))
+                if (!FlgToneConvertSkip && (this.TalkSentence == null || this.TalkSentence == ""))
                 {
-                    Debug.Log(this);
+                    this.TalkSentence = this.Tone.Convert(this.BaseSentence);
                 }
+            }
+            catch(Exception ex)
+            {
+                Debug.Log(ex);
             }
         }
 

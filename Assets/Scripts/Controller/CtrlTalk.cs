@@ -1176,7 +1176,6 @@ public class CtrlTalk : ConcurrentBehaviour
                 NowLoadTopic.TalkSentenceList[0].ToneConvert();
 
                 //初期データをセット
-                //yield return StartCoroutine(ClalisForLiplisGetVoiceMp3.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
                 yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
 
                 //以降は順次セット

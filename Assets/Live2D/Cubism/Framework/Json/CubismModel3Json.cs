@@ -413,6 +413,13 @@ namespace Live2D.Cubism.Framework.Json
                 var clc = model.gameObject.AddComponent<CubismLookController>();
             }
 
+            //目線追従クラスの追加
+            if (model.gameObject.GetComponent<CubismRenderController>() == null)
+            {
+                var clc = model.gameObject.AddComponent<CubismRenderController>();
+            }
+    
+
             // Make sure model is 'fresh'
             model.ForceUpdateNow();
 

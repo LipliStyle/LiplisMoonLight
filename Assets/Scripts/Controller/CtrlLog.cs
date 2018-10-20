@@ -308,8 +308,10 @@ public class CtrlLog : MonoBehaviour {
 		//親パネルにセット
 		panel.transform.SetParent(Content.transform, false);
 
-		//パネルリストに追加
-		this.PanelList.Add(panel);
+        panel.transform.SetAsFirstSibling();
+
+        //パネルリストに追加
+        this.PanelList.Add(panel);
 
 	}
 

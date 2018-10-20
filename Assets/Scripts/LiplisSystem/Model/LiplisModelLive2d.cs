@@ -41,7 +41,7 @@ namespace Assets.Scripts.LiplisSystem.Model
 
         //=============================
         //アタッチオブジェクト
-        public CubismRenderController RendererController { get; set; }
+        public CubismRenderController RenderController { get; set; }
         public CubismAutoEyeBlinkInput EyeBlink { get; set; }
         public CubismMouthController MouthController { get; set; }
         public CubismAutoMouthInput LipSync { get; set; }
@@ -147,7 +147,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.LipSync = model.gameObject.GetComponent<CubismAutoMouthInput>();
 
             //レンダラーコントローラの取得
-            this.RendererController = model.gameObject.GetComponent<CubismRenderController>();
+            this.RenderController = model.gameObject.GetComponent<CubismRenderController>();
 
             //当たり判定クラス取得
             this.RayCaster = model.gameObject.GetComponent<CubismRaycaster>();
@@ -214,8 +214,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 var path = modelPath + ModelPathDefine.MOTIONS + "/" + motion.FileName;
 
                 //ModelJsonオブジェクト取得
-                //CubismMotion3Json model3Json = CubismMotion3Json.LoadFrom(AssetLoader.LoadAsset<string>(path));
-                CubismMotion3Json model3Json = LoadMotion(path);
+                CubismMotion3Json model3Json = CubismMotion3Json.LoadFrom(AssetLoader.LoadAsset<string>(path));
 
                 //モーションロード
                 AnimationClip clip = model3Json.ToAnimationClip();
@@ -248,17 +247,6 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //モーションテーブル 値追加
                 TableMotion[motion.Emotion].Add(motion.FileName);
             }
-        }
-
-
-        /// <summary>
-        /// モデルをロードする
-        /// TODO Exceptionの実装 
-        /// </summary>
-        /// <param name="targetSettinPath"></param>
-        public CubismMotion3Json LoadMotion(string motionPath)
-        {
-            return CubismMotion3Json.LoadFrom(AssetLoader.LoadAsset<string>(motionPath));
         }
 
         /// <summary>
@@ -588,6 +576,15 @@ namespace Assets.Scripts.LiplisSystem.Model
         }
 
         /// <summary>
+        /// ソーティングオーダーを設定する
+        /// </summary>
+        /// <param name="SortingOrder"></param>
+        public void SetOrder(int SortingOrder)
+        {
+            RenderController.SortingOrder = SortingOrder;
+        }
+
+        /// <summary>
         /// モーションをランダムに再生する
         /// </summary>
         /// <param name="MotionCode"></param>
@@ -684,10 +681,10 @@ namespace Assets.Scripts.LiplisSystem.Model
                 {
                     SetVisible(false);
                 }
-            }
 
-            //モデルオパシティの更新
-            RendererController.Opacity = modelOpacity;
+                //モデルオパシティの更新
+                RenderController.Opacity = modelOpacity;
+            }
         }
 
 

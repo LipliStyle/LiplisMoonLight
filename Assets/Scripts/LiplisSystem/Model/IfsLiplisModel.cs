@@ -85,6 +85,12 @@ namespace Assets.Scripts.LiplisSystem.Model
         void SetVisible(bool flg);
 
         /// <summary>
+        /// ソーティングオーダーを設定する
+        /// </summary>
+        /// <param name="SortingOrder"></param>
+        void SetOrder(int SortingOrder);
+
+        /// <summary>
         /// VisbleONかどうか。
         /// </summary>
         bool IsVisble();

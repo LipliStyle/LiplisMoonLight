@@ -3,6 +3,8 @@
 //  概要      : リプリスモデル
 //              モデルのベースクラス
 //
+//              ソートオーダーをばらけさせること。
+//              致命的な負荷増大となる。
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
@@ -48,6 +50,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         public MST_CARACTER_POSITION Position;      //現在のモデルの配置
         public float LocationY;                     //モデルのY座標(上面からの距離。ポジションが入れ替わった場合に、高さを保持するためのプロパティ)
         public Vector3 ModelLocation;               //モデルの位置
+        int SortOrder = 0;                          //ソートオーダー　※この値は超重要。適切に設定しないと負荷が増大する。
 
         //=============================
         //ウインドウキューリスト
@@ -98,6 +101,9 @@ namespace Assets.Scripts.LiplisSystem.Model
             //アロケーションID設定
             this.AllocationId = AllocationId;
 
+            //ソートオーダーの設定
+            this.SortOrder = AllocationId * 10;
+
             //レンダリング階層取得
             this.CanvasRendering = CanvasRendering;
 
@@ -145,6 +151,9 @@ namespace Assets.Scripts.LiplisSystem.Model
         {
             //アロケーションID設定
             this.AllocationId = AllocationId;
+
+            //ソートオーダーの設定
+            this.SortOrder = AllocationId * 10;
 
             //レンダリング階層取得
             this.CanvasRendering = CanvasRendering;
@@ -299,6 +308,8 @@ namespace Assets.Scripts.LiplisSystem.Model
                 LoadModelLive2d30(modelData, flgResource);
             }
         }
+
+
         private void LoadModelLive2d30(LiplisModelData modelData, bool flgResource)
         {
             //Live2dモデルの読み込み
@@ -311,6 +322,9 @@ namespace Assets.Scripts.LiplisSystem.Model
                 Expression,
                 CallbackOnNextTalkOrSkip
                 );
+
+            //オーダー設定
+            model.SetOrder(this.SortOrder++);
 
             //モデルをリストに追加
             ModelList.Add(model);

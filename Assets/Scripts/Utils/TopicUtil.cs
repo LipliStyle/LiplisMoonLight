@@ -17,11 +17,15 @@ namespace Assets.Scripts.Utils
     {
         /// <summary>
         /// トピックにアロケーションIDを設定する
+        /// 
+        /// 必ずおしゃべり直前に呼ばれる必要がある。
+        /// このタイミングでないと、キャラクター変更に対応できないため。
         /// </summary>
         /// <param name="topic"></param>
         public static void SetAllocationIdAndTone(MsgTopic topic, List<LiplisModel> ModelList)
         {
-            int allocationId = 0;
+            //初期アロケーションIDをランダムに設定
+            int allocationId = Random.Range(0, ModelList.Count-1);
 
             //アロケーションID設定
             foreach (MsgSentence sentence in topic.TalkSentenceList)

@@ -220,7 +220,7 @@
           "Emotion": 0
         }
       ],
-      "Direction": 0
+      "Direction": 2
     },
     {
       "FileName": "Momoha_Right.model3.json",
@@ -330,7 +330,7 @@
           "Emotion": 0
         }
       ],
-      "Direction": 0
+      "Direction": 1
     }
   ],
   "ExpressionList": [

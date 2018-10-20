@@ -110,7 +110,7 @@
           "Emotion": -1
         }
       ],
-      "Direction": 0
+      "Direction": 2
     },
     {
       "FileName": "Shiroha_Right.model3.json",
@@ -220,7 +220,7 @@
           "Emotion": 2
         }
       ],
-      "Direction": 0
+      "Direction": 1
     },
     {
       "FileName": "Shiroha_Front.model3.json",

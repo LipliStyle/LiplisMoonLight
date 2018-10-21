@@ -6,9 +6,9 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
-
 using Assets.Scripts.Define;
 using System;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.Data.SubData
 {
@@ -33,7 +33,13 @@ namespace Assets.Scripts.Data.SubData
         ///デバッグモード
         public bool FlgDebug;
 
+        ///=============================
+        ///舞台上に居るキャラクターのリスト
+        public List<string> LstModelOnTheStage;
 
+        /// <summary>
+        /// コンストラクター
+        /// </summary>
         public DatSetting()
         {
             this.FlgTopicNews = true;
@@ -47,6 +53,25 @@ namespace Assets.Scripts.Data.SubData
 
             this.FlgVoice = false;
             this.FlgDebug = false;
+        }
+
+        /// <summary>
+        /// モデルリスト初期化
+        /// 
+        /// ここで設定した順序は
+        /// LipliStyle.LiplisMoonLight.savedata_setting
+        /// に設定される。
+        /// 
+        /// 以後、保存されたデータが使用される。
+        /// </summary>
+        private void InitLstModelOnTheStage()
+        {
+            this.LstModelOnTheStage = new List<string>();
+
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.HAZUKI);   //葉月 アロケーションID 0
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.SHIROHA);  //白葉 アロケーションID 1
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.KUROHA);   //黒葉 アロケーションID 2 
+            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.MOMOHA);   //桃葉 アロケーションID 3
         }
 
         /// <summary>
@@ -150,6 +175,26 @@ namespace Assets.Scripts.Data.SubData
                 return 24;
             }
         }
+
+        /// <summary>
+        /// 現在設定されているキャラクターリストを取得する
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetLstModelOnTheStage()
+        {
+            //未初期化なら、初期化してから返す
+            if(this.LstModelOnTheStage == null)
+            {
+                InitLstModelOnTheStage();
+            }
+            else if(this.LstModelOnTheStage.Count ==0)
+            {
+                InitLstModelOnTheStage();
+            }
+
+            return this.LstModelOnTheStage;
+        }
+
 
     }
 }

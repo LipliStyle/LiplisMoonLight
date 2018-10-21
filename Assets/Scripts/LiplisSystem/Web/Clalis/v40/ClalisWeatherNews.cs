@@ -38,7 +38,7 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis.v40
                 //結果を返す
                 return ConvertWetherToCode(result.weather);
             }
-            catch(Exception ex)
+            catch
             {
                 return 4;
             }

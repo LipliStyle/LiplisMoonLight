@@ -8,7 +8,6 @@
 //=======================================================================﻿
 using Assets.Scripts.Data.Cache;
 using Assets.Scripts.Data.SubData;
-using Assets.Scripts.DataChar;
 using System;
 using System.Collections.Generic;
 

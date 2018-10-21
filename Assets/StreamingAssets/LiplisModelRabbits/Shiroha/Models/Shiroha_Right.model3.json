@@ -1,0 +1,9 @@
+﻿{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Shiroha_Right.moc3",
+		"Textures": [
+			"Shiroha.2048/Shiroha_Right.png"
+		]
+	}
+}

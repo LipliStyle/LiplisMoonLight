@@ -8,6 +8,7 @@
 //
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //=======================================================================﻿
+#pragma warning disable 649,414
 using UnityEngine;
 using System;
 using System.Collections;

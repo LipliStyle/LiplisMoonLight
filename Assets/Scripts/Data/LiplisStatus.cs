@@ -7,7 +7,6 @@
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
 using Assets.Scripts.Data.SubData;
-using Assets.Scripts.DataChar;
 using System;
 
 namespace Assets.Scripts.Data
@@ -69,8 +68,6 @@ namespace Assets.Scripts.Data
             if (this.InfoWether       == null) {this.InfoWether = new DatWether(); }
             if (this.NewTopic         == null) { this.NewTopic = new　DatNewTopic(); }
             if (this.InfoAnniversary  == null) { this.InfoAnniversary = new DatAnniversaryDays(); }
-
-            if (this.CharDataList     == null) { this.CharDataList = new CharacterDataList(); }
             if (this.NewsList         == null) { this.NewsList = new DatNewsList(); }
 
             this.EnvironmentInfo = new DatEnvironmentInfomation();
@@ -80,11 +77,6 @@ namespace Assets.Scripts.Data
 
         //環境情報
         public DatEnvironmentInfomation EnvironmentInfo;
-
-
-
-        //キャラクターデータ
-        public CharacterDataList CharDataList;
 
         //最終挨拶
         //最終ニュース

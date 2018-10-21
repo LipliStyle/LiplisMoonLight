@@ -22,5 +22,6 @@ namespace Assets.Scripts.Define
         public const int RESPECT    = 8;    //尊敬/軽蔑
         public const int CLAMLY     = 9;    //冷静/焦燥
         public const int PROUD      = 10;   //誇り/恥じらい
+
     }
 }

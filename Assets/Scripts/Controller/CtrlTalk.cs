@@ -5,14 +5,14 @@
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
+using Assets.Scripts.Controller;
 using Assets.Scripts.Data;
-using Assets.Scripts.DataChar;
-using Assets.Scripts.DataChar.CharacterTalk;
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Cif.v60.Res;
 using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.LiplisSystem.Model;
 using Assets.Scripts.LiplisSystem.Msg;
-using Assets.Scripts.LiplisSystem.UI;
+using Assets.Scripts.LiplisSystem.Sentece;
 using Assets.Scripts.LiplisSystem.Web;
 using Assets.Scripts.LiplisSystem.Web.Clalis.v60;
 using Assets.Scripts.Utils;
@@ -25,8 +25,8 @@ using UnityEngine.UI;
 
 public class CtrlTalk : ConcurrentBehaviour
 {
-    ///=============================
-    /// ウインドウ保持時間
+    //=============================
+    // ウインドウ保持時間
     private const int WINDOW_LIFESPAN_TIME = 60;            //ウインドウの寿命
     private const int TALK_WAIT_DEFAULT = 7;
     private const int TALK_WAIT_NEUTRAL_DEFAULT = 5;
@@ -35,14 +35,14 @@ public class CtrlTalk : ConcurrentBehaviour
 
     ///=============================
     /// ウインドウインスタンス
-    private Queue<LiplisTitleWindow> WindowTitleListQ;
-    private Queue<LiplisImageWindow> WindowImageListQ;
+    private Queue<InfoWindow> WindowTitleListQ;
+    private Queue<ImageWindow> WindowImageListQ;
 
     ///=============================
     /// 現在処理中ウインドウインスタンス
-    private LiplisWindow NowTalkWindow;
-    private LiplisTitleWindow NowTitleWindow;
-    private LiplisImageWindow NowImageWindow;
+    private TalkWindow NowTalkWindow;
+    private InfoWindow NowTitleWindow;
+    private ImageWindow NowImageWindow;
 
     ///=============================
     /// 現在ロードトピック
@@ -67,6 +67,10 @@ public class CtrlTalk : ConcurrentBehaviour
     /// ログ画面
     public GameObject CanvasLog;
     private CtrlLog NewsLog;
+
+    ///=============================
+    /// モデルコントローラー
+    public CtrlModelController modelController;
 
     ///=============================
     ///制御フラグ
@@ -149,8 +153,8 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     void init()
     {
-        if (this.WindowTitleListQ == null) { WindowTitleListQ = new Queue<LiplisTitleWindow>(); }
-        if (this.WindowImageListQ == null) { WindowImageListQ = new Queue<LiplisImageWindow>(); }
+        if (this.WindowTitleListQ == null) { WindowTitleListQ = new Queue<InfoWindow>(); }
+        if (this.WindowImageListQ == null) { WindowImageListQ = new Queue<ImageWindow>(); }
         instance = this;
 
         //なうセンテンスカウント 初期化
@@ -159,7 +163,7 @@ public class CtrlTalk : ConcurrentBehaviour
         //ニュースログ取得
         if (CanvasLog == null)
         {
-            Debug.Log("NULL!");
+            //NULLなら何もしない
         }
         else
         {
@@ -180,7 +184,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     private void InitInfoWindowInstanse()
     {
-        if(InfoWindowInstanse == null)
+        if (InfoWindowInstanse == null)
         {
             InfoWindowInstanse = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_INFO);
         }
@@ -266,7 +270,7 @@ public class CtrlTalk : ConcurrentBehaviour
                     else if (LiplisStatus.Instance.NewTopic.LastData != null)
                     {
                         //ラストデータNULLチェック
-                        if(LiplisStatus.Instance.NewTopic.LastData.topicList!= null)
+                        if (LiplisStatus.Instance.NewTopic.LastData.topicList != null)
                         {
                             //トピックデータNULLチェック
                             if (LiplisStatus.Instance.NewTopic.LastData.topicList.Count > 0)
@@ -278,7 +282,7 @@ public class CtrlTalk : ConcurrentBehaviour
                             {
                                 StartCoroutine(SetTopicDirectTopicAsync());
                             }
-                               
+
                         }
                         else
                         {
@@ -307,14 +311,14 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     private void WindowMaintenance()
     {
-        LiplisStatus.Instance.CharDataList.WindowMaintenance(WINDOW_LIFESPAN_TIME);
+        modelController.WindowMaintenance(WINDOW_LIFESPAN_TIME);
 
         //一定時間経過したウインドウは自動的に除去する
         if (!UnityNullCheck.IsNull(NowTalkWindow))
         {
             if (NowTalkWindow.CreateTime.AddSeconds(WINDOW_LIFESPAN_TIME) < DateTime.Now)
             {
-                NowTalkWindow.imgWindow.FlgTalking = false;
+                NowTalkWindow.FlgTalking = false;
                 NowTalkWindow.CloseWindow();
             }
         }
@@ -344,14 +348,14 @@ public class CtrlTalk : ConcurrentBehaviour
 
 
             //音声再生完了待ち
-            if(LAppLive2DManager.Instance.IsPlaying())
+            if (modelController.IsPlaying())
             {
                 return;
             }
 
             if (!UnityNullCheck.IsNull(NowTalkWindow))
             {
-                if (!NowTalkWindow.imgWindow.FlgTalking)
+                if (!NowTalkWindow.FlgTalking)
                 {
 
                     if (NowLoadTopic != null)
@@ -384,18 +388,6 @@ public class CtrlTalk : ConcurrentBehaviour
                 //おしゃべりウインドウがなければカウントアップ
                 TalkWaitCount++;
             }
-
-            //ニュートラル戻しタイムアウト
-            if (TalkWaitCount == TALK_WAIT_NEUTRAL_DEFAULT)
-            {
-                OnNeutralAll();
-            }
-            if (TalkWaitCount == TALK_WAIT_NEUTRAL_IDLE_DEFAULT)
-            {
-                OnIdleAll();
-            }
-
-
 
             //おしゃべり待ちタイムアウト
             if (TalkWaitCount >= TALK_WAIT_DEFAULT)
@@ -473,7 +465,7 @@ public class CtrlTalk : ConcurrentBehaviour
         MsgTopic topic = new MsgTopic();
 
         //各キャラクターの挨拶を取得する
-        List<MsgTopic> lst = LiplisStatus.Instance.CharDataList.GetGreet();
+        List<MsgTopic> lst = modelController.GetGreet();
 
         //センテンスを入れなおす
         foreach (var charGreet in lst)
@@ -517,7 +509,7 @@ public class CtrlTalk : ConcurrentBehaviour
                 MsgSentence sentence = talkSentence.Clone();
 
                 //キャラデータ取得
-                CharacterData cahrData = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId];
+                LiplisModel cahrData = modelController.TableModelId[AllocationId];
 
                 if (sentenceIdx == 0)
                 {
@@ -526,7 +518,7 @@ public class CtrlTalk : ConcurrentBehaviour
                 }
                 else
                 {
-                    sentence.ToneConvert(cahrData.Tone);
+                    sentence.ToneConvert();
                 }
 
                 //アロケーションID設定
@@ -548,6 +540,12 @@ public class CtrlTalk : ConcurrentBehaviour
         }
     }
 
+    /// <summary>
+    /// 天気文章をセットする
+    /// 
+    /// TODO CtrlTalk:SetWetherSentence アロケーションIDの付け方再考
+    /// </summary>
+    /// <param name="topic"></param>
     public void SetWetherSentence(MsgTopic topic)
     {
         //NULLチェック
@@ -563,9 +561,13 @@ public class CtrlTalk : ConcurrentBehaviour
 
         //最終センテンス取得
         MsgSentence lastSentence = topic.TalkSentenceList[topic.TalkSentenceList.Count - 1];
-        CharacterData cahrData1;
-        CharacterData cahrData2;
-        CharacterData cahrData3;
+
+        //モデル
+        LiplisModel cahrData1;
+        LiplisModel cahrData2;
+        LiplisModel cahrData3;
+
+        //アロケーションID
         int AllocationId1;
         int AllocationId2;
         int AllocationId3;
@@ -579,9 +581,9 @@ public class CtrlTalk : ConcurrentBehaviour
         if (AllocationId3 > 3) { AllocationId3 = 0; }
 
         //キャラクターデータ取得
-        cahrData1 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId1];
-        cahrData2 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId2];
-        cahrData3 = LiplisStatus.Instance.CharDataList.CharIdList[AllocationId3];
+        cahrData1 = modelController.TableModelId[AllocationId1];
+        cahrData2 = modelController.TableModelId[AllocationId2];
+        cahrData3 = modelController.TableModelId[AllocationId3];
 
 
         //現在時刻取得
@@ -593,7 +595,7 @@ public class CtrlTalk : ConcurrentBehaviour
         //0～12 今日 午前、午後、夜の天気
         if (dt.Hour >= 0 && dt.Hour <= 18)
         {
-            SentenceCreatorWether.CreateWetherMessage("今日の天気は", todayWether, topic.TalkSentenceList, cahrData1.Tone, cahrData1.AllocationId);
+            LiplisWeather.CreateWetherMessage("今日の天気は", todayWether, topic.TalkSentenceList, cahrData1.Tone, cahrData1.AllocationId);
         }
 
         //19～23 明日の天気
@@ -602,8 +604,8 @@ public class CtrlTalk : ConcurrentBehaviour
             //明日の天気も取得
             MsgDayWether tomorrowWether = LiplisStatus.Instance.InfoWether.GetWetherSentenceTommorow(dt);
 
-            SentenceCreatorWether.CreateWetherMessage("", todayWether, topic.TalkSentenceList, cahrData2.Tone, cahrData2.AllocationId);
-            SentenceCreatorWether.CreateWetherMessage("明日の天気は", tomorrowWether, topic.TalkSentenceList, cahrData3.Tone, cahrData3.AllocationId);
+            LiplisWeather.CreateWetherMessage("", todayWether, topic.TalkSentenceList, cahrData2.Tone, cahrData2.AllocationId);
+            LiplisWeather.CreateWetherMessage("明日の天気は", tomorrowWether, topic.TalkSentenceList, cahrData3.Tone, cahrData3.AllocationId);
 
         }
     }
@@ -625,21 +627,6 @@ public class CtrlTalk : ConcurrentBehaviour
     }
 
     /// <summary>
-    /// ニュートラル戻し
-    /// </summary>
-    private void OnNeutralAll()
-    {
-        //全登録モデルをニュートラルに戻す
-        LiplisStatus.Instance.CharDataList.NeutralAll();
-    }
-    private void OnIdleAll()
-    {
-        //全登録モデルをニュートラルに戻す
-        LiplisStatus.Instance.CharDataList.NeutralAll();
-    }
-
-
-    /// <summary>
     /// 次の文章をセットする
     /// </summary>
     private void SetNextSentence()
@@ -655,9 +642,9 @@ public class CtrlTalk : ConcurrentBehaviour
             }
 
             //設定数おしゃべりしたら次の話題
-            if(NowSentenceCount > LiplisSetting.Instance.Setting.GetTalkNum())
+            if (NowSentenceCount > LiplisSetting.Instance.Setting.GetTalkNum())
             {
-                while(NowLoadTopic.TalkSentenceList.Count>0)
+                while (NowLoadTopic.TalkSentenceList.Count > 0)
                 {
                     MsgSentence s = NowLoadTopic.TalkSentenceList.Dequeue();
                 }
@@ -681,8 +668,8 @@ public class CtrlTalk : ConcurrentBehaviour
 
     private void SetNextSentence(MsgSentence sentence)
     {
-        //音声再生
-        VoiceTalk(sentence);
+        //トーンコンバート
+        sentence.ToneConvert();
 
         //ウインドウを表示する
         if (!sentence.FlgAddMessge)
@@ -697,8 +684,14 @@ public class CtrlTalk : ConcurrentBehaviour
             this.NowTalkWindow.AddText(sentence.TalkSentence);
         }
 
+        //音声再生
+        VoiceTalk(sentence);
+
         //表情設定
-        LiplisStatus.Instance.CharDataList.SetExpression(sentence);
+        StartCoroutine(modelController.SetExpression(sentence));
+
+        //おしゃべりの開始
+        modelController.StartTalking(sentence);
 
         //センテンスカウントインクリメント
         NowSentenceCount++;
@@ -710,13 +703,11 @@ public class CtrlTalk : ConcurrentBehaviour
     private void VoiceTalk(MsgSentence sentence)
     {
         //音声おしゃべり設定がONなら、音声おしゃべりする
-        if(LiplisSetting.Instance.Setting.FlgVoice)
+        if (LiplisSetting.Instance.Setting.FlgVoice)
         {
-            if(sentence.VoiceData != null)
+            if (sentence.VoiceData != null)
             {
-                LiplisStatus.Instance.CharDataList.StartVoice(sentence.AllocationId, sentence.VoiceData);
-                //audioSourceList[sentence.AllocationId].clip = sentence.VoiceData;
-                //audioSourceList[sentence.AllocationId].Play();
+                modelController.StartVoice(sentence.AllocationId, sentence.VoiceData);
             }
         }
     }
@@ -728,9 +719,6 @@ public class CtrlTalk : ConcurrentBehaviour
     {
         //ウインドウを一旦クリア
         DestroyAllWindow();
-
-        //ニュートラル戻し
-        OnNeutralAll();
 
         //話題取得
         if (LiplisStatus.Instance.NewTopic.TalkTopicList.Count > 0 || LiplisStatus.Instance.NewTopic.InterruptTopicList.Count > 0)
@@ -822,7 +810,7 @@ public class CtrlTalk : ConcurrentBehaviour
         initNowSentenceCount();
 
         //キャラクター位置移動
-        LiplisStatus.Instance.CharDataList.ShuffleCharPosition(this.NowLoadTopic);
+        modelController.ShuffleCharPosition(this.NowLoadTopic);
 
         //音声ダウンロード開始
         yield return StartCoroutine(SetVoiceData());
@@ -843,7 +831,7 @@ public class CtrlTalk : ConcurrentBehaviour
         initNowSentenceCount();
 
         //キャラクター位置移動
-        LiplisStatus.Instance.CharDataList.ShuffleCharPosition(this.NowLoadTopic);
+        modelController.ShuffleCharPosition(this.NowLoadTopic);
 
         //音声ダウンロード開始
         yield return StartCoroutine(SetVoiceDataInterrupt());
@@ -861,7 +849,7 @@ public class CtrlTalk : ConcurrentBehaviour
     private void SetTopicTalkTopicList()
     {
         //次の話題をロードする
-        this.NowLoadTopic = LiplisStatus.Instance.NewTopic.TopicListDequeue();
+        this.NowLoadTopic = LiplisStatus.Instance.NewTopic.TopicListDequeue(modelController.GetModelList());
 
         //ログ追加
         StartCoroutine(NewsLog.AddLog(this.NowLoadTopic.Clone()));
@@ -939,7 +927,7 @@ public class CtrlTalk : ConcurrentBehaviour
     public void SetTopicTalkFromLastNewsList(string DataKey, ContentCategoly NewsSource)
     {
         //次の話題をロードする
-        MsgTopic topic = LiplisStatus.Instance.NewTopic.SearchTopic(DataKey);
+        MsgTopic topic = LiplisStatus.Instance.NewTopic.SearchTopic(DataKey,modelController.GetModelList());
 
         //Topicが取得できたら、なうろーどに入れて終了
         if (topic != null)
@@ -1052,7 +1040,7 @@ public class CtrlTalk : ConcurrentBehaviour
         }
         catch
         {
-            this.NowLoadTopic = LiplisStatus.Instance.CharDataList.CreateTopicFromShortNews();
+            this.NowLoadTopic = modelController.CreateTopicFromShortNews();
         }
 
     }
@@ -1074,7 +1062,7 @@ public class CtrlTalk : ConcurrentBehaviour
         //NULLチェック
         if (resTopic == null || resTopic.topicList.Count < 0)
         {
-            this.NowLoadTopic = LiplisStatus.Instance.CharDataList.CreateTopicFromShortNews();
+            this.NowLoadTopic = modelController.CreateTopicFromShortNews();
         }
 
         //取得したトピックを返す
@@ -1109,7 +1097,7 @@ public class CtrlTalk : ConcurrentBehaviour
             topic.FlgNotAddChatted = true;
 
             //アロケーションIDを設定する
-            TopicUtil.SetAllocationId(topic);
+            TopicUtil.SetAllocationIdAndTone(topic, modelController.GetModelList());
         }
 
         //データ追加
@@ -1140,10 +1128,10 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     private bool IsTalkingNow()
     {
-        if (LiplisStatus.Instance.CharDataList.GetWindowQCount() > 0)
+        if (modelController.GetWindowQCount() > 0)
         {
             //ウインドウがあれば、先頭ウインドウのおしゃべり中フラグを調べる
-            return this.NowTalkWindow.imgWindow.FlgTalking;
+            return this.NowTalkWindow.FlgTalking;
         }
         else
         {
@@ -1157,7 +1145,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     private void SkipWindow()
     {
-        this.NowTalkWindow.imgWindow.SetSkip();
+        this.NowTalkWindow.SetSkip();
     }
 
 
@@ -1178,11 +1166,21 @@ public class CtrlTalk : ConcurrentBehaviour
         //音声おしゃべり設定がONなら、音声おしゃべりする
         if (LiplisSetting.Instance.Setting.FlgVoice)
         {
-            //初期データをセット
-            yield return StartCoroutine(ClalisForLiplisGetVoiceMp3.SetVoiceDataStart(NowLoadTopic));
+            if(NowLoadTopic.TalkSentenceList.Count < 0)
+            {
+                //0以下なら何もしない
+            }
+            else
+            {
+                //トーンコンバート
+                NowLoadTopic.TalkSentenceList[0].ToneConvert();
 
-            //以降は順次セット
-            SetVoiceData(this.NowLoadTopic);
+                //初期データをセット
+                yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
+
+                //以降は順次セット
+                SetVoiceData(this.NowLoadTopic);
+            }
         }
     }
 
@@ -1200,7 +1198,7 @@ public class CtrlTalk : ConcurrentBehaviour
             {
                 //すでにデータがあれば何もしない
             }
-            else if (sentence.AllocationId < 0 || sentence.AllocationId > 3)
+            else if (sentence.AllocationId < 0 || sentence.AllocationId >= modelController.GetModelCount())
             {
                 //何もしない
             }
@@ -1212,8 +1210,12 @@ public class CtrlTalk : ConcurrentBehaviour
     }
     public IEnumerator SetVoiceData(MsgTopic NowLoadTopic, MsgSentence sentence)
     {
-        var Async = ClalisForLiplisGetVoiceMp3.GetAudioClip(NowLoadTopic, sentence.AllocationId, sentence.SubId);
+        //トーンコンバート
+        sentence.ToneConvert();
 
+        //var Async = ClalisForLiplisGetVoiceMp3.GetAudioClip(NowLoadTopic, sentence.AllocationId, sentence.SubId);
+        var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence,modelController.GetModelCount());
+        
         //非同期実行
         yield return Async;
 
@@ -1231,7 +1233,7 @@ public class CtrlTalk : ConcurrentBehaviour
         if (LiplisSetting.Instance.Setting.FlgVoice)
         {
             //初期データをセット
-            yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic));
+            yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
 
             //以降は順次セット
             SetVoiceDataInterrupt(this.NowLoadTopic);
@@ -1252,7 +1254,7 @@ public class CtrlTalk : ConcurrentBehaviour
             {
                 //すでにデータがあれば何もしない
             }
-            else if (sentence.AllocationId < 0 || sentence.AllocationId > 3)
+            else if (sentence.AllocationId < 0 || sentence.AllocationId >= modelController.GetModelCount())
             {
                 //何もしない
             }
@@ -1264,7 +1266,7 @@ public class CtrlTalk : ConcurrentBehaviour
     }
     public IEnumerator SetVoiceDataInterrupt(MsgSentence sentence)
     {
-        var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence);
+        var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence, modelController.GetModelCount());
 
         //非同期実行
         yield return Async;
@@ -1285,7 +1287,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// </summary>
     public void DestroyAllWindow()
     {
-        LiplisStatus.Instance.CharDataList.DestroyAllWindow();
+        modelController.DestroyAllWindow();
     }
 
     /// <summary>
@@ -1296,27 +1298,10 @@ public class CtrlTalk : ConcurrentBehaviour
     public void CreateWindow(string message, int AllocationId)
     {
         //キャラクターデータ取得
-        CharacterData charData = LiplisStatus.Instance.CharDataList.GetCharacter(AllocationId);
-
-        //向き変更
-        charData.ChengeDirectionRandam();
-
-        //インスタンティエイト
-        GameObject window = Instantiate(charData.WindowInstances) as GameObject;
-
-        //ウインドウ
-        LiplisWindow lpsWindow = charData.CreateWindowTalk(window,UiRenderingFront.transform,message);
-
-        if (lpsWindow == null)
-        {
-            return;
-        }
-
-        //現在おしゃべりウインドウ設置
-        this.NowTalkWindow = lpsWindow;
-
-        //ウインドウセット
-        charData.SetWindow(lpsWindow, AllocationId);
+        LiplisModel charData = modelController.GetCharacterModel(AllocationId);
+        
+        //おしゃべりウインドウ生成し、現在ウインドウ設置
+        this.NowTalkWindow = charData.CreateWindowTalk(message);
     }
 
 
@@ -1341,7 +1326,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="z"></param>
-    private LiplisTitleWindow CreateWindowTitle(float x, float y, float z, string message, string url)
+    private InfoWindow CreateWindowTitle(float x, float y, float z, string message, string url)
     {
         message = message.Trim().Replace("\n", "");
 
@@ -1393,20 +1378,29 @@ public class CtrlTalk : ConcurrentBehaviour
         //親キャンバスに登録
         window.transform.SetParent(UiRenderingFront.transform, false);
 
+        //親ウインドウ登録
+        imgWindow.SetParentWindow(window);
+
+        //生成時刻セット
+        imgWindow.SetCreateTime(DateTime.Now);
+
         //クリックイベント
         try
         {
             //テキスト　サイズ、位置調整
             GameObject windowText = window.transform.Find("TitleTalkText").gameObject;
-            windowText.GetComponent<Button>().onClick.AddListener(() => Title_Click(url));
+
+            //TODO CtrlTalk:CreateWindowTitleここでなぜかエラーが出る 要調査
+            //windowText.GetComponent<Button>().onClick.AddListener(() => Title_Click(url));
         }
         catch (Exception ex)
         {
             Debug.Log(ex.Message);
         }
 
+
         //結果を返す
-        return new LiplisTitleWindow(window, heightImg);
+        return imgWindow;
     }
 
 
@@ -1458,17 +1452,17 @@ public class CtrlTalk : ConcurrentBehaviour
         float z = TITLE_POS_Z;
 
         //ウインドウ生成
-        LiplisTitleWindow window = null;
+        InfoWindow window = null;
 
         if (WindowTitleListQ.Count >= 1)
         {
             //1個前のウインドウ取得
-            LiplisTitleWindow LastWindow = WindowTitleListQ.Dequeue();
+            InfoWindow LastWindow = WindowTitleListQ.Dequeue();
 
             //現在ウインドウXYZ取得
-            x = LastWindow.imgWindow.ParentWindow.transform.localPosition.x;
-            y = LastWindow.imgWindow.ParentWindow.transform.localPosition.y;
-            z = LastWindow.imgWindow.ParentWindow.transform.localPosition.z;
+            x = LastWindow.ParentWindow.transform.localPosition.x;
+            y = LastWindow.ParentWindow.transform.localPosition.y;
+            z = LastWindow.ParentWindow.transform.localPosition.z;
 
             //ウインドウ生成
             window = CreateWindowTitle(x, y, z, message, url);
@@ -1588,7 +1582,7 @@ public class CtrlTalk : ConcurrentBehaviour
     /// <summary>
     /// ウインドウを作成する
     /// </summary>
-    private LiplisImageWindow CreateWindowImage()
+    private ImageWindow CreateWindowImage()
     {
         //ウインドウのプレハブからインスタンス生成
         InitImageWindowInstanse();
@@ -1599,9 +1593,6 @@ public class CtrlTalk : ConcurrentBehaviour
         //ウインドウ名設定
         window.name = "ImageWindow" + WindowImageListQ.Count;
 
-        //ウインドウ生成
-        LiplisImageWindow lpsWindow = new LiplisImageWindow(window);
-
         //位置設定
         //window.transform.position = new Vector3(LpsDefine.SCREAN_DEFAULT_WIDTH / 6, IMAGE_POS_Y, IMAGE_POS_Z);
         window.transform.position = new Vector3(-999, -999, 0);
@@ -1611,6 +1602,15 @@ public class CtrlTalk : ConcurrentBehaviour
 
         //親キャンバスに登録
         window.transform.SetParent(UiRenderingBack.transform, false);
+
+        //ウインドウ生成
+        ImageWindow lpsWindow = window.GetComponent<ImageWindow>();
+
+        //親ウインドウ登録
+        lpsWindow.SetParentWindow(window);
+
+        //生成時刻登録
+        lpsWindow.SetCreateTime(DateTime.Now);
 
         //結果を返す
         return lpsWindow;
@@ -1694,7 +1694,7 @@ public class CtrlTalk : ConcurrentBehaviour
     public void TxtTemp_Click()
     {
         ////割り込みリストに追加する
-        //AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetTemperature());
+        //AddInterruptTopic(modelController.GetTemperature());
 
         ////トピック送り
         //SetNextTopic();
@@ -1706,7 +1706,7 @@ public class CtrlTalk : ConcurrentBehaviour
     public void TxtChanceOfRain_Click()
     {
         ////割り込みリストに追加する
-        //AddInterruptTopic(LiplisStatus.Instance.CharDataList.GetChanceOfRain());
+        //AddInterruptTopic(modelController.GetChanceOfRain());
 
 
         ////トピック送り
@@ -1735,7 +1735,7 @@ public class CtrlTalk : ConcurrentBehaviour
     public void Btn_Next_Click()
     {
         //メイン画面がOFFのときは抜ける
-        if(!UiRenderingFront.gameObject.activeSelf)
+        if (!UiRenderingFront.gameObject.activeSelf)
         {
             return;
         }
@@ -1775,7 +1775,7 @@ public class CtrlTalk : ConcurrentBehaviour
         }
 
         //Live2Dの整列
-        LiplisStatus.Instance.CharDataList.InitCharPosition();
+        modelController.InitCharPosition();
 
         //イメージウインドウの整列
         this.NowTitleWindow.SetMoveTarget(new Vector3(TITLE_POS_X, TITLE_POS_Y, TITLE_POS_Z));

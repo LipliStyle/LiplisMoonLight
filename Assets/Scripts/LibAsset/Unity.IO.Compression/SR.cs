@@ -33,7 +33,7 @@ namespace Unity.IO.Compression {
 
         internal static string GetString(string p)
         {
-            //HACK: just return the string passed in, not doing localization
+            //HACKA: just return the string passed in, not doing localization
             return p;
         }
     }

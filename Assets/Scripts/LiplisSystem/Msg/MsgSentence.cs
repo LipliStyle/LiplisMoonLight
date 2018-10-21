@@ -6,8 +6,7 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
-using Assets.Scripts.DataChar.CharacterTalk;
-using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.LiplisSystem.Model;
 using System;
 using UnityEngine;
 
@@ -29,16 +28,16 @@ namespace Assets.Scripts.LiplisSystem.Msg
         public string TalkSentence;     //おしゃべり文章
         public int Emotion;             //エモーション
         public int Point;               //ポイント
-        public int Mode;
+        public bool FlgToneConvertSkip;         //コンバート
         public bool FlgAddMessge;          //追加メッセージ
 
         ///=============================
         /// 音声データ
-        public AudioClip VoiceData; 
+        public AudioClip VoiceData;
 
         ///=============================
-        /// 口調変換するかどうか
-        public bool FlgToneConvert = true;  //トーンコンバートするかどうか
+        /// トーンデータ
+        private LiplisTone Tone;
 
         /// <summary>
         /// デフォルトコンストラクター
@@ -54,68 +53,56 @@ namespace Assets.Scripts.LiplisSystem.Msg
         /// モード1:口調変換しない 
         /// </summary>
         /// <param name="BaseSentence"></param>
-        public MsgSentence(CharDataTone Tone, string BaseSentence, int Emotion, int Point, int Mode)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, bool FlgToneConvertSkip, int AllocationId, bool FlgAddMessge)
         {
             this.BaseSentence = BaseSentence;
             this.Emotion = Emotion;
             this.Point = Point;
-            this.Mode = Mode;
-
-            ToneConvert(Tone);
-        }
-        public MsgSentence(CharDataTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge)
-        {
-            this.BaseSentence = BaseSentence;
-            this.Emotion = Emotion;
-            this.Point = Point;
-            this.Mode = Mode;
-            this.FlgAddMessge = FlgAddMessge;
-
-            ToneConvert(Tone);
-        }
-        public MsgSentence(CharDataTone Tone, string BaseSentence, int Emotion, int Point, int Mode, bool FlgAddMessge, int AllocationId)
-        {
-            this.BaseSentence = BaseSentence;
-            this.Emotion = Emotion;
-            this.Point = Point;
-            this.Mode = Mode;
+            this.FlgToneConvertSkip = FlgToneConvertSkip;
             this.FlgAddMessge = FlgAddMessge;
             this.AllocationId = AllocationId;
-
-            ToneConvert(Tone);
+            this.Tone = Tone;
         }
-        public MsgSentence(CharDataTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode)
+        public MsgSentence(LiplisTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, bool FlgToneConvertSkip, int AllocationId)
         {
             this.BaseSentence = BaseSentence;
             this.TalkSentence = TalkSentence;
             this.Emotion = Emotion;
             this.Point = Point;
-            this.Mode = Mode;
-
-            ToneConvert(Tone);
-        }
-
-        public MsgSentence(CharDataTone Tone, string BaseSentence, string TalkSentence, int Emotion, int Point, int Mode, int AllocationId)
-        {
-            this.BaseSentence = BaseSentence;
-            this.TalkSentence = TalkSentence;
-            this.Emotion = Emotion;
-            this.Point = Point;
-            this.Mode = Mode;
+            this.FlgToneConvertSkip = FlgToneConvertSkip;
             this.AllocationId = AllocationId;
-
-            ToneConvert(Tone);
+            this.FlgAddMessge = false;
+            this.Tone = Tone;
         }
 
         /// <summary>
         /// トーンコンバートする
         /// </summary>
-        public void ToneConvert(CharDataTone Tone)
+        public void ToneConvert()
         {
-            if (Mode != 1)
+            try
             {
-                this.TalkSentence = Tone.Convert(this.BaseSentence);
+                //スキップフラグがOFFでかつ未コンバートの場合 
+                //必ずコンバート処理するように変更。理由は、アロケーションIDが変更されている可能性があるから。
+                //if (!FlgToneConvertSkip && (this.TalkSentence == null || this.TalkSentence == ""))
+                if (!FlgToneConvertSkip && (this.TalkSentence == null || this.TalkSentence == ""))
+                {
+                    this.TalkSentence = this.Tone.Convert(this.BaseSentence);
+                }
             }
+            catch(Exception ex)
+            {
+                Debug.Log(ex);
+            }
+        }
+
+        /// <summary>
+        /// トーン設定をセットする
+        /// </summary>
+        /// <param name="Tone"></param>
+        public void SetTone(LiplisTone Tone)
+        {
+            this.Tone = Tone;
         }
 
         /// <summary>
@@ -126,16 +113,16 @@ namespace Assets.Scripts.LiplisSystem.Msg
         {
             MsgSentence msg = new MsgSentence();
 
-            msg.CreateTime   = this.CreateTime;
-            msg.DataKey      = this.DataKey;
-            msg.SubId        = this.SubId;
-            msg.AllocationId = this.AllocationId;
-            msg.BaseSentence = this.BaseSentence;    //ベース文章
-            msg.TalkSentence = this.TalkSentence;     //おしゃべり文章
-            msg.Emotion      = this.Emotion;             //エモーション
-            msg.Point        = this.Point;               //ポイント
-            msg.Mode         = this.Mode;
-            msg.FlgAddMessge = this.FlgAddMessge;          //追加メッセージ
+            msg.CreateTime           = this.CreateTime;
+            msg.DataKey              = this.DataKey;
+            msg.SubId                = this.SubId;
+            msg.AllocationId         = this.AllocationId;
+            msg.BaseSentence         = this.BaseSentence;    //ベース文章
+            msg.TalkSentence         = this.TalkSentence;     //おしゃべり文章
+            msg.Emotion              = this.Emotion;             //エモーション
+            msg.Point                = this.Point;               //ポイント
+            msg.FlgToneConvertSkip   = this.FlgToneConvertSkip;
+            msg.FlgAddMessge         = this.FlgAddMessge;          //追加メッセージ
 
             return msg;
     }

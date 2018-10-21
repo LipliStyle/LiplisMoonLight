@@ -1,6 +1,7 @@
 ﻿//=======================================================================
 //  ClassName : GlobalCoroutine
 //  概要      : アクティブ状態にかかわらずコルーチンを実行する
+//              また、モノビヘイビアを継承していないクラスからもインスタントに実行できる
 //
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
@@ -90,7 +91,7 @@ namespace Assets.Scripts.Utils
 
                     ImgThumbnail.texture = www.texture;
                 }
-                catch (Exception ex)
+                catch
                 {
                     ImgThumbnail.texture = empty;
                 }

@@ -1,13 +1,19 @@
-﻿using System;
+﻿//=======================================================================
+//  ClassName : UiCanvasFront
+//  概要      : CanvasFrontより参照されている
+//
+//  LiplisLive2DSystem
+//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//=======================================================================﻿
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class UiCanvasFront : MonoBehaviour {
 
-    private bool FlgStart = false;
-
-
-	// Use this for initialization
+	/// <summary>
+    /// スタート時処理
+    /// </summary>
 	void Start () {
         //3.5秒後に実行する
         StartCoroutine(DelayMethod(1.0f, () =>
@@ -29,7 +35,9 @@ public class UiCanvasFront : MonoBehaviour {
         action();
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// 更新時処理
+    /// </summary>
     void Update () {
 
 	}

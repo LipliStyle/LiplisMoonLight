@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 224659297611392308}
   - component: {fileID: 222396556203260276}
   - component: {fileID: 114003719295517980}
+  - component: {fileID: 114288597266370780}
   m_Layer: 5
   m_Name: PrefabNewsPanel
   m_TagString: Untagged
@@ -92,6 +93,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114288597266370780
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1646319483091148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9d5cfbe2d6d2148a0266d73958fccf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114486021035882364
 MonoBehaviour:
   m_ObjectHideFlags: 1

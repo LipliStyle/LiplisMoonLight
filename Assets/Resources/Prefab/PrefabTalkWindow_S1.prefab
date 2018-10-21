@@ -41,8 +41,8 @@ GameObject:
   - component: {fileID: 114858807785901348}
   - component: {fileID: 114058568628340492}
   - component: {fileID: 114413398180669128}
-  - component: {fileID: 114903931110276932}
-  - component: {fileID: 114309464418663646}
+  - component: {fileID: 114052798070272348}
+  - component: {fileID: 114307448821509148}
   m_Layer: 5
   m_Name: PrefabTalkWindow_S1
   m_TagString: Untagged
@@ -50,6 +50,27 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &114052798070272348
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1509611095510216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dbdfcaf830b13448b07929d624f2e2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  alfa: 0
+  flgOn: 0
+  flgFadeTrans: 0
+  flgEnd: 0
+  FlgTalking: 0
+  _bubbleText: {fileID: 114898256866528418}
+  _maxImageWidth: 300
+  _maxImageHeight: 200
+  _printSpeed: 0.1
+  _isSayToClear: 0
 --- !u!114 &114058568628340492
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -69,7 +90,7 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &114309464418663646
+--- !u!114 &114307448821509148
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77,20 +98,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1509611095510216}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a9ed8acb4facc341a499c1d23e19165, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e9d5cfbe2d6d2148a0266d73958fccf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alfa: 0
-  flgOn: 0
-  flgFadeTrans: 0
-  flgEnd: 0
-  TargetModelName: 
-  FlgTalking: 0
-  _bubbleText: {fileID: 114898256866528418}
-  _maxImageWidth: 300
-  _maxImageHeight: 200
-  _printSpeed: 0.1
-  _isSayToClear: 0
 --- !u!114 &114404786606287770
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -177,17 +187,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _widthMargin: 40
   _heightMargin: 42
---- !u!114 &114903931110276932
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1509611095510216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 335a2de14e6b4e74f9c1fd7fd7f0b9f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!222 &222157600689359110
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -216,8 +215,8 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: -2.3326812, y: 1.4162709}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}

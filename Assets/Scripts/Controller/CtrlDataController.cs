@@ -7,8 +7,9 @@
 //　　　　　　　　　　　　　→開放処理をCtrlGameControllerに移動
 //
 //  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
+#pragma warning disable 649,414
 using Assets.Scripts.Data;
 using Assets.Scripts.Data.SubData;
 using Assets.Scripts.LiplisSystem.Cif.v60.Res;
@@ -207,11 +208,12 @@ public class CtrlDataController : ConcurrentBehaviour
     /// </summary>
     public void Load()
     {
-        //指定キー「LiplisStatus」でリプリスステータスのインスタンスをロードする
-        LiplisStatus.SetInstance(SaveData.GetClass<LiplisStatus>(LpsDefine.SETKEY_LIPLIS_STATUS, LiplisStatus.Instance));
+        //必ず設定ロードを先に呼ぶ！
+        //指定キー「LiplisStatus」でリプリスセッティングのインスタンスをロードする
+        LiplisSetting.SetInstance(SaveDataSetting.GetClass<LiplisSetting>(LpsDefine.SETKEY_LIPLIS_SETTING, LiplisSetting.Instance));
 
         //指定キー「LiplisStatus」でリプリスステータスのインスタンスをロードする
-        LiplisSetting.SetInstance(SaveDataSetting.GetClass<LiplisSetting>(LpsDefine.SETKEY_LIPLIS_SETTING, LiplisSetting.Instance));
+        LiplisStatus.SetInstance(SaveData.GetClass<LiplisStatus>(LpsDefine.SETKEY_LIPLIS_STATUS, LiplisStatus.Instance));
 
         //キャッシュインスタンス化
         LiplisCache c = LiplisCache.Instance;
@@ -437,29 +439,8 @@ public class CtrlDataController : ConcurrentBehaviour
         //トークインスタンス取得
         DatNewTopic NewTopic = LiplisStatus.Instance.NewTopic;
 
-        //最新ニュースデータ取得
-        IEnumerator Async;
-
-        //件数が少ない場合はライト版で取得する
-        if (NewTopic == null)
-        {
-            NewTopic = new DatNewTopic();
-            NewTopic.LastData = new ResLpsTopicList();
-            Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
-        }
-        else if (NewTopic.LastData == null)
-        {
-            NewTopic.LastData = new ResLpsTopicList();
-            Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
-        }
-        else if (NewTopic.TalkTopicList.Count <= 25)
-        {
-            Async = ClalisForLiplisGetNewTopicMlLight.GetNewTopic();
-        }
-        else
-        {
-            Async = ClalisForLiplisGetNewTopicMl.GetNewTopic();
-        }
+        //アシンク取得
+        IEnumerator Async = DownloadData(NewTopic);
 
         //非同期実行
         yield return Async;
@@ -520,6 +501,36 @@ public class CtrlDataController : ConcurrentBehaviour
         //終了にする
         FlgRunSetLastTopicMltData = false;
     }
+
+    private IEnumerator DownloadData(DatNewTopic NewTopic)
+    {
+        //最新ニュースデータ取得
+        IEnumerator Async;
+
+        //件数が少ない場合はライト版で取得する
+        if (NewTopic == null)
+        {
+            NewTopic = new DatNewTopic();
+            NewTopic.LastData = new ResLpsTopicList();
+            Async = ClalisForLiplisGetNewTopic2MltLight.GetNewTopic(new List<string>());
+        }
+        else if (NewTopic.LastData == null)
+        {
+            NewTopic.LastData = new ResLpsTopicList();
+            Async = ClalisForLiplisGetNewTopic2MltLight.GetNewTopic(new List<string>());
+        }
+        else if (NewTopic.TalkTopicList.Count <= 25)
+        {
+            Async = ClalisForLiplisGetNewTopic2MltLight.GetNewTopic(new List<string>());
+        }
+        else
+        {
+            Async = ClalisForLiplisGetNewTopic2Mlt.GetNewTopic(new List<string>());
+        }
+
+        return Async;
+    }
+
 
     /// <summary>
     /// 古いデータを削除する

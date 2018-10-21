@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿//=======================================================================
+//  ClassName : ContentCategoly
+//  概要      : コンテンツカテゴリ
+//
+//  LiplisLive2D
+//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//=======================================================================﻿
 namespace Assets.Scripts.Define
 {
 

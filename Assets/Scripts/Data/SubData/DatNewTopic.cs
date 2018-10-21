@@ -8,7 +8,9 @@
 //====================================================================
 using Assets.Scripts.LiplisSystem.Cif.v60.Res;
 using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.LiplisSystem.Model;
 using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -77,14 +79,16 @@ namespace Assets.Scripts.Data.SubData
         /// トピックリストからデータを取得する
         /// </summary>
         /// <returns></returns>
-        public MsgTopic TopicListDequeue()
+        public MsgTopic TopicListDequeue(List<LiplisModel> ModelList)
         {
-            return TopicListDequeue(0);
+            return TopicListDequeue(ModelList, 0);
         }
-        public MsgTopic TopicListDequeue(int retryCnt)
+        public MsgTopic TopicListDequeue(List<LiplisModel> ModelList, int retryCnt)
         {
             //次の話題をロードする
             MsgTopic result = LiplisStatus.Instance.NewTopic.TalkTopicList.Dequeue();
+
+            TopicUtil.SetAllocationIdAndTone(result, ModelList);
 
             //現在ロード中の話題をおしゃべり済みに入れる
             if (!result.FlgNotAddChatted)
@@ -107,7 +111,7 @@ namespace Assets.Scripts.Data.SubData
                 else
                 {
                     retryCnt++;
-                    return TopicListDequeue(retryCnt);
+                    return TopicListDequeue(ModelList, retryCnt);
                 }
 
             }
@@ -157,28 +161,41 @@ namespace Assets.Scripts.Data.SubData
         /// </summary>
         /// <param name="DataKey"></param>
         /// <returns></returns>
-        public MsgTopic SearchTopic(string DataKey)
+        public MsgTopic SearchTopic(string DataKey, List<LiplisModel> ModelList)
         {
+            MsgTopic result = null;
+
             //トピックリストから検索。あればトピックリストから返す
             foreach (var topic in TalkTopicList)
             {
                 if(topic.DataKey == DataKey)
                 {
-                    return TopicListDequeueTargetTopic(topic);
+                    result = TopicListDequeueTargetTopic(topic);
+                    break;
                 }
             }
 
             //おしゃべり済みデータから検索
-            foreach (var topic in ChattedKeyList)
+            if(result == null)
             {
-                if (topic.DataKey == DataKey)
+                foreach (var topic in ChattedKeyList)
                 {
-                    return topic.Clone();
+                    if (topic.DataKey == DataKey)
+                    {
+                        result = topic.Clone();
+                        break;
+                    }
                 }
             }
 
+            //アロケーションID設定
+            if(result != null)
+            {
+                TopicUtil.SetAllocationIdAndTone(result, ModelList);
+            }
+            
             //見つからない場合はNULLを返す
-            return null;
+            return result;
         }
 
         /// <summary>

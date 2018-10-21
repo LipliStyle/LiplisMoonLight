@@ -80,7 +80,7 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis.v60
         /// </summary>
         /// <param name="NowLoadTopic"></param>
         /// <returns></returns>
-        public static IEnumerator SetVoiceDataStart(MsgTopic NowLoadTopic)
+        public static IEnumerator SetVoiceDataStart(MsgTopic NowLoadTopic, int ModelCount)
         {
             if (NowLoadTopic.TalkSentenceList.Count < 1)
             {
@@ -92,7 +92,7 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis.v60
             {
                 //すでにデータがあれば何もしない
             }
-            else if (NowLoadTopic.TalkSentenceList[0].AllocationId < 0 || NowLoadTopic.TalkSentenceList[0].AllocationId > 3)
+            else if (NowLoadTopic.TalkSentenceList[0].AllocationId < 0 || NowLoadTopic.TalkSentenceList[0].AllocationId >= ModelCount)
             {
                 //何もしない
             }

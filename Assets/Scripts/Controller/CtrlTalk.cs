@@ -345,8 +345,6 @@ public class CtrlTalk : ConcurrentBehaviour
                 SkipWindow();
             }
 
-
-
             //音声再生完了待ち
             if (modelController.IsPlaying())
             {
@@ -633,6 +631,10 @@ public class CtrlTalk : ConcurrentBehaviour
     {
         try
         {
+            //音声ストップ
+            modelController.StopVoiceAll();
+
+
             //バカよけ
             if (NowLoadTopic.TalkSentenceList.Count < 1)
             {
@@ -825,16 +827,13 @@ public class CtrlTalk : ConcurrentBehaviour
     /// <summary>
     /// 割り込み話題話題設定の終了処理
     /// </summary>
-    private IEnumerator SetToipcEndInterrupt()
+    private void SetToipcEndInterrupt()
     {
         //なうセンテンスカウントの初期化
         initNowSentenceCount();
 
         //キャラクター位置移動
         modelController.ShuffleCharPosition(this.NowLoadTopic);
-
-        //音声ダウンロード開始
-        yield return StartCoroutine(SetVoiceDataInterrupt());
 
         //タイトルウインドウをセットする
         SetTitleWindow();
@@ -870,7 +869,7 @@ public class CtrlTalk : ConcurrentBehaviour
         StartCoroutine(NewsLog.AddLog(this.NowLoadTopic.Clone()));
 
         //話題のセット、移動
-        StartCoroutine(SetToipcEndInterrupt());
+        SetToipcEndInterrupt();
     }
 
 
@@ -1223,57 +1222,7 @@ public class CtrlTalk : ConcurrentBehaviour
         sentence.VoiceData = (AudioClip)Async.Current;
     }
 
-
-    /// <summary>
-    /// ボイスデータを設定する
-    /// </summary>
-    public IEnumerator SetVoiceDataInterrupt()
-    {
-        //音声おしゃべり設定がONなら、音声おしゃべりする
-        if (LiplisSetting.Instance.Setting.FlgVoice)
-        {
-            //初期データをセット
-            yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
-
-            //以降は順次セット
-            SetVoiceDataInterrupt(this.NowLoadTopic);
-        }
-    }
-
-    /// <summary>
-    /// ボイスデータを取得する
-    /// </summary>
-    /// <param name="NowLoadTopic"></param>
-    /// <returns></returns>
-    public void SetVoiceDataInterrupt(MsgTopic NowLoadTopic)
-    {
-        foreach (MsgSentence sentence in NowLoadTopic.TalkSentenceList)
-        {
-            //センテンス状態チェック
-            if (sentence.VoiceData != null)
-            {
-                //すでにデータがあれば何もしない
-            }
-            else if (sentence.AllocationId < 0 || sentence.AllocationId >= modelController.GetModelCount())
-            {
-                //何もしない
-            }
-            else
-            {
-                StartCoroutine(SetVoiceDataInterrupt(sentence));
-            }
-        }
-    }
-    public IEnumerator SetVoiceDataInterrupt(MsgSentence sentence)
-    {
-        var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence, modelController.GetModelCount());
-
-        //非同期実行
-        yield return Async;
-
-        //データ取得
-        sentence.VoiceData = (AudioClip)Async.Current;
-    }
+    
     #endregion
 
     //====================================================================

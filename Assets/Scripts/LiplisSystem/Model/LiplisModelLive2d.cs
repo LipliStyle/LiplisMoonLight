@@ -625,6 +625,24 @@ namespace Assets.Scripts.LiplisSystem.Model
             Audio.spatialBlend = 0;
             Audio.Play();
         }
+
+        /// <summary>
+        /// 音声おしゃべりを停止する
+        /// </summary>
+        public void StopVoice()
+        {
+            if (Audio == null)
+            {
+                Debug.Log("オーディオがNULL！");
+                return;
+            }
+            Audio.Stop();
+
+            Audio.clip = null;
+        }
+
+
+
         #endregion
 
         //====================================================================

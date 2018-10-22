@@ -705,6 +705,30 @@ namespace Assets.Scripts.LiplisSystem.Model
             }
         }
 
+        /// <summary>
+        /// 音声おしゃべりを開始する
+        /// </summary>
+        /// <param name="acVoice"></param>
+        public void StartVoice(AudioClip acVoice)
+        {
+            //音声を停止する
+            StopVoice();
+
+            //音声おしゃべりを開始する
+            ActiveModel.StartVoice(acVoice);
+        }
+
+        /// <summary>
+        /// 音声おしゃべりを停止する
+        /// </summary>
+        public void StopVoice()
+        {
+            foreach (var model in ModelList)
+            {
+                model.StopVoice();
+            }
+        }
+
         #endregion
 
         //====================================================================
@@ -998,9 +1022,6 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 WindowTalkListQ.Dequeue().CloseWindow();
             }
-
-
-            //LiplisStatus.Instance.CharDataList.DestroyAllWindow();
         }
         #endregion
 

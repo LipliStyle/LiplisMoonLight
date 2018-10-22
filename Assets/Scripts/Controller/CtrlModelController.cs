@@ -718,7 +718,18 @@ namespace Assets.Scripts.Controller
         /// <param name="acVoice"></param>
         public void StartVoice(int AllocationId, AudioClip acVoice)
         {
-            TableModelId[AllocationId].ActiveModel.StartVoice(acVoice);
+            TableModelId[AllocationId].StartVoice(acVoice);
+        }
+
+        /// <summary>
+        /// 音声停止
+        /// </summary>
+        public void StopVoiceAll()
+        {
+            foreach (var model in ModelList)
+            {
+                model.StopVoice();
+            }
         }
 
         /// <summary>

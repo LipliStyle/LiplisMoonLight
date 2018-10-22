@@ -111,6 +111,11 @@ namespace Assets.Scripts.LiplisSystem.Model
         void StartVoice(AudioClip acVoice);
 
         /// <summary>
+        /// 音声おしゃべりを停止する
+        /// </summary>
+        void StopVoice();
+
+        /// <summary>
         /// 再生中かどうかを返す
         /// true:再生中
         /// </summary>

@@ -15,12 +15,12 @@ public class UiCanvasFront : MonoBehaviour {
     /// スタート時処理
     /// </summary>
 	void Start () {
-        //3.5秒後に実行する
-        StartCoroutine(DelayMethod(1.0f, () =>
-        {
-            //あいさつ実行
-            CtrlTalk.Instance.Greet();                       
-        }));
+        ////3.5秒後に実行する
+        //StartCoroutine(DelayMethod(1.0f, () =>
+        //{
+        //    //あいさつ実行
+        //    CtrlTalk.Instance.Greet();                       
+        //}));
     }
 
     /// <summary>

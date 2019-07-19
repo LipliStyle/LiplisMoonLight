@@ -20,7 +20,7 @@ namespace Assets.Scripts.Data
     {
         #region Fields
 
-        private string path;
+        protected string path;
         //保存先
         public string Path
         {
@@ -28,7 +28,7 @@ namespace Assets.Scripts.Data
             set { path = value; }
         }
 
-        private string fileName;
+        protected string fileName;
         //ファイル名
         public string FileName
         {
@@ -36,7 +36,7 @@ namespace Assets.Scripts.Data
             set { fileName = value; }
         }
 
-        private Dictionary<string, string> saveDictionary;
+        protected Dictionary<string, string> saveDictionary;
         //keyとjson文字列を格納
 
         #endregion
@@ -186,7 +186,7 @@ namespace Assets.Scripts.Data
             return saveDictionary.Keys.ToList<string>();
         }
 
-        public void Save()
+        public virtual void Save()
         {
             using (StreamWriter writer = new StreamWriter(path + fileName, false, Encoding.GetEncoding("utf-8")))
             {
@@ -197,7 +197,7 @@ namespace Assets.Scripts.Data
             }
         }
 
-        public void Load()
+        public virtual void Load()
         {
             try
             {
@@ -228,7 +228,6 @@ namespace Assets.Scripts.Data
                 Debug.Log("SaveData:Load");
                 Debug.Log(ex);
             }
-
         }
 
         public string GetJsonString(string key)

@@ -6,28 +6,32 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
+using System;
 using System.Collections.Generic;
 
 namespace Assets.Scripts.LiplisSystem.Model.Json
 {
+    [Serializable]
     public class LiplisChatSetting
     {
-        public List<ChatSetting> ChatList { get; set; }
+        public List<ChatSetting> ChatList;
 
         public LiplisChatSetting()
         {
             ChatList = new List<ChatSetting>();
         }
     }
+
+    [Serializable]
     public class ChatSetting
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public string type { get; set; }
-        public string sentence { get; set; }
-        public string emotion { get; set; }
-        public string rangeStart { get; set; }
-        public string rangeEnd { get; set; }
+        public int id;
+        public string name;
+        public string type;
+        public string sentence;
+        public string emotion;
+        public string rangeStart;
+        public string rangeEnd;
 
         /// <summary>
         /// エモーションを取得する

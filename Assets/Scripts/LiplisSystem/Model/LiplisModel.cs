@@ -8,6 +8,7 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
+using Assets.Scripts.Data;
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Model.Event;
@@ -47,7 +48,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         //制御プロパティ
         public int AllocationId;                    //割当ID
         public IfsLiplisModel ActiveModel;          //現在ロード中のモデル
-        public MST_CARACTER_POSITION Position;      //現在のモデルの配置
+        public Int32 Position;                      //現在のモデルの配置
         public float LocationY;                     //モデルのY座標(上面からの距離。ポジションが入れ替わった場合に、高さを保持するためのプロパティ)
         public Vector3 ModelLocation;               //モデルの位置
         int SortOrder = 0;                          //ソートオーダー　※この値は超重要。適切に設定しないと負荷が増大する。
@@ -79,15 +80,23 @@ namespace Assets.Scripts.LiplisSystem.Model
         public GameObject ImageInstanceLogWindowR;
 
         //=============================
+        //グループモデル数
+        private int ModelNum;
+
+        //=============================
         //必須イベント
         public ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip { get; set; }  //スキップコールバック
 
-        //====================================================================
-        //
-        //                             初期化処理
-        //                         
-        //====================================================================
-        #region 初期化処理
+        //=============================
+        //モデル位置
+        public const int MODEL_POS_RIGHT = 0;
+        public int MODEL_POS_LEFT { get { return this.ModelNum - 1; } }
+//====================================================================
+//
+//                             初期化処理
+//                         
+//====================================================================
+#region 初期化処理
 
         /// <summary>
         /// ファイルロード コンストラクター
@@ -96,7 +105,8 @@ namespace Assets.Scripts.LiplisSystem.Model
             GameObject CanvasRendering,
             string ModelPath, 
             ModelEvents.
-            OnNextTalkOrSkip CallbackOnNextTalkOrSkip)
+            OnNextTalkOrSkip CallbackOnNextTalkOrSkip,
+            int ModelNum)
         {
             //アロケーションID設定
             this.AllocationId = AllocationId;
@@ -109,6 +119,9 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //コールバックメソッドの設定
             this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
+
+            //モデル数セット
+            this.ModelNum = ModelNum;
 
             //モデル設定を読み込み
             LoadModelSetting(ModelPath);
@@ -147,13 +160,14 @@ namespace Assets.Scripts.LiplisSystem.Model
             LiplisChatSetting chatSetting, 
             Texture2D TextureWindow,
             Texture2D TextureLogWindow,
-            Texture2D TextureCharIcon)
+            Texture2D TextureCharIcon,
+            int ModelNum)
         {
             //アロケーションID設定
             this.AllocationId = AllocationId;
 
             //ソートオーダーの設定
-            this.SortOrder = AllocationId * 10;
+            this.SortOrder = AllocationId * 10 + 100;
 
             //レンダリング階層取得
             this.CanvasRendering = CanvasRendering;
@@ -163,6 +177,10 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //コールバックメソッドの設定
             this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
+
+            //モデル数セット
+            this.ModelNum = ModelNum;
+
 
             //モデル設定
             this.modelSetting = modelSetting;
@@ -197,7 +215,7 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //アロケーションIDから、位置を設定する。
             //モデルを表示する前に特定。モデルの引数として必要。
-            SetPositionAndLocation();
+            InitPositionAndLocation();
 
             //モデルの読み込み
             LoadModel(flgResource);
@@ -316,7 +334,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             IfsLiplisModel model = new LiplisModelLive2d(this.ModelPath,
                 flgResource,
                 modelData,
-                modelSetting.Scale,
+                modelSetting.ModelScale,
                 CanvasRendering, 
                 ModelLocation, 
                 Expression,
@@ -406,36 +424,16 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// ポジション、ロケーション初期設定
         /// </summary>
-        private void SetPositionAndLocation()
+        private void InitPositionAndLocation()
         {
-            //位置を設定
-            if (this.AllocationId == 1)
-            {
-                //右に配置
-                Position = MST_CARACTER_POSITION.Right;
-            }
-            else if (this.AllocationId == 2)
-            {
-                //真ん中に配置
-                Position = MST_CARACTER_POSITION.Center;
-            }
-            else if (this.AllocationId == 3)
-            {
-                //左に配置
-                Position = MST_CARACTER_POSITION.Left;
-            }
-            else
-            {
-                //司会位置に設定
-                Position = MST_CARACTER_POSITION.Moderator;
-            }
+            //初期位置はアロケーションID = Positionとする。
+            Position = AllocationId;
 
             //デフォルトY座標設定
-            //this.LocationY = -2.05F;
-            this.LocationY = -90;
+            this.LocationY = modelSetting.ModelLocationY;
 
             //モデルロケーションの設定
-            this.ModelLocation = MODEL_POS.GetPosLive2d20(this.Position, this.LocationY);
+            this.ModelLocation = MODEL_POS.GetPosLive2d30(this.Position, this.LocationY, this.ModelNum);
         }
         #endregion
 
@@ -551,17 +549,20 @@ namespace Assets.Scripts.LiplisSystem.Model
             SetModelVisible();
         }
 
+
+
+
         /// <summary>
         /// 方向モデルを取得する
         /// </summary>
         /// <returns></returns>
-        public IfsLiplisModel GetDirectionModel(MST_CARACTER_POSITION Position)
+        public IfsLiplisModel GetDirectionModel(Int32 Position)
         {
             //候補リスト
             List<IfsLiplisModel> CandidateModelList = new List<IfsLiplisModel>();
 
             //設定されたポジションから変更可能な方向を判断する。
-            if (Position == MST_CARACTER_POSITION.Moderator)
+            if (Position == MODEL_POS_RIGHT)
             {
                 //最右端 左向き禁止
                 //変更候補検索
@@ -574,7 +575,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                     }
                 }
             }
-            else if (Position == MST_CARACTER_POSITION.Left)
+            else if (Position == MODEL_POS_LEFT)
             {
                 //最左端 右向き禁止
                 //変更候補検索
@@ -661,7 +662,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         public void MoveTarget()
         {
-            ModelLocation = MODEL_POS.GetPosLive2d20(this.Position,this.LocationY);
+            ModelLocation = MODEL_POS.GetPosLive2d30(this.Position,this.LocationY,this.ModelNum);
 
             MoveTarget(ModelLocation);
         }
@@ -728,6 +729,8 @@ namespace Assets.Scripts.LiplisSystem.Model
                 model.StopVoice();
             }
         }
+
+        
 
         #endregion
 
@@ -810,7 +813,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 window.transform.SetParent(CanvasRendering.transform, false);
 
                 //位置設定
-                window.transform.localPosition = WINDOW_POS.GetPos(ModelLocation);
+                window.transform.localPosition = WINDOW_POS.GetPos(ModelLocation,modelSetting.SpeechBallonLocationY);
 
                 //サイズ変更
                 RectTransform windowRect = window.GetComponent<RectTransform>();
@@ -895,7 +898,6 @@ namespace Assets.Scripts.LiplisSystem.Model
 
                 float height = NowTalkWindow.ParentWindow.GetComponent<RectTransform>().sizeDelta.y;
 
-
                 //ウインドウ移動量設定
                 SlideWindow(talkWindow);
             }
@@ -974,7 +976,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 {
                     TalkWindow talkWindow = WindowTalkListQ.Dequeue();
 
-                    if (WindowTalkListQ.Count > 2)
+                    if (WindowTalkListQ.Count >= LiplisSetting.Instance.Setting.GetSpeechBallonNum())
                     {
                         talkWindow.CloseWindow();
                     }

@@ -6,7 +6,8 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
-using Newtonsoft.Json;
+using LiplisMoonlight;
+using System;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -23,7 +24,11 @@ namespace Assets.Scripts.LiplisSystem.Model.Priset
         /// <returns></returns>
         public static T LoadClassFromJson<T>(string pathResources)
         {
-            return JsonConvert.DeserializeObject<T>(LoadText(pathResources));
+            string json = LoadText(pathResources);
+
+            return JsonUtility.FromJson<T>(json);
+
+            //return JsonConvert.DeserializeObject<T>(LoadText(pathResources));
         }
 
         /// <summary>
@@ -46,6 +51,9 @@ namespace Assets.Scripts.LiplisSystem.Model.Priset
         /// <returns></returns>
         public static string LoadText(string filePath)
         {
+#if UNITY_IPHONE
+            return File.ReadAllText(filePath, Encoding.UTF8);
+#else
             if (filePath.Contains(":/"))
             {
                 WWW www = new WWW(filePath);
@@ -60,6 +68,7 @@ namespace Assets.Scripts.LiplisSystem.Model.Priset
             {
                 return File.ReadAllText(filePath, Encoding.UTF8);
             }
+#endif
         }
 
         /// <summary>

@@ -37,6 +37,15 @@ namespace Assets.Scripts.Controller.UiController.TopicListController
         // サムネイルロードフラグ
         public bool FlgThumbnailLoadRequest =false;
 
+        //=====================================
+        // トピックパネルサイズ
+        //プレファブのサイズと合わせる。
+        //現在使用中のプレファブは「PrefabNewsPanel_v2」
+        public const float TOPIC_PANEL_SIZE_H = 150f;   //トピックパネル高さ TabBaseTopicList.CreateRowPanelで設定している。プレファブの高さと合わせる。
+        public const float TOPIC_PANEL_SIZE_W = 425f;   //トピックパネル高さ TabBaseTopicList.CreateRowPanelで設定している。プレファブの幅と合わせる。
+        public const float TOPIC_PANEL_ROWS = 66f;      //行数 行数。最終行までスクロールしたときにちょうどよく止まる位置を調整する。
+        public const float TOPIC_PANEL_COLS = 3f;       //列数 スクロールビューのContentに並べるパネルの個数
+
         //====================================================================
         //
         //                           初期化処理
@@ -69,7 +78,7 @@ namespace Assets.Scripts.Controller.UiController.TopicListController
             rectTransform.anchoredPosition = Vector2.zero;
             rectTransform.offsetMax = Vector2.zero;
             rectTransform.offsetMin = new Vector2(offsetY, 0);
-            rectTransform.sizeDelta = new Vector2(480, 0);
+            rectTransform.sizeDelta = new Vector2(TOPIC_PANEL_SIZE_W, 0);
 
             //サムネインスタンス取得
             this.Thumbnail = Panel.transform.Find("Image").GetComponent<Image>();

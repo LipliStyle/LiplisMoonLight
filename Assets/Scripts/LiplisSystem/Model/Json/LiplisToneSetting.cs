@@ -6,13 +6,15 @@
 //  LiplisLive2D
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //====================================================================
+using System;
 using System.Collections.Generic;
 
 namespace Assets.Scripts.LiplisSystem.Model.Json
 {
+    [Serializable]
     public class LiplisToneSetting
     {
-        public List<ToneSetting> ToneList { get; set; }
+        public List<ToneSetting> ToneList;
 
         public LiplisToneSetting()
         {
@@ -20,14 +22,15 @@ namespace Assets.Scripts.LiplisSystem.Model.Json
         }
     }
 
+    [Serializable]
     public class ToneSetting
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public string sentence { get; set; }
-        public string befor { get; set; }
-        public string after { get; set; }
-        public string type { get; set; }
+        public int id;
+        public string name;
+        public string sentence;
+        public string befor;
+        public string after;
+        public string type;
     }
 
 }

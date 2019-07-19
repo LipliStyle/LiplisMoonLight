@@ -53,44 +53,44 @@ public class CtrlBackGroundImage : ConcurrentBehaviour
 		base.Awake();
 	}
 
-	// Use this for initialization
-	void Start () {
-		//1回実行しておく
-		//StartCoroutine(CheckChangeTimeCode());
+    // Use this for initialization
+    void Start()
+    {
+        //1回実行しておく
+        //StartCoroutine(CheckChangeTimeCode());
 
-		//定周期ループスタート
-		StartCoroutine(UpdateTimerTick());
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        //定周期ループスタート
+        StartCoroutine(UpdateTimerTick());
+    }
 
-	}
+    // Update is called once per frame
+    void Update()
+    {
 
-	/// <summary>
-	/// データ収集ループ　
-	/// TIME_OUTに設定した周期で回る
-	/// </summary>
-	/// <returns></returns>
-	IEnumerator UpdateTimerTick()
-	{
-		while (true)
-		{
-			//データ収集処理
-			yield return StartCoroutine(CheckChangeTimeCode());
+    }
 
-			//非同期待機
-			yield return new WaitForSeconds(TIME_OUT);
-		}
-	}
+    /// <summary>
+    /// データ収集ループ　
+    /// TIME_OUTに設定した周期で回る
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator UpdateTimerTick()
+    {
+        while (true)
+        {
+            //データ収集処理
+            yield return StartCoroutine(CheckChangeTimeCode());
+
+            //非同期待機
+            yield return new WaitForSeconds(TIME_OUT);
+        }
+    }
 
 	/// <summary>
 	/// タイムコード更新チェック
 	/// </summary>
 	IEnumerator CheckChangeTimeCode()
 	{
-
-
 		//タイムコードを取得する
 		int nowTimeCode = GetTimeCode(DateTime.Now);
 		string nowWetherCode = GetWetherCode();

@@ -37,7 +37,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         //モデルオブジェクト
         public GameObject ModelObject { get; set; }
         public CubismModel model { get; set; }
-        public float ScalseMagnification { get; set; }
+        public float ModelScale { get; set; }
 
         //=============================
         //アタッチオブジェクト
@@ -59,8 +59,18 @@ namespace Assets.Scripts.LiplisSystem.Model
         public Dictionary<int, List<string>> TableExpression;
 
         //=============================
-        //表情オブジェクト
+        //方向オブジェクト
+        MODELE_DIRECTION NowDirection;
+        CubismParameter PramAngleX;
+        CubismParameter ParamBodyAngleX;
 
+        //=============================
+        //方向定義
+        private const float PARAM_ANGLE_LEFT = 30;
+        private const float PARAM_ANGLE_RIGTH = -30;
+        private const float PARAM_BODY_ANGLE_LEFT = 10;
+        private const float PARAM_BODY_ANGLE_RIGTH = -10;
+        private const float PARAM_NEWTRAL = 0;
 
         ///=============================
         ///透明度
@@ -88,7 +98,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         public LiplisModelLive2d(string modelPath,          //モデルパス
                                 bool flgResource,
                                 LiplisModelData modelData,  //モデルデータ
-                                float ScalseMagnification,
+                                float ModelScale,
                                 GameObject CanvasRendering, //親キャンバス
                                 Vector3 targetPosition,     //ターゲット座標
                                 MsgExpression Expression,   //表情データ
@@ -101,7 +111,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.Direction = modelData.Direction;
             this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
             this.flgResource = flgResource;
-            this.ScalseMagnification = ScalseMagnification;
+            this.ModelScale = ModelScale;
 
             //モデルのロード
             LoadModel(modelPath, modelData.FileName, targetPosition);
@@ -167,11 +177,34 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モーションのロード
             LoadMotion(this.model, modelPath);
 
+            //方向パラメータの取得
+            SetDirectionParam();
+
             //口パクを初期化
             StopTalking();
 
             //ドラッグオブジェクトのセット
             SetDragObject();
+        }
+
+        /// <summary>
+        /// 方向パラメータを取得する
+        /// </summary>
+        private void SetDirectionParam()
+        {
+            PramAngleX = model.Parameters.FindById("ParamAngleX");
+            ParamBodyAngleX = model.Parameters.FindById("ParamBodyAngleX");
+
+            //NULLなら休パラメータを読んでみる
+            if (PramAngleX == null)
+            {
+                PramAngleX = model.Parameters.FindById("PARAM_ANGLE_X");
+            }
+
+            if (ParamBodyAngleX == null)
+            {
+                ParamBodyAngleX = model.Parameters.FindById("PARAM_BODY_ANGLE_X");
+            }
         }
 
         /// <summary>
@@ -181,7 +214,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         {
             //ドラッグドロップアタッチ
             this.model.gameObject.AddComponent<CapsuleCollider>();
-            this.model.gameObject.AddComponent<DragGameObject>();
+            this.model.gameObject.AddComponent<DragGameObjectLive2d>();
         }
 
         /// <summary>
@@ -286,7 +319,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             foreach (CubismDrawable drawable in drawables)
             {
                 //当たり判定の範囲であれば、アタッチ
-                if(drawable.name.StartsWith("D_REF"))
+                if (drawable.name.StartsWith("D_REF"))
                 {
                     //レイキャストエイブルをアッドコンポーネント
                     drawable.gameObject.AddComponent<CubismRaycastable>();
@@ -299,7 +332,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         private void SetScale()
         {
-            this.SetScale(new Vector3(200f * ScalseMagnification, 200f * ScalseMagnification, 200f));
+            this.SetScale(new Vector3(ModelScale, ModelScale, ModelScale));
         }
 
         /// <summary>
@@ -314,7 +347,6 @@ namespace Assets.Scripts.LiplisSystem.Model
         }
 
         #endregion
-
 
         //====================================================================
         //
@@ -333,7 +365,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             try
             {
                 //キーチェック
-                if(!TableMotion.ContainsKey((int)MotionCode))
+                if (!TableMotion.ContainsKey((int)MotionCode))
                 {
                     Debug.Log("GetMotionNameTargetMotionRndam 存在なし:" + MotionCode);
 
@@ -446,19 +478,19 @@ namespace Assets.Scripts.LiplisSystem.Model
             string motionName = GetMotionNameTargetMotionRndam(ExpressionCode);
 
             //取得モーションがNULLでなければ実行する。
-            if(motionName != null)
+            if (motionName != null)
             {
                 //モーション実行
                 Animator.Play(motionName);
+                Animator.Blend(GetExpressionNameTargetMotionRndam(ExpressionCode));
 
                 //モーション完了待ち
                 yield return new WaitForSeconds(Animator.GetClip(motionName).length);
 
                 //パラメーター初期化
-                InitParamator();
+                //InitParamator();
 
                 //表情とアイドル設定
-                Animator.Blend(GetExpressionNameTargetMotionRndam(ExpressionCode));
                 Animator.Blend(GetMotionNameTargetIdleMotionRndam());
 
             }
@@ -477,21 +509,14 @@ namespace Assets.Scripts.LiplisSystem.Model
             }
 
         }
-        
+
         /// <summary>
         /// 本インスタンスからセットエクスプレッションを呼ぶための目セッド
         /// </summary>
         /// <param name="ExpressionCode"></param>
         public void SetExpressionLocal(MOTION ExpressionCode)
         {
-            GameObject obj = new GameObject();     // コルーチン実行用オブジェクト作成
-            obj.name = "GlobalCoroutine";
-
-            GlobalCoroutine component = obj.AddComponent<GlobalCoroutine>();
-            if (component != null)
-            {
-                component.StartCoroutine(SetExpression(ExpressionCode));
-            }
+            GlobalCoroutine.Go(SetExpression(ExpressionCode));
         }
 
 
@@ -503,7 +528,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             if (this.LipSync == null)
             {
                 return;
-            }          
+            }
 
             this.LipSync.LipSyncOn();
         }
@@ -513,7 +538,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         public void StopTalking()
         {
-            if(this.LipSync == null)
+            if (this.LipSync == null)
             {
                 return;
             }
@@ -594,7 +619,7 @@ namespace Assets.Scripts.LiplisSystem.Model
             {
                 string motionName = GetMotionNameTargetMotionRndam(MotionCode);
 
-                if(motionName == null)
+                if (motionName == null)
                 {
                     return;
                 }
@@ -602,7 +627,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //Animator.Stop();
                 Animator.Play(motionName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.Log(ex);
             }
@@ -641,7 +666,14 @@ namespace Assets.Scripts.LiplisSystem.Model
             Audio.clip = null;
         }
 
-
+        /// <summary>
+        /// 方向変換
+        /// </summary>
+        /// <param name="Direction"></param>
+        public void ChengeDirection(MODELE_DIRECTION Direction)
+        {
+            this.NowDirection = Direction;
+        }
 
         #endregion
 
@@ -667,6 +699,9 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //透明度の調整
             OnRenderObjectOpacity();
+
+            //方向のセット
+            SetDirection();
         }
 
         /// <summary>
@@ -721,18 +756,18 @@ namespace Assets.Scripts.LiplisSystem.Model
             var hitCount = this.RayCaster.Raycast(ray, results);
 
             //あたってなければ抜ける
-            if(hitCount < 1)
+            if (hitCount < 1)
             {
                 return;
             }
 
             //当たり判定結果
-            int hitTestResult = 0; 
+            int hitTestResult = 0;
 
             //判定結果を走査
             foreach (CubismRaycastHit result in results)
             {
-                if(result.Drawable == null)
+                if (result.Drawable == null)
                 {
                     continue;
                 }
@@ -755,7 +790,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 }
             }
 
-            if(hitTestResult == 1)
+            if (hitTestResult == 1)
             {
                 //次の話題
                 CallbackOnNextTalkOrSkip();
@@ -771,6 +806,36 @@ namespace Assets.Scripts.LiplisSystem.Model
                 CallbackOnNextTalkOrSkip();
             }
         }
+
+        /// <summary>
+        /// 方向をセットする。
+        /// </summary>
+        private void SetDirection()
+        {
+            //いずれかの方向がNULLなら
+            if (PramAngleX == null || ParamBodyAngleX == null)
+            {
+                return;
+            }
+
+            if (this.NowDirection == MODELE_DIRECTION.LEFT)
+            {
+                PramAngleX.Value = PARAM_ANGLE_LEFT;
+                ParamBodyAngleX.Value = PARAM_BODY_ANGLE_LEFT;
+            }
+            else if (this.NowDirection == MODELE_DIRECTION.RIGNT)
+            {
+                PramAngleX.Value = PARAM_ANGLE_RIGTH;
+                ParamBodyAngleX.Value = PARAM_BODY_ANGLE_RIGTH;
+            }
+            else
+            {
+                PramAngleX.Value = PARAM_NEWTRAL;
+                ParamBodyAngleX.Value = PARAM_NEWTRAL;
+            }
+        }
+
+
         #endregion
     }
 }

@@ -23,7 +23,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// モデルオブジェクト
         /// </summary>
-        GameObject ModelObject{get;set;}
+        GameObject ModelObject { get; set; }
 
         /// <summary>
         /// 向き
@@ -132,6 +132,13 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         /// <param name="MotionCode"></param>
         void StartRandomMotion(MOTION MotionCode);
+
+
+        /// <summary>
+        /// モーションをセットする
+        /// </summary>
+        /// <param name="MotionCode"></param>
+        void ChengeDirection(MODELE_DIRECTION Direction);
         #endregion
 
         //====================================================================

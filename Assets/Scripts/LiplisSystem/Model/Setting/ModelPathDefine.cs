@@ -28,14 +28,5 @@ namespace Assets.Scripts.LiplisSystem.Model.Setting
         public const string IMG_WINDOW          = "/LiplisTalkWindow.png";
         public const string IMG_WINDOW_LOG      = "/LiplisTalkWindowLog.png";
         public const string IMG_ICON_CHAR       = "/IconCharacter.png";
-
-
-        ///=============================
-        ///プリセットモデル定義
-        public const string PRISET_MODEL_SETTING_HAZUKI = "LiplisModelRabbits/Hazuki";
-        public const string PRISET_MODEL_SETTING_KUROHA = "LiplisModelRabbits/Kuroha";
-        public const string PRISET_MODEL_SETTING_SHIROHA = "LiplisModelRabbits/Shiroha";
-        public const string PRISET_MODEL_SETTING_MOMOHA = "LiplisModelRabbits/Momoha";
-
     }
 }

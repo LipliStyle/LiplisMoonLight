@@ -28,6 +28,9 @@ namespace Assets.Scripts.Data.SubData
         public float TalkSpeed;
         public int TalkNum;
         public int GraphicLevel;
+        public int DrawingFps;
+        public int SpeechBallonNum;
+        public int CharArrangement;
 
         ///=============================
         ///デバッグモード
@@ -50,28 +53,12 @@ namespace Assets.Scripts.Data.SubData
             this.TalkSpeed = 5.0f;
             this.TalkNum = 1;
             this.GraphicLevel = 1;
+            this.DrawingFps = 0;
+            this.SpeechBallonNum = 2;
+            this.CharArrangement = 0;
 
             this.FlgVoice = false;
             this.FlgDebug = false;
-        }
-
-        /// <summary>
-        /// モデルリスト初期化
-        /// 
-        /// ここで設定した順序は
-        /// LipliStyle.LiplisMoonLight.savedata_setting
-        /// に設定される。
-        /// 
-        /// 以後、保存されたデータが使用される。
-        /// </summary>
-        private void InitLstModelOnTheStage()
-        {
-            this.LstModelOnTheStage = new List<string>();
-
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.HAZUKI);   //葉月 アロケーションID 0
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.SHIROHA);  //白葉 アロケーションID 1
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.KUROHA);   //黒葉 アロケーションID 2 
-            this.LstModelOnTheStage.Add(LIPLIS_MODEL_RABBITS.MOMOHA);   //桃葉 アロケーションID 3
         }
 
         /// <summary>
@@ -177,24 +164,49 @@ namespace Assets.Scripts.Data.SubData
         }
 
         /// <summary>
-        /// 現在設定されているキャラクターリストを取得する
+        /// FPSを取得する
         /// </summary>
         /// <returns></returns>
-        public List<string> GetLstModelOnTheStage()
+        public int GetFps()
         {
-            //未初期化なら、初期化してから返す
-            if(this.LstModelOnTheStage == null)
+            if(this.DrawingFps == 0)
             {
-                InitLstModelOnTheStage();
+                return 60;
             }
-            else if(this.LstModelOnTheStage.Count ==0)
+            else if (this.DrawingFps == 1)
             {
-                InitLstModelOnTheStage();
+                return 30;
             }
-
-            return this.LstModelOnTheStage;
+            else
+            {
+                this.DrawingFps = 0;
+                return 60;
+            }
         }
 
-
+        /// <summary>
+        /// 吹き出し数を取得する
+        /// </summary>
+        /// <returns></returns>
+        public int GetSpeechBallonNum()
+        {
+            if (this.SpeechBallonNum == 0)
+            {
+                return 3;
+            }
+            else if (this.SpeechBallonNum == 1)
+            {
+                return 2;
+            }
+            else if (this.SpeechBallonNum == 2)
+            {
+                return 1;
+            }
+            else
+            {
+                this.SpeechBallonNum = 0;
+                return 3;
+            }
+        }
     }
 }

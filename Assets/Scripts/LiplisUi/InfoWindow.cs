@@ -5,7 +5,6 @@
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
 //=======================================================================﻿
-using Assets.Scripts.LiplisSystem.Web;
 using SpicyPixel.Threading;
 using System;
 using UnityEngine;

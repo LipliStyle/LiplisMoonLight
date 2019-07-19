@@ -8,7 +8,6 @@
 //====================================================================
 
 using Live2D.Cubism.Framework.Json;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Assets.Scripts.LiplisSystem.Model.Priset
@@ -26,7 +25,8 @@ namespace Assets.Scripts.LiplisSystem.Model.Priset
             TextAsset textasset = Resources.Load(pathResources) as TextAsset;
 
             //キュービズムJosnデシリアライズ
-            CubismMotion3Json model3Json = JsonConvert.DeserializeObject<CubismMotion3Json>(textasset.text);
+            //CubismMotion3Json model3Json = JsonConvert.DeserializeObject<CubismMotion3Json>(textasset.text);
+            CubismMotion3Json model3Json = JsonUtility.FromJson<CubismMotion3Json>(textasset.text);
 
             //アニメーションクリップを生成し、返す
             return model3Json.ToAnimationClip();

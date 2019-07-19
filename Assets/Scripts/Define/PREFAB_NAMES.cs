@@ -17,5 +17,6 @@ namespace Assets.Scripts.Define
         public const string WINDOW_LOG_CHAR_L1 = "Prefab/PrefabLogWindowL1";
         public const string WINDOW_LOG_CHAR_R1 = "Prefab/PrefabLogWindowR1";
         public const string WINDOW_NEWS_PANEL  = "Prefab/PrefabNewsPanel";
+        public const string WINDOW_NEWS_PANEL_v2 = "Prefab/PrefabNewsPanel_v2";
     }
 }

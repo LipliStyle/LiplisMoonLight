@@ -95,22 +95,39 @@ namespace Assets.Scripts.LiplisSystem.Model
                 return;
             }
 
-            //キーチェックし、追加
-            if (ToneDictionary.ContainsKey(befor))
+            foreach (var toneDef in toneDefinition)
             {
-                //トーン追加
-                this.ToneDictionary[befor].AddRange(toneDefinition);
-            }
-            else
-            {
-                //新規トーンデータ作成
-                List<ToneDefinition> toneList = new List<ToneDefinition>();
+                //修正ビフォー
+                string fixBefor = befor;
 
-                //トーン追加
-                toneList.AddRange(toneDefinition);
+                //終端置換の場合は、キーを置き換える
+                if (toneDef.Type == TONE_TYPE.END_CHINESE_CHARACTER ||
+                    toneDef.Type == TONE_TYPE.END_NUMBER ||
+                    toneDef.Type == TONE_TYPE.END_ALPHABET ||
+                    toneDef.Type == TONE_TYPE.END_SYMBOL ||
+                    toneDef.Type == TONE_TYPE.END_KATAKANA ||
+                    toneDef.Type == TONE_TYPE.END_HIRAGANA)
+                {
+                    fixBefor = toneDef.FixBefor;
+                }
 
-                //トーンディクショナリに新規登録
-                this.ToneDictionary.Add(befor, toneList);
+                //キーチェックし、追加
+                if (ToneDictionary.ContainsKey(fixBefor))
+                {
+                    //トーン追加
+                    this.ToneDictionary[fixBefor].AddRange(toneDefinition);
+                }
+                else
+                {
+                    //新規トーンデータ作成
+                    List<ToneDefinition> toneList = new List<ToneDefinition>();
+
+                    //トーン追加
+                    toneList.AddRange(toneDefinition);
+
+                    //トーンディクショナリに新規登録
+                    this.ToneDictionary.Add(fixBefor, toneList);
+                }
             }
         }
 
@@ -159,7 +176,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //終端文字の置き換え追加
                 string fixAfter = after + DOLL2;
 
-                resList.Add(new ToneDefinition(tType, befor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
+                resList.Add(new ToneDefinition(tType, fixBefor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
 
 
                 //終端漢字形容詞の正規表現追加
@@ -168,7 +185,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //終端文字の置き換え追加
                 string fixAfter2 = after + DOLL2;
 
-                resList.Add(new ToneDefinition(tType, befor, after, fixBefor2, fixAfter2, new Regex(fixBefor2, RegexOptions.Compiled)));
+                resList.Add(new ToneDefinition(tType, fixBefor2, after, fixBefor2, fixAfter2, new Regex(fixBefor2, RegexOptions.Compiled)));
             }
             else if (tType == TONE_TYPE.END_NUMBER)
             {
@@ -180,7 +197,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //終端文字の置き換え追加
                 string fixAfter = after + DOLL2;
 
-                resList.Add(new ToneDefinition(tType, befor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
+                resList.Add(new ToneDefinition(tType, fixBefor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
             }
             else if (tType == TONE_TYPE.END_ALPHABET)
             {
@@ -192,7 +209,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //終端文字の置き換え追加
                 string fixAfter = after + DOLL2;
 
-                resList.Add(new ToneDefinition(tType, befor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
+                resList.Add(new ToneDefinition(tType, fixBefor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
 
             }
             else if (tType == TONE_TYPE.END_SYMBOL)
@@ -205,7 +222,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //終端文字の置き換え追加
                 string fixAfter = after + DOLL2;
 
-                resList.Add(new ToneDefinition(tType, befor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
+                resList.Add(new ToneDefinition(tType, fixBefor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
 
             }
             else if (tType == TONE_TYPE.END_KATAKANA)
@@ -218,7 +235,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //終端文字の置き換え追加
                 string fixAfter = after + DOLL2;
 
-                resList.Add(new ToneDefinition(tType, befor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
+                resList.Add(new ToneDefinition(tType, fixBefor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
 
             }
             else if (tType == TONE_TYPE.END_HIRAGANA)
@@ -231,7 +248,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //終端文字の置き換え追加
                 string fixAfter = after + DOLL2;
 
-                resList.Add(new ToneDefinition(tType, befor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
+                resList.Add(new ToneDefinition(tType, fixBefor, after, fixBefor, fixAfter, new Regex(fixBefor, RegexOptions.Compiled)));
 
             }
 

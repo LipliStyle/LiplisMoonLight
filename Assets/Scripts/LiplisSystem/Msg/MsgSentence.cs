@@ -82,6 +82,12 @@ namespace Assets.Scripts.LiplisSystem.Msg
         {
             try
             {
+                //トーンコンバーターがNULLの場合はエラー回避
+                if (this.Tone == null)
+                {
+                    this.TalkSentence = this.BaseSentence;
+                }
+
                 //スキップフラグがOFFでかつ未コンバートの場合 
                 //必ずコンバート処理するように変更。理由は、アロケーションIDが変更されている可能性があるから。
                 //if (!FlgToneConvertSkip && (this.TalkSentence == null || this.TalkSentence == ""))
@@ -103,6 +109,7 @@ namespace Assets.Scripts.LiplisSystem.Msg
         public void SetTone(LiplisTone Tone)
         {
             this.Tone = Tone;
+            ToneConvert();
         }
 
         /// <summary>

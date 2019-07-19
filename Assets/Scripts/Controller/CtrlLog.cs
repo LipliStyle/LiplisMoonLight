@@ -209,7 +209,7 @@ public class CtrlLog : MonoBehaviour {
 			Btn_Log_Close_Click();
 
 			//おしゃべり実行
-			CtrlTalk.Instance.SetTopicTalkFromLastNewsList(selectedLog.DATAKEY, ContentCategolyText.GetContentCategoly(selectedLog.DATA_TYPE));
+			CtrlTalk.Instance.SetTopicTalkFromLastNewsListFromLog(selectedLog.DATAKEY, ContentCategolyText.GetContentCategoly(selectedLog.DATA_TYPE));
 		}
 	}
 
@@ -549,7 +549,14 @@ public class CtrlLog : MonoBehaviour {
 		Text TxtMessage = panel.transform.Find("ImgText").GetComponent<Image>().transform.Find("Text").GetComponent<Text>();
 
 		//内容設定
-		TxtMessage.text = sentence.TalkSentence;
+        if(sentence.TalkSentence != "")
+        {
+            TxtMessage.text = sentence.TalkSentence;
+        }
+        else
+        {
+            TxtMessage.text = sentence.BaseSentence;
+        }
 
 		Vector3 txtPos = panel.transform.position;
 		panel.transform.position = new Vector3(txtPos.x, -idx * 40, txtPos.z);
@@ -588,6 +595,9 @@ public class CtrlLog : MonoBehaviour {
 
         //キャラクターアイコン設定
         panel.transform.Find("ImgChar").GetComponent<Image>().sprite = model.SpriteCharIcon;
+
+        //キャラクターアイコン設定
+        panel.transform.Find("TxtName").GetComponent<Text>().text = model.ModelName;
 
         return panel;
     }

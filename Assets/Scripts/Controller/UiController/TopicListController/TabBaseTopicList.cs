@@ -70,7 +70,7 @@ public abstract class TabBaseTopicList : MonoBehaviour
     {
         empty = Sprite.Create(new Texture2D(0,0),new Rect(),new  Vector2());
 
-        this.PrefabNewsPanel = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_NEWS_PANEL);
+        this.PrefabNewsPanel = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_NEWS_PANEL_v2);
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public abstract class TabBaseTopicList : MonoBehaviour
         int offsetY = 0;
 
         //枠作成
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < TopicPanel.TOPIC_PANEL_ROWS; i++)
         {
             CreateRow120(offsetY);
             offsetY++;
@@ -99,15 +99,21 @@ public abstract class TabBaseTopicList : MonoBehaviour
     public void CreateRow120(float offsetY)
     {
         //パネル生成
-        Image panel = CreateRowPanel_120(offsetY);
+        Image panel = CreateRowPanel(offsetY);
 
-        panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, -1440, this.Categoly));
+        //panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, -1440, this.Categoly));
 
-        panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, -480, this.Categoly));
+        //panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, -480, this.Categoly));
 
-        panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, 480, this.Categoly));
+        //panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, 480, this.Categoly));
 
-        panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, 1440, this.Categoly));
+        //panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, 1440, this.Categoly));
+
+        panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, -TopicPanel.TOPIC_PANEL_SIZE_W*2, this.Categoly));
+
+        panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, 0, this.Categoly));
+
+        panelList.Add(new TopicPanel(panel.gameObject, Instantiate(PrefabNewsPanel) as GameObject, TopicPanel.TOPIC_PANEL_SIZE_W *2, this.Categoly));
     }
 
 
@@ -115,7 +121,7 @@ public abstract class TabBaseTopicList : MonoBehaviour
     /// 1行パネルを作成する
     /// </summary>
     /// <returns></returns>
-    public Image CreateRowPanel_120(float offsetY)
+    public Image CreateRowPanel(float offsetY)
     {
         Image panel = UICreator.CreatePanel(this.Content);
 
@@ -125,9 +131,9 @@ public abstract class TabBaseTopicList : MonoBehaviour
         rectTransform.anchorMax = new Vector2(1, 1);
         rectTransform.pivot = new Vector2(0.5f, 1);
         rectTransform.anchoredPosition = Vector2.zero;
-        rectTransform.offsetMax = new Vector2(0, offsetY * -120);
-        rectTransform.offsetMin = new Vector2(0, -120f);
-        rectTransform.sizeDelta = new Vector2(0, 120f);
+        rectTransform.offsetMax = new Vector2(0, offsetY * -TopicPanel.TOPIC_PANEL_SIZE_H);
+        rectTransform.offsetMin = new Vector2(0, -TopicPanel.TOPIC_PANEL_SIZE_H);
+        rectTransform.sizeDelta = new Vector2(0, TopicPanel.TOPIC_PANEL_SIZE_H);
 
         return panel;
     }
@@ -714,20 +720,20 @@ public abstract class TabBaseTopicList : MonoBehaviour
         }
 
         //高さ調整
-        SetContentHeightRowCount120(NewsList.Count);
+        SetContentHeightRowCount(NewsList.Count);
     }
 
     /// <summary>
     /// コンテントの高さを設定する
     /// </summary>
-    public void SetContentHeightRowCount120(int newsCount)
+    public void SetContentHeightRowCount(int newsCount)
     {
         double rowCount = 1;
 
-        rowCount = Math.Ceiling((double)newsCount / 4.0);
+        rowCount = Math.Floor((double)newsCount / TopicPanel.TOPIC_PANEL_COLS);
 
         //高さ計算
-        double height = (rowCount * 120);
+        double height = (rowCount * TopicPanel.TOPIC_PANEL_SIZE_H);
 
         //サイズ調整
         RectTransform rectTransform = this.Content.GetComponent<RectTransform>();

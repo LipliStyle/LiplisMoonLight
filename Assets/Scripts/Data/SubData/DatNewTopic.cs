@@ -88,6 +88,7 @@ namespace Assets.Scripts.Data.SubData
             //次の話題をロードする
             MsgTopic result = LiplisStatus.Instance.NewTopic.TalkTopicList.Dequeue();
 
+            //アロケーションID設定
             TopicUtil.SetAllocationIdAndTone(result, ModelList);
 
             //現在ロード中の話題をおしゃべり済みに入れる
@@ -118,30 +119,11 @@ namespace Assets.Scripts.Data.SubData
         }
 
         /// <summary>
-        /// 対象データをリストから削除し、おしゃべり済みに移行する
-        /// </summary>
-        /// <param name="topic"></param>
-        /// <returns></returns>
-        public MsgTopic TopicListDequeueTargetTopic(MsgTopic topic)
-        {
-            //次の話題をロードする
-            LiplisStatus.Instance.NewTopic.TalkTopicList.Remove(topic);
-
-            //現在ロード中の話題をおしゃべり済みに入れる
-            if (!topic.FlgNotAddChatted)
-            {
-                LiplisStatus.Instance.NewTopic.ChattedKeyList.AddToNotDuplicate(topic.Clone());
-            }
-
-            return topic;
-        }
-
-        /// <summary>
         /// ラストトピックリストからトピックを取得する
         /// </summary>
         /// <param name="retryCnt"></param>
         /// <returns></returns>
-        public MsgTopic GetTopicFromResLpsTopicList()
+        public MsgTopic GetTopicFromResLpsTopicList(List<LiplisModel> ModelList)
         {
             //次の話題をロードする
             int count = LiplisStatus.Instance.NewTopic.LastData.topicList.Count;
@@ -153,7 +135,15 @@ namespace Assets.Scripts.Data.SubData
             int idx = r.Next(0, count-1);
 
             //ラストトピックからランダムに1件取得する
-            return LiplisStatus.Instance.NewTopic.LastData.topicList[idx].Clone();
+            MsgTopic result = LiplisStatus.Instance.NewTopic.LastData.topicList[idx].Clone();
+
+            //アロケーションID設定
+            if (result != null)
+            {
+                TopicUtil.SetAllocationIdAndTone(result, ModelList);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -197,6 +187,26 @@ namespace Assets.Scripts.Data.SubData
             //見つからない場合はNULLを返す
             return result;
         }
+
+        /// <summary>
+        /// 対象データをリストから削除し、おしゃべり済みに移行する
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        public MsgTopic TopicListDequeueTargetTopic(MsgTopic topic)
+        {
+            //次の話題をロードする
+            LiplisStatus.Instance.NewTopic.TalkTopicList.Remove(topic);
+
+            //現在ロード中の話題をおしゃべり済みに入れる
+            if (!topic.FlgNotAddChatted)
+            {
+                LiplisStatus.Instance.NewTopic.ChattedKeyList.AddToNotDuplicate(topic.Clone());
+            }
+
+            return topic;
+        }
+
 
         /// <summary>
         /// キーリストを取得する
@@ -263,41 +273,53 @@ namespace Assets.Scripts.Data.SubData
         /// 削除処理
         /// </summary>
         private const int MINIMUM_NUMBER = 100;
+        private const int MINIMUM_NUMBER2 = 1000;
         public void DeleteOldData()
         {
             //下処理に変更
             //指定条件に合致するデータを削除する
-            //LiplisStatus.Instance.NewTopic.TalkTopicList.RemoveAll(TermOldTopicDelete);
-            //LiplisStatus.Instance.NewTopic.ChattedKeyList.RemoveAll(TermOldTopicDelete);
+            LiplisStatus.Instance.NewTopic.TalkTopicList.RemoveAll(TermOldTopicDelete12);
+            LiplisStatus.Instance.NewTopic.ChattedKeyList.RemoveAll(TermOldTopicDelete12);
 
-            while (TalkTopicList.Count > MINIMUM_NUMBER)
+            //1000件以上ならさらに削除
+            if (LiplisStatus.Instance.NewTopic.TalkTopicList.Count > MINIMUM_NUMBER2)
             {
-                if(LpsDatetimeUtil.dec(TalkTopicList[0].CreateTime) <= DateTime.Now.AddHours(-24))
-                {
-                    MsgTopic topic = TalkTopicList.Dequeue();
-                    topic.TalkSentenceList.Clear();
-                    topic.TalkSentenceList = null;
-                    topic = null;
-                }
-                else
-                {
-                    break;
-                }
+                LiplisStatus.Instance.NewTopic.TalkTopicList.RemoveAll(TermOldTopicDelete6);
             }
-            while (ChattedKeyList.Count > MINIMUM_NUMBER)
+
+            if (LiplisStatus.Instance.NewTopic.ChattedKeyList.Count > MINIMUM_NUMBER2)
             {
-                if (LpsDatetimeUtil.dec(ChattedKeyList[0].CreateTime) <= DateTime.Now.AddHours(-24))
-                {
-                    MsgTopic topic = ChattedKeyList.Dequeue();
-                    topic.TalkSentenceList.Clear();
-                    topic.TalkSentenceList = null;
-                    topic = null;
-                }
-                else
-                {
-                    break;
-                }
+                LiplisStatus.Instance.NewTopic.ChattedKeyList.RemoveAll(TermOldTopicDelete6);
             }
+
+            //while (TalkTopicList.Count > MINIMUM_NUMBER)
+            //{
+            //    if(LpsDatetimeUtil.dec(TalkTopicList[0].CreateTime) <= DateTime.Now.AddHours(-24))
+            //    {
+            //        MsgTopic topic = TalkTopicList.Dequeue();
+            //        topic.TalkSentenceList.Clear();
+            //        topic.TalkSentenceList = null;
+            //        topic = null;
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
+            //}
+            //while (ChattedKeyList.Count > MINIMUM_NUMBER)
+            //{
+            //    if (LpsDatetimeUtil.dec(ChattedKeyList[0].CreateTime) <= DateTime.Now.AddHours(-24))
+            //    {
+            //        MsgTopic topic = ChattedKeyList.Dequeue();
+            //        topic.TalkSentenceList.Clear();
+            //        topic.TalkSentenceList = null;
+            //        topic = null;
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
+            //}
         }
 
         /// <summary>
@@ -339,10 +361,17 @@ namespace Assets.Scripts.Data.SubData
         /// </summary>
         /// <param name="topic"></param>
         /// <returns></returns>
-        private bool TermOldTopicDelete(MsgTopic topic)
+        private bool TermOldTopicDelete24(MsgTopic topic)
         {
             return LpsDatetimeUtil.dec(topic.CreateTime) <= DateTime.Now.AddHours(-24);
         }
-
+        private bool TermOldTopicDelete12(MsgTopic topic)
+        {
+            return LpsDatetimeUtil.dec(topic.CreateTime) <= DateTime.Now.AddHours(-12);
+        }
+        private bool TermOldTopicDelete6(MsgTopic topic)
+        {
+            return LpsDatetimeUtil.dec(topic.CreateTime) <= DateTime.Now.AddHours(-6);
+        }
     }
 }

@@ -39,9 +39,9 @@ namespace Assets.Scripts.Data
         /// <summary>
         /// SingletonなSaveDatabaseクラス
         /// </summary>
-        protected static SaveDataBase data = null;
+        protected static SaveDataBaseBin data = null;
 
-        protected static SaveDataBase Savedatabase
+        protected static SaveDataBaseBin Savedatabase
         {
             get
             {
@@ -54,8 +54,8 @@ namespace Assets.Scripts.Data
                     UnityEngine.iOS.Device.SetNoBackupFlag(path);
 #endif
 
-                    string fileName = Application.companyName + "." + Application.productName + ".savedata.json";
-                    data = new SaveDataBase(path, fileName);
+                    string fileName = Application.companyName + "." + Application.productName + ".savedata.zip";
+                    data = new SaveDataBaseBin(path, fileName);
                 }
                 return data;
             }

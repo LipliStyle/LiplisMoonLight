@@ -180,6 +180,9 @@ namespace Assets.Scripts.LiplisSystem.Sentece
             //インスタンス生成
             MsgSentence sentence = new MsgSentence(Tone, message, message, emotion.EMOTION, emotion.POINT, false, AllocationId, addMessage);
 
+            //トーンコンバート
+            sentence.ToneConvert();
+
             //生成したセンテンスを返す
             return sentence;
         }

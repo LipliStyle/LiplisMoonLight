@@ -16,7 +16,6 @@ using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
 using Live2D.Cubism.Framework.Raycasting;
 using Live2D.Cubism.Framework.LookAt;
-using Newtonsoft.Json;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -93,8 +92,8 @@ namespace Live2D.Cubism.Framework.Json
 
 
             // Deserialize Json.
-            //var modelJson = JsonUtility.FromJson<CubismModel3Json>(modelJsonAsset);
-            var modelJson = JsonConvert.DeserializeObject<CubismModel3Json>(modelJsonAsset);
+            var modelJson = JsonUtility.FromJson<CubismModel3Json>(modelJsonAsset);
+            //var modelJson = JsonConvert.DeserializeObject<CubismModel3Json>(modelJsonAsset);
 
             // Finalize deserialization.
             modelJson.AssetPath = assetPath;
@@ -407,18 +406,11 @@ namespace Live2D.Cubism.Framework.Json
                 model.gameObject.AddComponent<CubismRaycaster>();
             }
 
-            //目線追従クラスの追加
-            if (model.gameObject.GetComponent<CubismLookController>() == null)
-            {
-                var clc = model.gameObject.AddComponent<CubismLookController>();
-            }
-
-            //目線追従クラスの追加
-            if (model.gameObject.GetComponent<CubismRenderController>() == null)
-            {
-                var clc = model.gameObject.AddComponent<CubismRenderController>();
-            }
-    
+            ////目線追従クラスの追加
+            //if (model.gameObject.GetComponent<CubismLookController>() == null)
+            //{
+            //    var clc = model.gameObject.AddComponent<CubismLookController>();
+            //}
 
             // Make sure model is 'fresh'
             model.ForceUpdateNow();

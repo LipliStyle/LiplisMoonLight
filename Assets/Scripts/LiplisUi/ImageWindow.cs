@@ -92,9 +92,14 @@ public class ImageWindow : ConcurrentBehaviour
     public bool flgEnd;
 
     ///=============================
+    ///デフォルトウインドウ位置
+    public float DefaultLocationX = 0;
+
+    ///=============================
     ///デフォルト画像サイズ
     public const float IMAGE_SIZE_DEFAULT_WIDTH = 400f;
     public const float IMAGE_SIZE_DEFAULT_HEIGTH = 400f;
+    public const float CANVAS_FRONT_HEIGHT = 450f;
 
     /// <summary>
     /// アウェーク
@@ -157,6 +162,36 @@ public class ImageWindow : ConcurrentBehaviour
     public void SetCreateTime(DateTime CreateTime)
     {
         this.CreateTime = CreateTime;
+    }
+
+    /// <summary>
+    /// ロケーションXを設定する
+    /// </summary>
+    /// <param name="modelNum"></param>
+    public void SetLocationX(int modelNum)
+    {
+        if (modelNum % 2 == 0)
+        {
+            DefaultLocationX = 0;
+        }
+        else
+        {
+            if (modelNum == 1)
+            {
+                DefaultLocationX = 0;
+            }
+            else
+            {
+                //左側キャラクター数
+                float leftNum = Mathf.Ceil((float)modelNum / 2f);
+
+                //右側キャラクター数
+                float rightNum = Mathf.Floor((float)modelNum / 2f);
+
+                //ロケーション算出
+                DefaultLocationX = ((-310 + (140 * leftNum)) + (310 - (140 * rightNum))) / 2;
+            }
+        }
     }
 
     /// <summary>
@@ -400,15 +435,11 @@ public class ImageWindow : ConcurrentBehaviour
     /// </summary>
     public void InitLocation()
     {
-        float windowLocationX = ParentWindowRect.sizeDelta.x / 2;
-        float windowLocationY = -ParentWindowRect.sizeDelta.y / 2 + 450;
+        //位置の初期化
+        ParentWindowRect.anchoredPosition = new Vector2(-999, -999);
 
-        if (540 - ParentWindowRect.sizeDelta.y / 2 < windowLocationY)
-        {
-            windowLocationY = (540 - ParentWindowRect.sizeDelta.y / 2);
-        }
-
-        ParentWindowRect.anchoredPosition = new Vector2(windowLocationX, windowLocationY);
+        //位置の再設定
+        SetImageWindowLocation();
     }
 
     /// <summary>
@@ -461,7 +492,7 @@ public class ImageWindow : ConcurrentBehaviour
         ParentWindowRect.sizeDelta = new Vector2(GetTextureWidth() + 8, GetTextureHeight() + 36);
 
         //ウインドウ座標設定
-        SetIMageWindowLocation();
+        SetImageWindowLocation();
 
         if (this.moveTargetWidth != GetTextureWidth())
         {
@@ -471,7 +502,11 @@ public class ImageWindow : ConcurrentBehaviour
         }
     }
 
-    public void SetIMageWindowLocation()
+
+    /// <summary>
+    /// ウインドウロケーション設定
+    /// </summary>
+    public void SetImageWindowLocation()
     {
         //あんカードロケーション取得
         float windowLocationX = ParentWindowRect.anchoredPosition.x;
@@ -480,11 +515,11 @@ public class ImageWindow : ConcurrentBehaviour
         //初期位置なら調整
         if (windowLocationX == -999 && windowLocationY == -999)
         {
-            windowLocationX = ParentWindowRect.sizeDelta.x/2;
-            windowLocationY = -ParentWindowRect.sizeDelta.y / 2 + 450;
+            windowLocationX = DefaultLocationX;
+            windowLocationY = 0;
         }
 
-        if(540 - ParentWindowRect.sizeDelta.y / 2< windowLocationY)
+        if (540 - ParentWindowRect.sizeDelta.y / 2 < windowLocationY)
         {
             windowLocationY = (540 - ParentWindowRect.sizeDelta.y / 2);
         }
@@ -492,6 +527,7 @@ public class ImageWindow : ConcurrentBehaviour
         //基本的に元の位置設定
         ParentWindowRect.anchoredPosition = new Vector2(windowLocationX, windowLocationY);
     }
+
 
     /// <summary>
     /// 画像セット開始

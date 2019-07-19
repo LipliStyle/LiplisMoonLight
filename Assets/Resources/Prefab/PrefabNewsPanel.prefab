@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 222396556203260276}
   - component: {fileID: 114003719295517980}
   - component: {fileID: 114288597266370780}
+  - component: {fileID: 114000412290128364}
   m_Layer: 5
   m_Name: PrefabNewsPanel
   m_TagString: Untagged
@@ -40,7 +41,6 @@ GameObject:
   - component: {fileID: 222112308847399430}
   - component: {fileID: 114972339185634442}
   - component: {fileID: 114985643851509590}
-  - component: {fileID: 114495008570778756}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -66,6 +66,17 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &114000412290128364
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1646319483091148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -146154839, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114003719295517980
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -137,18 +148,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
---- !u!114 &114495008570778756
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1708370249840624}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1200242548, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 1
 --- !u!114 &114802314653349742
 MonoBehaviour:
   m_ObjectHideFlags: 1

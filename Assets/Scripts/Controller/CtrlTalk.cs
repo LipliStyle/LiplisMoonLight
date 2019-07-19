@@ -47,6 +47,7 @@ public class CtrlTalk : ConcurrentBehaviour
     ///=============================
     /// 現在ロードトピック
     private MsgTopic NowLoadTopic;
+    private MsgTopic LogLoadTopic;
     private int NowSentenceCount;
 
     ///=============================
@@ -62,6 +63,7 @@ public class CtrlTalk : ConcurrentBehaviour
     // レンダリングUIキャッシュ
     public GameObject UiRenderingBack;
     public GameObject UiRenderingFront;
+    public GameObject UiRenderingFrontOrverlay;
 
     ///=============================
     /// ログ画面
@@ -146,6 +148,24 @@ public class CtrlTalk : ConcurrentBehaviour
 
         //タイマースタート
         startTimer();
+
+        //あいさつ実行
+        StartCoroutine(DelayMethod(3.5f, () =>
+        {
+            Greet();
+        }));
+    }
+
+    /// <summary>
+    /// 渡された処理を指定時間後に実行する
+    /// </summary>
+    /// <param name="waitTime">遅延時間[ミリ秒]</param>
+    /// <param name="action">実行したい処理</param>
+    /// <returns></returns>
+    private IEnumerator DelayMethod(float waitTime, Action action)
+    {
+        yield return new WaitForSeconds(waitTime);
+        action();
     }
 
     /// <summary>
@@ -512,7 +532,8 @@ public class CtrlTalk : ConcurrentBehaviour
                 if (sentenceIdx == 0)
                 {
                     sentence.BaseSentence = "今日は" + sentence.BaseSentence + "みたいです～♪";
-                    sentence.TalkSentence = sentence.BaseSentence;
+                    sentence.ToneConvert();
+                    //sentence.TalkSentence = sentence.BaseSentence;
                 }
                 else
                 {
@@ -527,7 +548,7 @@ public class CtrlTalk : ConcurrentBehaviour
                 AllocationId++;
 
                 //アロケーションIDコントロール
-                if (AllocationId > 3)
+                if (AllocationId > modelController.GetMaxAllocationId())
                 {
                     AllocationId = 0;
                 }
@@ -557,32 +578,13 @@ public class CtrlTalk : ConcurrentBehaviour
             return;
         }
 
+        if(topic.TalkSentenceList.Count < 1)
+        {
+            return;
+        }
+
         //最終センテンス取得
         MsgSentence lastSentence = topic.TalkSentenceList[topic.TalkSentenceList.Count - 1];
-
-        //モデル
-        LiplisModel cahrData1;
-        LiplisModel cahrData2;
-        LiplisModel cahrData3;
-
-        //アロケーションID
-        int AllocationId1;
-        int AllocationId2;
-        int AllocationId3;
-
-        //アロケーションID取得
-        AllocationId1 = lastSentence.AllocationId + 1;
-        if (AllocationId1 > 3) { AllocationId1 = 0; }
-        AllocationId2 = AllocationId1 + 1;
-        if (AllocationId2 > 3) { AllocationId2 = 0; }
-        AllocationId3 = AllocationId2 + 1;
-        if (AllocationId3 > 3) { AllocationId3 = 0; }
-
-        //キャラクターデータ取得
-        cahrData1 = modelController.TableModelId[AllocationId1];
-        cahrData2 = modelController.TableModelId[AllocationId2];
-        cahrData3 = modelController.TableModelId[AllocationId3];
-
 
         //現在時刻取得
         DateTime dt = DateTime.Now;
@@ -593,7 +595,11 @@ public class CtrlTalk : ConcurrentBehaviour
         //0～12 今日 午前、午後、夜の天気
         if (dt.Hour >= 0 && dt.Hour <= 18)
         {
-            LiplisWeather.CreateWetherMessage("今日の天気は", todayWether, topic.TalkSentenceList, cahrData1.Tone, cahrData1.AllocationId);
+            //次モデル取得
+            LiplisModel model = modelController.GetCharacterModelNext(lastSentence.AllocationId);
+
+            //センテンス生成
+            LiplisWeather.CreateWetherMessage("今日の天気は", todayWether, topic.TalkSentenceList, model.Tone, model.AllocationId);
         }
 
         //19～23 明日の天気
@@ -602,8 +608,17 @@ public class CtrlTalk : ConcurrentBehaviour
             //明日の天気も取得
             MsgDayWether tomorrowWether = LiplisStatus.Instance.InfoWether.GetWetherSentenceTommorow(dt);
 
-            LiplisWeather.CreateWetherMessage("", todayWether, topic.TalkSentenceList, cahrData2.Tone, cahrData2.AllocationId);
-            LiplisWeather.CreateWetherMessage("明日の天気は", tomorrowWether, topic.TalkSentenceList, cahrData3.Tone, cahrData3.AllocationId);
+            //次モデル取得
+            LiplisModel model1 = modelController.GetCharacterModelNext(lastSentence.AllocationId);
+
+            //1文目追加
+            LiplisWeather.CreateWetherMessage("", todayWether, topic.TalkSentenceList, model1.Tone, model1.AllocationId);
+
+            //次モデル取得
+            LiplisModel model2 = modelController.GetCharacterModelNext(model1.AllocationId);
+
+            //2文目追加
+            LiplisWeather.CreateWetherMessage("明日の天気は", tomorrowWether, topic.TalkSentenceList, model2.Tone, model2.AllocationId);
 
         }
     }
@@ -671,7 +686,7 @@ public class CtrlTalk : ConcurrentBehaviour
     private void SetNextSentence(MsgSentence sentence)
     {
         //トーンコンバート
-        sentence.ToneConvert();
+        //sentence.ToneConvert();
 
         //ウインドウを表示する
         if (!sentence.FlgAddMessge)
@@ -694,6 +709,13 @@ public class CtrlTalk : ConcurrentBehaviour
 
         //おしゃべりの開始
         modelController.StartTalking(sentence);
+
+        //ログに追記
+        if (this.LogLoadTopic != null)
+        {
+            this.LogLoadTopic.TalkSentenceList.Add(sentence);
+        }
+
 
         //センテンスカウントインクリメント
         NowSentenceCount++;
@@ -850,11 +872,30 @@ public class CtrlTalk : ConcurrentBehaviour
         //次の話題をロードする
         this.NowLoadTopic = LiplisStatus.Instance.NewTopic.TopicListDequeue(modelController.GetModelList());
 
-        //ログ追加
-        StartCoroutine(NewsLog.AddLog(this.NowLoadTopic.Clone()));
+        //ログを記録した後、あらたらなトピックを生成する
+        RegisterLogAndCreateLogLoadTopic();
 
         //話題のセット、移動
         StartCoroutine(SetToipcEnd());
+    }
+
+    /// <summary>
+    /// ログトピックを生成する
+    /// </summary>
+    /// <returns></returns>
+    private void RegisterLogAndCreateLogLoadTopic()
+    {
+        //ログを登録する
+        if(this.LogLoadTopic != null)
+        {
+            StartCoroutine(NewsLog.AddLog(this.LogLoadTopic));
+        }
+
+        //ログトピックを生成する
+        this.LogLoadTopic = this.NowLoadTopic.Clone();
+
+        //センテンスリストを初期化する
+        this.LogLoadTopic.TalkSentenceList.Clear();
     }
 
     /// <summary>
@@ -865,8 +906,11 @@ public class CtrlTalk : ConcurrentBehaviour
         //割り込み話題があれば、そちらから取得する
         this.NowLoadTopic = LiplisStatus.Instance.NewTopic.InterruptTopicList.Dequeue();
 
+        //割り込み次は、即ログに記録するので次回記録されないようにNULLを設定しておく
+        this.LogLoadTopic = null;
+
         //ログ追加
-        StartCoroutine(NewsLog.AddLog(this.NowLoadTopic.Clone()));
+        StartCoroutine(NewsLog.AddLog(this.NowLoadTopic));
 
         //話題のセット、移動
         SetToipcEndInterrupt();
@@ -951,12 +995,26 @@ public class CtrlTalk : ConcurrentBehaviour
     }
 
     /// <summary>
+    /// ログから指定のログの話題をおしゃべり
+    /// </summary>
+    /// <param name="DataKey"></param>
+    /// <param name="NewsSource"></param>
+    public void SetTopicTalkFromLastNewsListFromLog(string DataKey, ContentCategoly NewsSource)
+    {
+        //ウインドウを一旦クリア
+        DestroyAllWindow();
+
+        //おしゃべり
+        SetTopicTalkFromLastNewsList(DataKey, NewsSource);
+    }
+
+    /// <summary>
     /// トピックリストから取得する
     /// </summary>
     private void SetTopicFromResLpsTopicList()
     {
         //次の話題をロードする
-        this.NowLoadTopic = LiplisStatus.Instance.NewTopic.GetTopicFromResLpsTopicList();
+        this.NowLoadTopic = LiplisStatus.Instance.NewTopic.GetTopicFromResLpsTopicList(modelController.GetModelList());
 
 
         if (NowLoadTopic.TalkSentenceList.Count < 2)
@@ -987,6 +1045,9 @@ public class CtrlTalk : ConcurrentBehaviour
         {
             //話題取得
             this.NowLoadTopic = resTopic.topicList[0];
+
+            //アロケーションID設定
+            TopicUtil.SetAllocationIdAndTone(this.NowLoadTopic, modelController.GetModelList());
 
             //カテゴリセット
             this.NowLoadTopic.TopicClassification = ((int)NewsSource).ToString();
@@ -1171,9 +1232,6 @@ public class CtrlTalk : ConcurrentBehaviour
             }
             else
             {
-                //トーンコンバート
-                NowLoadTopic.TalkSentenceList[0].ToneConvert();
-
                 //初期データをセット
                 yield return StartCoroutine(ClalisForLiplisGetVoiceMp3Ondemand.SetVoiceDataStart(NowLoadTopic, modelController.GetModelCount()));
 
@@ -1210,9 +1268,8 @@ public class CtrlTalk : ConcurrentBehaviour
     public IEnumerator SetVoiceData(MsgTopic NowLoadTopic, MsgSentence sentence)
     {
         //トーンコンバート
-        sentence.ToneConvert();
+        //sentence.ToneConvert();
 
-        //var Async = ClalisForLiplisGetVoiceMp3.GetAudioClip(NowLoadTopic, sentence.AllocationId, sentence.SubId);
         var Async = ClalisForLiplisGetVoiceMp3Ondemand.GetAudioClip(sentence,modelController.GetModelCount());
         
         //非同期実行
@@ -1383,8 +1440,8 @@ public class CtrlTalk : ConcurrentBehaviour
 
 
     //ウインドウ位置定義
-    private const float TITLE_POS_X = -180; //250 //130;
-    private const float TITLE_POS_Y = 150; //-185;
+    private const float TITLE_POS_X = -240; //180 //130;
+    private const float TITLE_POS_Y = 165; //-185;
     private const float TITLE_POS_Z = 0;
 
     /// <summary>
@@ -1543,17 +1600,19 @@ public class CtrlTalk : ConcurrentBehaviour
         window.name = "ImageWindow" + WindowImageListQ.Count;
 
         //位置設定
-        //window.transform.position = new Vector3(LpsDefine.SCREAN_DEFAULT_WIDTH / 6, IMAGE_POS_Y, IMAGE_POS_Z);
         window.transform.position = new Vector3(-999, -999, 0);
 
         //スケール設定
-        window.transform.localScale = new Vector3(1, 1, 1);
+        window.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
 
         //親キャンバスに登録
         window.transform.SetParent(UiRenderingBack.transform, false);
 
         //ウインドウ生成
         ImageWindow lpsWindow = window.GetComponent<ImageWindow>();
+
+        //デフォルトロケーションを設定
+        lpsWindow.SetLocationX(modelController.ModelList.Count);
 
         //親ウインドウ登録
         lpsWindow.SetParentWindow(window);
@@ -1728,7 +1787,8 @@ public class CtrlTalk : ConcurrentBehaviour
 
         //イメージウインドウの整列
         this.NowTitleWindow.SetMoveTarget(new Vector3(TITLE_POS_X, TITLE_POS_Y, TITLE_POS_Z));
-        //this.NowImageWindow.SetMoveTarget(new Vector3(-999, -999, 0));
+
+        //イメージウインドウのロケーションリセット
         this.NowImageWindow.InitLocation();
     }
 

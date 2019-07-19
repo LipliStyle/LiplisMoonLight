@@ -74,6 +74,9 @@ public class CtrlDataController : ConcurrentBehaviour
         //天気情報は常に最新を取る
         LiplisStatus.Instance.InfoWether.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
 
+        //本日情報は常に最新を取る
+        LiplisStatus.Instance.InfoAnniversary.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
+
         //ニュースリストは常に最新を取る
         LiplisStatus.Instance.NewsList.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
 

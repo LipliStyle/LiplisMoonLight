@@ -2,17 +2,24 @@
 //  ClassName : CtrlSetting
 //  概要      : 設定画面コントローラー
 //
+//　新規設定追加手順
+//　　1. 画面に設定UIを追加する。
+//　　2. CtrlSetting(本クラス)に設定値のプロパティを追加する
+//　　3. UnityのIDE上で、
+//　　　 CanvasSettingにアタッチされている、CtrlSettingの追加したパラメータに、
+//       対象UIをドラッグドロップする。
+//    4. DatSettingにUIに対応するプロパティを追加する。
+//　　　 必要であれば、ゲッターも作成(値を読み替える必要がある場合など)
+//　　5. DatSettingのコンストラクターに初期化処理を追加する。
+//　　6. CtrlSetting.InitWindowに設定処理を追加する。　 
+//　　7. CtrlSetting.SaveSettingに設定処理を追加する。
+//
 //  LiplisLive2DSystem
 //  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
 //=======================================================================﻿
 using Assets.Scripts.Data;
 using Assets.Scripts.LiplisSystem.Com;
-using SpicyPixel.Threading;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,7 +41,10 @@ public class CtrlSetting : MonoBehaviour {
     public Slider TopicSpeed;
     public Dropdown TopicNumDrop;
     public Text TopicTextNews;
-    public Dropdown GraphicLevelDrop;
+    public Dropdown CboGraphicLevel;
+    public Dropdown CboDrawingFps;
+    public Dropdown CboSpeechBallonNum;
+    public Dropdown CboArrangement;
 
     /// <summary>
     /// 開始時
@@ -120,7 +130,12 @@ public class CtrlSetting : MonoBehaviour {
         TopicSpeed.value = LiplisSetting.Instance.Setting.TalkSpeed;
         TopicNumDrop.value = LiplisSetting.Instance.Setting.TalkNum;
 
-        GraphicLevelDrop.value = LiplisSetting.Instance.Setting.GraphicLevel;
+        CboGraphicLevel.value = LiplisSetting.Instance.Setting.GraphicLevel;
+
+        CboDrawingFps.value = LiplisSetting.Instance.Setting.DrawingFps;
+        CboSpeechBallonNum.value = LiplisSetting.Instance.Setting.SpeechBallonNum;
+
+        CboArrangement.value = LiplisSetting.Instance.Setting.CharArrangement;
     }
 
     /// <summary>
@@ -140,7 +155,15 @@ public class CtrlSetting : MonoBehaviour {
         LiplisSetting.Instance.Setting.TalkNum = TopicNumDrop.value;
 
         //グラフィックレベル
-        LiplisSetting.Instance.Setting.GraphicLevel = GraphicLevelDrop.value;
+        LiplisSetting.Instance.Setting.GraphicLevel = CboGraphicLevel.value;
+        LiplisSetting.Instance.Setting.DrawingFps = CboDrawingFps.value;
+        LiplisSetting.Instance.Setting.SpeechBallonNum = CboSpeechBallonNum.value;
+
+        //キャラクター配置
+        LiplisSetting.Instance.Setting.CharArrangement = CboArrangement.value;
+
+        //FPS変更
+        Application.targetFrameRate = LiplisSetting.Instance.Setting.GetFps();
 
         //指定キー「LiplisStatus」でリプリスステータスのインスタンスを保存する
         SaveDataSetting.SetClass(LpsDefine.SETKEY_LIPLIS_SETTING, LiplisSetting.Instance);

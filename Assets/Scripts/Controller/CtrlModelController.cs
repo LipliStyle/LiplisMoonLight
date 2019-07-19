@@ -21,6 +21,7 @@ using Assets.Scripts.LiplisSystem.Model.Setting;
 using Assets.Scripts.Utils;
 using Assets.Scripts.LiplisSystem.Model.Json;
 using System.Collections;
+using System.IO;
 
 namespace Assets.Scripts.Controller
 {
@@ -52,11 +53,37 @@ namespace Assets.Scripts.Controller
         void Start()
         {
             //キャラクターリストを生成する
-            CreateCharDataList(LiplisSetting.Instance.Setting.GetLstModelOnTheStage());
+            CreateCharDataList(CreateModelPathList());
         }
 
+        /// <summary>
+        /// モデルパスリストを生成する
+        /// </summary>
+        /// <returns></returns>
+        private List<string> CreateModelPathList()
+        {
+            List<string> result = new List<string>();
 
-          
+            //ストリーミングアセットのパスを取得する
+            string path = UtilUnityPath.GetStreamingAssetsPath();
+
+            ////フォルダリスト取得
+            //string[] dirs = Directory.GetDirectories(path);
+
+            ////リスト生成
+            //foreach(string dir in dirs)
+            //{
+            //    result.Add(dir);
+            //}
+
+            result.Add(path + "/Hazuki");
+            result.Add(path + "/Kuroha");
+            result.Add(path + "/Momoha");
+            result.Add(path + "/Shiroha");
+
+            return result;
+        }
+
 
         #endregion
 
@@ -97,6 +124,28 @@ namespace Assets.Scripts.Controller
         }
 
         /// <summary>
+        /// 次のキャラクターモデルを取得する
+        /// </summary>
+        /// <param name="AllocationId"></param>
+        /// <returns></returns>
+        public LiplisModel GetCharacterModelNext(int AllocationId)
+        {
+            //アロケーションIDを送る
+            AllocationId++;
+
+            //アロケーションIDコントロール
+            if (AllocationId > GetMaxAllocationId())
+            {
+                return TableModelId[0];
+            }
+            else
+            {
+                return TableModelId[AllocationId];
+            }
+            
+        }
+
+        /// <summary>
         /// ランダムにキャラクターを取得する
         /// </summary>
         /// <returns></returns>
@@ -116,6 +165,15 @@ namespace Assets.Scripts.Controller
         public int GetModelCount()
         {
             return this.TableModelId.Count;
+        }
+
+        /// <summary>
+        /// 最大アロケーションIDを取得する
+        /// </summary>
+        /// <returns></returns>
+        public int GetMaxAllocationId()
+        {
+            return this.TableModelId.Count -1;
         }
 
         /// <summary>
@@ -150,7 +208,7 @@ namespace Assets.Scripts.Controller
             foreach (var modelPath in LstModelOnTheStage)
             {
                 //モデル読み込み
-                LoadModel(modelPath, AllocationId);
+                AddModel(LoadModel(modelPath, AllocationId, LstModelOnTheStage.Count));
 
                 AllocationId++;
             }
@@ -160,60 +218,12 @@ namespace Assets.Scripts.Controller
         }
 
         /// <summary>
-        /// モデルをロードする
-        /// </summary>
-        /// <param name="LPS-DB2\浩介"></param>
-        private void LoadModel(string ModelSettingPath, int AllocationId)
-        {
-            //デフォルトモデルの場合は、プレファブから召喚
-            if(ModelSettingPath.StartsWith(LIPLIS_MODEL_RABBITS.RABBITS_KEY))
-            {
-                LoadModelRabbits(ModelSettingPath, AllocationId);
-            }
-            else
-            {
-                LoadModelFromPath(ModelSettingPath, AllocationId);
-            }
-        }
-
-        /// <summary>
-        /// プリセットモデルを読み込む
-        /// </summary>
-        /// <param name="ModelSettingPath"></param>
-        private void LoadModelRabbits(string ModelSettingPath, int AllocationId)
-        {
-            if (ModelSettingPath == LIPLIS_MODEL_RABBITS.SHIROHA)
-            {
-                //白葉
-                AddModel(CreateModelRabbits(ModelPathDefine.PRISET_MODEL_SETTING_SHIROHA, AllocationId));
-            }
-            else if (ModelSettingPath == LIPLIS_MODEL_RABBITS.KUROHA)
-            {
-                //黒葉
-                AddModel(CreateModelRabbits(ModelPathDefine.PRISET_MODEL_SETTING_KUROHA, AllocationId));
-            }
-            else if (ModelSettingPath == LIPLIS_MODEL_RABBITS.MOMOHA)
-            {
-                //桃葉
-                AddModel(CreateModelRabbits(ModelPathDefine.PRISET_MODEL_SETTING_MOMOHA, AllocationId));
-            }
-            else
-            {
-                //葉月
-                AddModel(CreateModelRabbits(ModelPathDefine.PRISET_MODEL_SETTING_HAZUKI, AllocationId));
-            }
-        }
-
-        /// <summary>
         /// ラビッツモデルを生成する
         /// </summary>
         /// <param name="modelPathAnderResource"></param>
         /// <returns></returns>
-        private LiplisModel CreateModelRabbits(string modelPathAnderResource, int AllocationId)
+        private LiplisModel LoadModel(string modelPath, int AllocationId, int modelNum)
         {
-            //モデルパス生成
-            string modelPath = UtilUnityPath.GetStreamingAssetsPath() + "/" + modelPathAnderResource;
-
             //モデル設定を取得する
             LiplisMoonlightModel lmm = PrisetModelSettingLoader.LoadClassFromJson<LiplisMoonlightModel>(modelPath + ModelPathDefine.LIPLIS_MODEL_JSON);
             LiplisToneSetting ltn = PrisetModelSettingLoader.LoadClassFromJson<LiplisToneSetting>(modelPath + ModelPathDefine.SETTINGS + ModelPathDefine.LIPLIS_TONE_SETTING);
@@ -225,18 +235,8 @@ namespace Assets.Scripts.Controller
             Texture2D TextureCharIcon = PrisetModelSettingLoader.LoadTexture(modelPath + ModelPathDefine.IMAGES + ModelPathDefine.IMG_ICON_CHAR) as Texture2D;
 
             //モデルを追加する
-            return new LiplisModel(AllocationId, CanvasRendering, modelPath, ctrlTalk.NextTalkOrSkip, lmm, ltn, lch, TextureWindow, TextureLogWindow, TextureCharIcon);
+            return new LiplisModel(AllocationId, CanvasRendering, modelPath, ctrlTalk.NextTalkOrSkip, lmm, ltn, lch, TextureWindow, TextureLogWindow, TextureCharIcon, modelNum);
 
-        }
-
-        /// <summary>
-        /// パスからユーザーモデルを読み込む
-        /// </summary>
-        /// <param name="ModelSettingPath"></param>
-        private void LoadModelFromPath(string ModelSettingPath, int AllocationId)
-        {
-            //TODO 要実装 CtrlModelController LoadModelFromPath
-            ///☆☆☆☆☆☆☆☆☆要実装☆☆☆☆☆☆☆☆☆
         }
 
         /// <summary>
@@ -340,10 +340,10 @@ namespace Assets.Scripts.Controller
         {
 
             //位置リストを取得
-            Dictionary<MST_CARACTER_POSITION, Vector3> locationList = SearchLocationList();
+            Dictionary<int, Vector3> locationList = SearchLocationList();
 
             //キャラクターロケーションYリスト
-            Dictionary<MST_CARACTER_POSITION, float> CharLocationYList = SearchCharLocationYList();
+            Dictionary<int, float> CharLocationYList = SearchCharLocationYList();
 
             //前回キャラクター位置
             List<LiplisModel> PrvCharList = new List<LiplisModel>(ModelList);
@@ -351,53 +351,12 @@ namespace Assets.Scripts.Controller
             //先頭アロケーションID取得
             int allocationId = topic.TalkSentenceList[0].AllocationId;
 
-            //範囲内なら選択
-            if (allocationId >= 0 && allocationId <= 3)
-            {
-                //司会設定
-                TableModelId[allocationId].Position = MST_CARACTER_POSITION.Moderator;
-            }
-            else
-            {
-                //ポジションの初期化
-                initPosition();
-
-                foreach (KeyValuePair<string, LiplisModel> kv in TableModel)
-                {
-                    kv.Value.MoveTarget();
-                }
-
-                return;
-            }
-
-            //司会キャラ
-            LiplisModel moderator = TableModelId[allocationId];
-
-            //その他位置キャラリスト
-            List<LiplisModel> OtherCharList = SearchMember(allocationId);
-
-            //もし司会がNULLなら、初期配置に戻す
-            if (moderator == null)
-            {
-                //ポジションの初期化
-                initPosition();
-
-                foreach (KeyValuePair<string, LiplisModel> kv in TableModel)
-                {
-                    kv.Value.MoveTarget();
-                }
-
-                return;
-            }
-
             //位置リスト
-            List<MST_CARACTER_POSITION> PosList = CreatePosList();
+            Queue<int> PosList = new Queue<int>(CreatePosList());
 
-            //選択されたもの以外の位置をほかのキャラクターにセットする
-            foreach (LiplisModel charData in OtherCharList)
+            foreach (LiplisModel model in ModelList)
             {
-                //ポジション設定
-                charData.Position = PosList.Dequeue();
+                model.Position = (PosList.Dequeue());
             }
 
             //Y座標の補正 身長差の分、位置がずれてしまうため補正
@@ -432,12 +391,12 @@ namespace Assets.Scripts.Controller
         private LiplisModel SearchModerator()
         {
             //位置リスト
-            List<MST_CARACTER_POSITION> PosList = CreatePosList();
+            List<int> PosList = CreatePosList();
 
             //司会位置のキャラクターを探し、それ以外のキャラをリスト化する
             foreach (LiplisModel charData in ModelList)
             {
-                if (charData.Position == MST_CARACTER_POSITION.Moderator)
+                if (charData.Position == LiplisModel.MODEL_POS_RIGHT)
                 {
                     return charData;
                 }
@@ -476,15 +435,15 @@ namespace Assets.Scripts.Controller
         /// ロケーションリストを生成する
         /// </summary>
         /// <returns></returns>
-        private Dictionary<MST_CARACTER_POSITION, Vector3> SearchLocationList()
+        private Dictionary<int, Vector3> SearchLocationList()
         {
             //その他位置キャラリスト
-            Dictionary<MST_CARACTER_POSITION, Vector3> locationList = new Dictionary<MST_CARACTER_POSITION, Vector3>();
+            Dictionary<int, Vector3> locationList = new Dictionary<int, Vector3>();
 
             //位置リスト
-            List<MST_CARACTER_POSITION> PosList = CreatePosList();
+            List<int> PosList = CreatePosList();
 
-            foreach (MST_CARACTER_POSITION pos in PosList)
+            foreach (int pos in PosList)
             {
                 locationList.Add(pos, new Vector3());
             }
@@ -501,15 +460,15 @@ namespace Assets.Scripts.Controller
         /// 対象位置のキャラクターロケーションYリスト
         /// </summary>
         /// <returns></returns>
-        private Dictionary<MST_CARACTER_POSITION, float> SearchCharLocationYList()
+        private Dictionary<int, float> SearchCharLocationYList()
         {
             //その他位置キャラリスト
-            Dictionary<MST_CARACTER_POSITION, float> locationList = new Dictionary<MST_CARACTER_POSITION, float>();
+            Dictionary<int, float> locationList = new Dictionary<int, float>();
 
             //位置リスト
-            List<MST_CARACTER_POSITION> PosList = CreatePosList();
+            List<int> PosList = CreatePosList();
 
-            foreach (MST_CARACTER_POSITION pos in PosList)
+            foreach (int pos in PosList)
             {
                 locationList.Add(pos, 0);
             }
@@ -528,23 +487,24 @@ namespace Assets.Scripts.Controller
         /// </summary>
         private void initPosition()
         {
-            ModelList[0].Position = MST_CARACTER_POSITION.Moderator;
-            ModelList[1].Position = MST_CARACTER_POSITION.Right;
-            ModelList[2].Position = MST_CARACTER_POSITION.Center;
-            ModelList[3].Position = MST_CARACTER_POSITION.Left;
+            foreach (var model in ModelList)
+            {
+                model.Position = model.AllocationId;
+            }
         }
 
 
         /// <summary>
         /// キャラクター位置リストを生成する
         /// </summary>
-        private List<MST_CARACTER_POSITION> CreatePosList()
+        private List<int> CreatePosList()
         {
-            List<MST_CARACTER_POSITION> PosList = new List<MST_CARACTER_POSITION>();
+            List<int> PosList = new List<int>();
 
-            PosList.Add(MST_CARACTER_POSITION.Center);
-            PosList.Add(MST_CARACTER_POSITION.Right);
-            PosList.Add(MST_CARACTER_POSITION.Left);
+            foreach (var model in ModelList)
+            {
+                PosList.Add(model.AllocationId);
+            }
 
             PosList.Shuffle();
 

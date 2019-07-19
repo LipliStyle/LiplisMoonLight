@@ -3,8 +3,8 @@
 //  概要      : 天気ニュース取得
 //              
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //====================================================================
 using Assets.Scripts.LiplisSystem.Cif.v40.Res;
 using Assets.Scripts.LiplisSystem.Com;

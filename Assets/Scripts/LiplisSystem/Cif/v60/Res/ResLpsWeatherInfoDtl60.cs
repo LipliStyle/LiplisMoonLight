@@ -3,7 +3,7 @@
 //  概要      : 天気明細データ
 //
 //  LiplisSystemシステム      
-//  Copyright(c) 2010-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2010-2017 sachin.
 //=======================================================================
 using System;
 

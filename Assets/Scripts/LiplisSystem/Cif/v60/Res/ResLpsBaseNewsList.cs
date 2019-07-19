@@ -3,9 +3,9 @@
 //  概要      : ベースニュースリスト
 //
 //  SatelliteServer
-//  Copyright(c) 2009-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2009-2017 sachin.
 //=======================================================================
-using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.Msg;
 using System;
 using System.Collections.Generic;
 
@@ -56,19 +56,21 @@ namespace Assets.Scripts.LiplisSystem.Cif.v60.Res
         /// すべてのリストを取得する
         /// </summary>
         /// <returns></returns>
-        public List<MsgBaseNewsData> GetAllList()
-        {
-            List<MsgBaseNewsData> resultList = new List<MsgBaseNewsData>();
+        //public List<MsgBaseNewsData> GetAllList()
+        //{
+        //    List<MsgBaseNewsData> resultList = new List<MsgBaseNewsData>();
 
-            resultList.AddRange(NewsList);
-            resultList.AddRange(MatomeList);
-            resultList.AddRange(ReTweetList);
-            resultList.AddRange(PictureList);
-            resultList.AddRange(HashList);
-            resultList.AddRange(HotWordList);
+        //    resultList.AddRange(NewsList);
+        //    resultList.AddRange(MatomeList);
+        //    resultList.AddRange(ReTweetList);
+        //    resultList.AddRange(PictureList);
+        //    resultList.AddRange(HashList);
+        //    resultList.AddRange(HotWordList);
 
-            return resultList;
-        }
+        //    return resultList;
+        //}
+
+
 
         /// <summary>
         /// リストの更新
@@ -168,6 +170,5 @@ namespace Assets.Scripts.LiplisSystem.Cif.v60.Res
                 return "";
             }
         }
-
     }
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright(c) Live2D Inc. All rights reserved.
  * 
  * Use of this source code is governed by the Live2D Open Software license
@@ -6,10 +6,9 @@
  */
 
 
-using System;
 using Live2D.Cubism.Core;
-using Live2D.Cubism.Framework;
 using Live2D.Cubism.Rendering.Masking;
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -678,7 +677,7 @@ namespace Live2D.Cubism.Rendering
         private void TryInitializeMesh()
         {
             // Only create mesh if necessary.
-            // HACKA 'Mesh.vertex > 0' makes sure mesh is recreated in case of runtime instantiation.
+            // HACK 'Mesh.vertex > 0' makes sure mesh is recreated in case of runtime instantiation.
             if (Meshes != null && Mesh.vertexCount > 0)
             {
                 return;

@@ -24,7 +24,7 @@ namespace Live2D.Cubism.Rendering.Masking
         private static int _uniqueId;
 
         /// <summary>
-        /// HACKA Prevents dynamic batching of <see cref="CubismRenderer"/>s that are masked.
+        /// HACK Prevents dynamic batching of <see cref="CubismRenderer"/>s that are masked.
         /// </summary>
         /// <remarks>
         /// As Unity transforms vertex positions into world space on dynamic batching, and masking relies on vertex positions to be in local space,

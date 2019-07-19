@@ -5,16 +5,16 @@
 //
 //              ソートオーダーをばらけさせること。
 //              致命的な負荷増大となる。
-//  LiplisLive2D
-//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2018 sachin.
 //====================================================================
+using Assets.Scripts.Com;
 using Assets.Scripts.Data;
 using Assets.Scripts.Define;
-using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Model.Event;
 using Assets.Scripts.LiplisSystem.Model.Json;
 using Assets.Scripts.LiplisSystem.Model.Setting;
-using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.Msg;
 using Assets.Scripts.Utils;
 using LiplisMoonlight;
 using LiplisMoonlight.LiplisModel;
@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.LiplisSystem.Model
 {
@@ -55,12 +56,11 @@ namespace Assets.Scripts.LiplisSystem.Model
 
         //=============================
         //ウインドウキューリスト
-        public Queue<TalkWindow> WindowTalkListQ;
-        public TalkWindow NowTalkWindow;          //現在おしゃべりウインドウ
+        public Queue<TalkWindow2> WindowTalkListQ;
+        public TalkWindow2 NowTalkWindow;          //現在おしゃべりウインドウ
 
         //=============================
         //スプライト
-        public Sprite SpriteWindow;
         public Sprite SpriteLogWindow;
         public Sprite SpriteCharIcon;
 
@@ -91,21 +91,19 @@ namespace Assets.Scripts.LiplisSystem.Model
         //モデル位置
         public const int MODEL_POS_RIGHT = 0;
         public int MODEL_POS_LEFT { get { return this.ModelNum - 1; } }
-//====================================================================
-//
-//                             初期化処理
-//                         
-//====================================================================
-#region 初期化処理
+
+        //====================================================================
+        //
+        //                             初期化処理
+        //                         
+        //====================================================================
+        #region 初期化処理
 
         /// <summary>
         /// ファイルロード コンストラクター
         /// </summary>
         public LiplisModel(int AllocationId, 
-            GameObject CanvasRendering,
             string ModelPath, 
-            ModelEvents.
-            OnNextTalkOrSkip CallbackOnNextTalkOrSkip,
             int ModelNum)
         {
             //アロケーションID設定
@@ -113,27 +111,17 @@ namespace Assets.Scripts.LiplisSystem.Model
 
             //ソートオーダーの設定
             this.SortOrder = AllocationId * 10;
-
-            //レンダリング階層取得
-            this.CanvasRendering = CanvasRendering;
-
-            //コールバックメソッドの設定
-            this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
-
             //モデル数セット
             this.ModelNum = ModelNum;
 
             //モデル設定を読み込み
             LoadModelSetting(ModelPath);
 
-            //イメージの読み込み
-            LoadImage();
-
             //プレファブの初期化
             InitPrefab();
 
             //モデルの初期化
-            InitModel(false);
+            InitModel();
 
             //トークウインドウの初期化
             InitTalkWindow();
@@ -151,10 +139,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="chatSetting"></param>
         /// <param name="TextureWindow"></param>
         public LiplisModel(int AllocationId, 
-            GameObject CanvasRendering,
             string ModelPath,
-            ModelEvents.OnNextTalkOrSkip 
-            CallbackOnNextTalkOrSkip,  
             LiplisMoonlightModel modelSetting, 
             LiplisToneSetting toneSetting,
             LiplisChatSetting chatSetting, 
@@ -169,18 +154,11 @@ namespace Assets.Scripts.LiplisSystem.Model
             //ソートオーダーの設定
             this.SortOrder = AllocationId * 10 + 100;
 
-            //レンダリング階層取得
-            this.CanvasRendering = CanvasRendering;
-
             //モデル設定を読み込み
             this.ModelPath = ModelPath;
 
-            //コールバックメソッドの設定
-            this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
-
             //モデル数セット
             this.ModelNum = ModelNum;
-
 
             //モデル設定
             this.modelSetting = modelSetting;
@@ -188,24 +166,23 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.chatSetting = chatSetting;
 
             //イメージの読み込み
-            this.SpriteWindow = CreateTalkWindowSprite(TextureWindow);
             this.SpriteLogWindow = CreateTalkWindowSprite(TextureLogWindow);
             this.SpriteCharIcon = CreateTalkWindowSprite(TextureCharIcon);
 
-            //モデルの初期化
-            InitModel(true);
+            ////モデルの初期化
+            InitModel();
 
-            //プレファブの初期化
+            ////プレファブの初期化
             InitPrefab();
 
-            //トークウインドウの初期化
+            ////トークウインドウの初期化
             InitTalkWindow();
         }
 
         /// <summary>
         /// モデルの初期化
         /// </summary>
-        private void InitModel(bool flgResource)
+        private void InitModel()
         {
             //モデル名の設定
             this.ModelName = modelSetting.ModelName;
@@ -217,11 +194,25 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モデルを表示する前に特定。モデルの引数として必要。
             InitPositionAndLocation();
 
-            //モデルの読み込み
-            LoadModel(flgResource);
-
             //おしゃべり設定の読み込み
             LoadTalkSetting();
+        }
+
+        /// <summary>
+        /// モデルをロードし、画面に召喚する
+        /// </summary>
+        /// <param name="CanvasRendering"></param>
+        /// <param name="CallbackOnNextTalkOrSkip"></param>
+        public void ActivateModel(GameObject CanvasRendering, ModelEvents.OnNextTalkOrSkip CallbackOnNextTalkOrSkip)
+        {
+            //レンダリング階層取得
+            this.CanvasRendering = CanvasRendering;
+
+            //コールバックメソッドの設定
+            this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
+
+            //モデルの読み込み
+            LoadModel();
 
             //アクティブモデルをセットし、モデルを一つ表示する
             SetActiveModel();
@@ -236,7 +227,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         private void InitPrefab()
         {
             //ウインドウプレハブインスタンス生成
-            this.ImageInstanceWindow = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_TALK_S_1);
+            this.ImageInstanceWindow = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_TALK_S_2);
             this.ImageInstanceLogWindowL = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_L1);
             this.ImageInstanceLogWindowR = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_R1);
         }
@@ -246,7 +237,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         private void InitTalkWindow()
         {
-            WindowTalkListQ = new Queue<TalkWindow>();
+            WindowTalkListQ = new Queue<TalkWindow2>();
         }
 
         /// <summary>
@@ -283,22 +274,9 @@ namespace Assets.Scripts.LiplisSystem.Model
         }
 
         /// <summary>
-        /// ウインドウイメージをロードする
-        /// </summary>
-        private void LoadImage()
-        {
-            //TODO LiplisModel:LoadImage要実装
-
-            //this.SpriteWindow = CreateTalkWindowSprite(windowTexutre);
-            //this.SpriteLogWindow = CreateTalkWindowSprite(windowTexutre);
-            //this.SpriteCharWindow = CreateTalkWindowSprite(windowTexutre);
-
-        }
-
-        /// <summary>
         /// モデルの読み込み
         /// </summary>
-        private void LoadModel(bool flgResource)
+        private void LoadModel()
         {
             //モデルリスト初夏
             ModelList = new List<IfsLiplisModel>();
@@ -306,10 +284,10 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モデルファイルのロード
             foreach (LiplisModelData modelData in modelSetting.ModelList)
             {
-                LoadModel(modelData,modelSetting.ModelType, flgResource);
+                LoadModel(modelData,modelSetting.ModelType);
             }
         }
-        private void LoadModel(LiplisModelData modelData ,int ModelType, bool flgResource)
+        private void LoadModel(LiplisModelData modelData ,int ModelType)
         {
             //モデルタイプによってインスタンス化する実装クラスを可変
             if (ModelType == (int)LiplisModelType.VRM)
@@ -323,20 +301,23 @@ namespace Assets.Scripts.LiplisSystem.Model
             else
             {
                 //デフォルトはLive2dとする。
-                LoadModelLive2d30(modelData, flgResource);
+                LoadModelLive2d30(modelData);
             }
         }
 
-
-        private void LoadModelLive2d30(LiplisModelData modelData, bool flgResource)
+        /// <summary>
+        /// モデルをロードする
+        /// </summary>
+        /// <param name="modelData"></param>
+        /// <param name="flgResource"></param>
+        private void LoadModelLive2d30(LiplisModelData modelData)
         {
             //Live2dモデルの読み込み
             IfsLiplisModel model = new LiplisModelLive2d(this.ModelPath,
-                flgResource,
                 modelData,
                 modelSetting.ModelScale,
-                CanvasRendering, 
-                ModelLocation, 
+                CanvasRendering,
+                ModelLocation,
                 Expression,
                 CallbackOnNextTalkOrSkip
                 );
@@ -548,9 +529,6 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モデルビジブル再設定
             SetModelVisible();
         }
-
-
-
 
         /// <summary>
         /// 方向モデルを取得する
@@ -791,7 +769,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public TalkWindow CreateWindowTalk(string message)
+        public TalkWindow2 CreateWindowTalk(string message, Text TextMainTalk)
         {
             //向き変更
             this.ChangeDirectionRandam();
@@ -800,9 +778,9 @@ namespace Assets.Scripts.LiplisSystem.Model
             GameObject window = UnityEngine.Object.Instantiate(ImageInstanceWindow) as GameObject;
 
             //ウインドウ
-            return CreateWindowTalk(window, message);
+            return CreateWindowTalk(window, message, TextMainTalk);
         }
-        public TalkWindow CreateWindowTalk(GameObject window, string message)
+        public TalkWindow2 CreateWindowTalk(GameObject window, string message, Text TextMainTalk)
         {
             try
             {
@@ -822,10 +800,10 @@ namespace Assets.Scripts.LiplisSystem.Model
                 windowRect.sizeDelta = CulcWindowSize(message);
 
                 //ローカルスケール設定
-                windowRect.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                windowRect.localScale = new Vector3(1f, 1f, 1f);
 
                 //ウインドウインスタンス取得
-                TalkWindow talkWindow = window.GetComponent<TalkWindow>();
+                TalkWindow2 talkWindow = window.GetComponent<TalkWindow2>();
 
                 //モデル設定
                 talkWindow.TargetModel = ActiveModel;
@@ -836,6 +814,9 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //ペアレント設定
                 talkWindow.SetParentWindow(window);
 
+                //ペアレント設定
+                talkWindow.SetMainText(TextMainTalk);
+
                 //高さ設定
                 talkWindow.SetHeightImg(windowRect.sizeDelta.y);
 
@@ -843,7 +824,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 talkWindow.SetCreateTime(DateTime.Now);
 
                 //ウインドウ画像の設定
-                talkWindow.SetWindowImage(SpriteWindow);
+                talkWindow.SetColor(GetColorFromSetting());
 
                 //NULLでなければウインドウセット
                 if (talkWindow != null)
@@ -869,7 +850,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         /// <param name="talkWindow"></param>
         /// <param name="AllocationId"></param>
-        public void SetWindow(TalkWindow talkWindow, int AllocationId)
+        public void SetWindow(TalkWindow2 talkWindow, int AllocationId)
         {
             //ターゲットモデルセット
             talkWindow.TargetModel = ActiveModel;
@@ -888,7 +869,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="message"></param>
-        private void AddWindow(TalkWindow talkWindow)
+        private void AddWindow(TalkWindow2 talkWindow)
         {
             //1個以上ならスライドする
             if (WindowTalkListQ.Count >= 1)
@@ -912,7 +893,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// <summary>
         /// ウインドをスライドする
         /// </summary>
-        private void SlideWindow(TalkWindow newTalkWindow)
+        private void SlideWindow(TalkWindow2 newTalkWindow)
         {
             //ウインドウが無ければ動かさない
             if (WindowTalkListQ.Count < 1)
@@ -962,7 +943,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         private void DestroyWindow()
         {
-            Queue<TalkWindow> bufQ = new Queue<TalkWindow>();
+            Queue<TalkWindow2> bufQ = new Queue<TalkWindow2>();
 
             //カウントチェック
             if (WindowTalkListQ.Count < 1)
@@ -974,7 +955,7 @@ namespace Assets.Scripts.LiplisSystem.Model
                 //まわして、範囲内のものはバッファキューに、範囲外のものは削除
                 while (WindowTalkListQ.Count > 0)
                 {
-                    TalkWindow talkWindow = WindowTalkListQ.Dequeue();
+                    TalkWindow2 talkWindow = WindowTalkListQ.Dequeue();
 
                     if (WindowTalkListQ.Count >= LiplisSetting.Instance.Setting.GetSpeechBallonNum())
                     {
@@ -1025,6 +1006,37 @@ namespace Assets.Scripts.LiplisSystem.Model
                 WindowTalkListQ.Dequeue().CloseWindow();
             }
         }
+
+        /// <summary>
+        /// 設定から
+        /// </summary>
+        /// <param name="settingStr"></param>
+        /// <returns></returns>
+        public Color GetColorFromSetting()
+        {
+            try
+            {
+                string[] buf = modelSetting.SpeechBallonColor.Split(',');
+
+                if(buf.Length == 3)
+                {
+                    return new Color(float.Parse(buf[0])/255f, float.Parse(buf[1])/255f, float.Parse(buf[2])/255f, 200f / 255);
+                }
+                else if(buf.Length == 4)
+                {
+                    return new Color(float.Parse(buf[0]) / 255f, float.Parse(buf[1]) / 255f, float.Parse(buf[2]) / 255f, float.Parse(buf[3]) / 255);
+                }
+                else
+                {
+                    return new Color(1f, 1f, 1f, 200f / 255);
+                }
+            }
+            catch
+            {
+                return new Color(1f, 1f, 1f, 200f/255);
+            }
+        }
+
         #endregion
 
         //====================================================================

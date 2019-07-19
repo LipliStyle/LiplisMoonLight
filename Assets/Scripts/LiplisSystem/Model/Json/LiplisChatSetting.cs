@@ -3,8 +3,8 @@
 //  概要      : チャットセンテンス
 //              
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2018 sachin.
 //====================================================================
 using System;
 using System.Collections.Generic;

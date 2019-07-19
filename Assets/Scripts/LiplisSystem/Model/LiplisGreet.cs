@@ -3,16 +3,16 @@
 //  概要      : キャラクターあいさつデータ
 //              
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //====================================================================
-using Assets.Scripts.Common;
+using Assets.Scripts.Com;
 using Assets.Scripts.Data;
 using Assets.Scripts.LiplisSystem.Cif.v60.Res;
-using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Model.Json;
-using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.LiplisSystem.Sentece;
+using Assets.Scripts.Msg;
+using Assets.Scripts.Utils;
 using System;
 using System.Collections.Generic;
 

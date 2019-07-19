@@ -6,8 +6,8 @@
  */
 
 
-using System;
 using Live2D.Cubism.Rendering;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -82,7 +82,7 @@ namespace Live2D.Cubism.Editor.Inspectors
                 foreach (var renderer in controller.Renderers)
                 {
                     EditorUtility.SetDirty(renderer);
-                    // HACKA Get mesh renderer directly.
+                    // HACK Get mesh renderer directly.
                     EditorUtility.SetDirty(renderer.GetComponent<MeshRenderer>());
                 }
             }

@@ -3,10 +3,10 @@
 //  概要      : 天気おしゃべりデータ
 //              シングルトン
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //=======================================================================﻿
-using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.Msg;
 
 namespace Assets.Scripts.Data.Talk
 {

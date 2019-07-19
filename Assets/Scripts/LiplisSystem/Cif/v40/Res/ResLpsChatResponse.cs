@@ -3,7 +3,7 @@
 //  概要      : おしゃべり応答
 //
 //  SatelliteServer
-//  Copyright(c) 2009-2015 sachin. All Rights Reserved. 
+//  Copyright(c) 2009-2015 sachin.
 //=======================================================================
 using System;
 using System.Collections.Generic;

@@ -3,9 +3,10 @@
 //  概要      : キャラクター口調データ
 //              
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2018 sachin.
 //====================================================================
+using Assets.Scripts.Com;
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Model.Json;

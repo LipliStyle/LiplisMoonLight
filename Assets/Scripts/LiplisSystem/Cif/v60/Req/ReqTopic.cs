@@ -5,7 +5,7 @@
 //  入力      : tone="トーン定義URL"
 //
 //  LiplisSystemシステム      
-//  Copyright(c) 2010-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2010-2017 sachin.
 //=======================================================================
 using System.Collections.Generic;
 

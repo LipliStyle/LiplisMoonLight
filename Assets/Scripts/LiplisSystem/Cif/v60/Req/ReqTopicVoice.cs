@@ -4,7 +4,7 @@
 //
 //
 //  LiplisSystemシステム      
-//  Copyright(c) 2010-2018 sachin. All Rights Reserved. 
+//  Copyright(c) 2010-2018 sachin.
 //=======================================================================
 
 namespace Assets.Scripts.LiplisSystem.Cif.v60.Req

@@ -3,8 +3,8 @@
 //  概要      : プリセットモデルの設定を読み込む
 //              
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2018 sachin.
 //====================================================================
 using LiplisMoonlight;
 using System;

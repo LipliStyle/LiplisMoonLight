@@ -1,10 +1,15 @@
-﻿using Assets.Scripts.LiplisSystem.Com;
-using Assets.Scripts.LiplisSystem.Msg;
+﻿//=======================================================================
+//  ClassName : LiplisNewsJpJson
+//  概要      : ニュースJson
+//
+//  LiplisMoonlight
+//  Copyright(c) 2017-2019 sachin.
+//=======================================================================﻿
+using Assets.Scripts.Com;
+using Assets.Scripts.Msg;
 using Clalis.v40.Res;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Assets.Scripts.LiplisSystem.Web.Clalis

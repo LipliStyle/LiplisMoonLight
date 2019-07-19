@@ -3,8 +3,8 @@
 //  概要      : DataTexture
 //              テクスチャーキャッシュ
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //=======================================================================﻿
 
 using System;

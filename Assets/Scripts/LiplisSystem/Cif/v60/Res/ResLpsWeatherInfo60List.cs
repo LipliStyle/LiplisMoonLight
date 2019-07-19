@@ -3,7 +3,7 @@
 //  概要      : ロケーションインフォリスト
 //
 //  LiplisSystemシステム      
-//  Copyright(c) 2010-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2010-2017 sachin.
 //=======================================================================
 using Assets.Scripts.LiplisSystem.Cif.v40.Res;
 using System.Collections.Generic;

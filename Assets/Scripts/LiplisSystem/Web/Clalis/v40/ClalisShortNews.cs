@@ -1,5 +1,13 @@
-﻿using Assets.Scripts.LiplisSystem.Com;
-using Assets.Scripts.LiplisSystem.Msg;
+﻿//====================================================================
+//  ClassName : ClalisShortNews
+//  概要      : 天気ショートニュース取得
+//              
+//
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
+//====================================================================
+using Assets.Scripts.LiplisSystem.Com;
+using Assets.Scripts.Msg;
 using Clalis.v40.Res;
 using Newtonsoft.Json;
 using System.Collections.Specialized;

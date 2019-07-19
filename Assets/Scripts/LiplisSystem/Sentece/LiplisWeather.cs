@@ -3,13 +3,13 @@
 //  概要      : 天気文章を生成するクラス
 //              
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //====================================================================
 using Assets.Scripts.Data;
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Model;
-using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.Msg;
 using System;
 using System.Collections.Generic;
 namespace Assets.Scripts.LiplisSystem.Sentece

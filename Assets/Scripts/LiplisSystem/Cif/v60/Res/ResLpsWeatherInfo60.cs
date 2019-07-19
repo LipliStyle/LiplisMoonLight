@@ -4,7 +4,7 @@
 //  概要      : レスポンス天気情報改
 //
 //  SatelliteServer
-//  Copyright(c) 2009-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2009-2017 sachin.
 //=======================================================================
 using System;
 

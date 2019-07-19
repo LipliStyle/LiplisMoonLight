@@ -2,10 +2,10 @@
 //  ClassName : ThumbnailUrl
 //  概要      : サムネイルURL生成クラス
 //              
-//  LiplisLive2D
+//  LiplisMoonlight
 //  Create 2018/06/23
 //
-//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//  Copyright(c) 2017-2018 sachin.
 //=======================================================================﻿
 using Assets.Scripts.LiplisSystem.Com;
 

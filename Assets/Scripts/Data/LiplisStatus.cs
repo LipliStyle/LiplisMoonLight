@@ -3,10 +3,12 @@
 //  概要      : ステータスデータ
 //              シングルトン
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //=======================================================================﻿
+using Assets.Scripts.Com;
 using Assets.Scripts.Data.SubData;
+using Assets.Scripts.Msg;
 using System;
 
 namespace Assets.Scripts.Data
@@ -39,6 +41,15 @@ namespace Assets.Scripts.Data
         }
 
         /// <summary>
+        /// コンストラクター
+        /// </summary>
+        public LiplisStatus()
+        {
+            DataLoad();
+        }
+
+
+        /// <summary>
         /// インスタンスをセットする
         /// </summary>
         /// <param name="Instance"></param>
@@ -52,31 +63,47 @@ namespace Assets.Scripts.Data
         }
 
         /// <summary>
-        /// コンストラクター
-        /// </summary>
-        public LiplisStatus()
-        {
-            DataLoad();
-        }
-
-        /// <summary>
         /// データロードする
         /// </summary>
         public void DataLoad()
         {
-            if (this.InfoLocation     == null) { this.InfoLocation = new DatLocation(); }
-            if (this.InfoWether       == null) {this.InfoWether = new DatWether(); }
-            if (this.NewTopic         == null) { this.NewTopic = new　DatNewTopic(); }
-            if (this.InfoAnniversary  == null) { this.InfoAnniversary = new DatAnniversaryDays(); }
-            if (this.NewsList         == null) { this.NewsList = new DatNewsList(); }
+            if (this.InfoLocation                == null) { this.InfoLocation = new DatLocation(); }
+            if (this.InfoWether                  == null) {this.InfoWether = new DatWether(); }
+            if (this.NewTopic                    == null) { this.NewTopic = new　DatNewTopic(); }
+            if (this.InfoAnniversary             == null) { this.InfoAnniversary = new DatAnniversaryDays(); }
+            if (this.NewsList                    == null) { this.NewsList = new DatNewsList(); }
+            if (this.NewTopic.TalkTopicList      == null) { this.NewTopic.TalkTopicList = new LpsQueue<MsgTopic>(); }
+            if (this.NewTopic.InterruptTopicList == null) { this.NewTopic.InterruptTopicList = new LpsQueue<MsgTopic>(); }
+            this.EnvironmentInfo                 = new DatEnvironmentInfomation(); //環境情報初期化
 
-            this.EnvironmentInfo = new DatEnvironmentInfomation();
+            //天気情報は常に最新を取る
+            this.InfoWether.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
+
+            //本日情報は常に最新を取る
+            this.InfoAnniversary.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
+
+            //ニュースリストは常に最新を取る
+            this.NewsList.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
+
+            //地域データは常に最新を取る
+            this.InfoLocation.LastUpdateTime = LpsDatetimeUtil.enc(DateTime.Now.AddMinutes(-70));
+
+            //最終解放日時
+            this.LastRunReleaseProcessing = DateTime.Now;
+
+            //保持件数が少ない場合は更新時刻を初期化する
+            this.NewTopic.InitLastUpdateTime();
+
+            //ペンディングフォルス設定
+            this.EnvironmentInfo.SetPendingOff();
         }
 
         #endregion
 
         //環境情報
         public DatEnvironmentInfomation EnvironmentInfo;
+
+
 
         //最終挨拶
         //最終ニュース

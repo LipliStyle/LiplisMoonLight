@@ -3,9 +3,9 @@
 //  概要      : アニバーサーリーデイズ
 //
 //  SatelliteServer
-//  Copyright(c) 2009-2017 sachin. All Rights Reserved. 
+//  Copyright(c) 2009-2017 sachin.
 //=======================================================================
-using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.Msg;
 using System.Collections.Generic;
 
 namespace Assets.Scripts.LiplisSystem.Cif.v60.Res

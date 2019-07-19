@@ -27,8 +27,8 @@
 //
 //　　publicフィールドをシリアライズから除外したい場合は[NonSerialized] をつける
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //====================================================================
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,9 +40,9 @@ namespace Assets.Scripts.Data
         /// <summary>
         /// SingletonなSaveDatabaseクラス
         /// </summary>
-        protected static SaveDataBase data = null;
+        protected static SaveDataSystem data = null;
 
-        protected static SaveDataBase Savedatabase
+        protected static SaveDataSystem Savedatabase
         {
             get
             {
@@ -50,7 +50,7 @@ namespace Assets.Scripts.Data
                 {
                     string path = Application.persistentDataPath + "/";
                     string fileName = Application.companyName + "." + Application.productName + ".savedata_setting.json";
-                    data = new SaveDataBase(path, fileName);
+                    data = new SaveDataSystem(path, fileName);
                 }
                 return data;
             }

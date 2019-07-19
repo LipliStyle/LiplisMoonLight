@@ -4,14 +4,15 @@
 //              
 //              ドラッグ移動は「DragGameObject」で行っている。インスタンス生成時、アタッチしている。
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2018 sachin.
 //====================================================================
 using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Model.Event;
 using Assets.Scripts.LiplisSystem.Model.Setting;
-using Assets.Scripts.LiplisSystem.Msg;
 using Assets.Scripts.LiplisUi.uGuiUtil;
+using Assets.Scripts.Live2dEx;
+using Assets.Scripts.Msg;
 using Assets.Scripts.Utils;
 using LiplisMoonlight.LiplisModel;
 using Live2D.Cubism.Core;
@@ -24,6 +25,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Live2D.Cubism.Framework.Json.CubismModel3Json;
 
 namespace Assets.Scripts.LiplisSystem.Model
 {
@@ -83,7 +85,6 @@ namespace Assets.Scripts.LiplisSystem.Model
         //モデルデータ設定
         private LiplisModelData modelData;
         public int Direction { get; set; }
-        private bool flgResource { get; set; }
 
         //====================================================================
         //
@@ -96,7 +97,6 @@ namespace Assets.Scripts.LiplisSystem.Model
         /// </summary>
         /// <param name="targetPath"></param>
         public LiplisModelLive2d(string modelPath,          //モデルパス
-                                bool flgResource,
                                 LiplisModelData modelData,  //モデルデータ
                                 float ModelScale,
                                 GameObject CanvasRendering, //親キャンバス
@@ -110,7 +110,6 @@ namespace Assets.Scripts.LiplisSystem.Model
             this.CanvasRendering = CanvasRendering;
             this.Direction = modelData.Direction;
             this.CallbackOnNextTalkOrSkip = CallbackOnNextTalkOrSkip;
-            this.flgResource = flgResource;
             this.ModelScale = ModelScale;
 
             //モデルのロード
@@ -137,8 +136,8 @@ namespace Assets.Scripts.LiplisSystem.Model
             //モデル生成
             this.model = model3Json.ToModel();
 
-            //アニメーターアタッチ
-            this.model.gameObject.AddComponent<Animation>();
+            //追加のコンポーネントをアタッチ
+            ToModelAttacheEx(model3Json.Groups);
 
             //モデルゲームオブジェクトを取得する
             this.ModelObject = this.model.gameObject;
@@ -186,6 +185,84 @@ namespace Assets.Scripts.LiplisSystem.Model
             //ドラッグオブジェクトのセット
             SetDragObject();
         }
+
+        /// <summary>
+        /// モデルに追加のコンポーネントをアタッチする
+        /// </summary>
+        /// <param name="Groups"></param>
+        private void ToModelAttacheEx(SerializableGroup[] Groups)
+        {
+            //アニメーターアタッチ
+            if (this.model.gameObject.GetComponent<Animation>() == null)
+            {
+                this.model.gameObject.AddComponent<Animation>();
+            }
+
+            // オーディオソースアタッチ
+            if (this.model.gameObject.GetComponent<AudioSource>() == null)
+            {
+                this.model.gameObject.AddComponent<AudioSource>();
+            }
+
+            //当たり判定クラスの追加
+            if (this.model.gameObject.GetComponent<CubismRaycaster>() == null)
+            {
+                this.model.gameObject.AddComponent<CubismRaycaster>();
+            }
+
+            // グループの初期化
+            var parameters = model.Parameters;
+
+            //パラメーターの読み込み、設定
+            for (var i = 0; i < parameters.Length; ++i)
+            {
+                if (IsParameterInGroup(parameters[i], "EyeBlink", Groups))
+                {
+                    if (model.gameObject.GetComponent<CubismEyeBlinkController>() == null)
+                    {
+                        model.gameObject.AddComponent<CubismEyeBlinkController>();
+
+                        //上書きモードに設定
+                        model.gameObject.GetComponent<CubismEyeBlinkController>().BlendMode = CubismParameterBlendMode.Override;
+                    }
+                    //まばたきが存在したら、瞬きコントローラ追加
+                    if (model.gameObject.GetComponent<CubismAutoEyeBlinkInput>() == null)
+                    {
+                        model.gameObject.AddComponent<CubismAutoEyeBlinkInput>();
+                    }
+
+                    parameters[i].gameObject.AddComponent<CubismEyeBlinkParameter>();
+                }
+
+
+                // Set up mouth parameters.
+                if (IsParameterInGroup(parameters[i], "LipSync", Groups))
+                {
+                    if (model.gameObject.GetComponent<CubismMouthController>() == null)
+                    {
+                        model.gameObject.AddComponent<CubismMouthController>();
+
+                        //上書きモードに設定
+                        model.gameObject.GetComponent<CubismMouthController>().BlendMode = CubismParameterBlendMode.Override;
+                    }
+                    if (model.gameObject.GetComponent<CubismAutoMouthInput>() == null)
+                    {
+                        model.gameObject.AddComponent<CubismAutoMouthInput>();
+                    }
+
+
+                    parameters[i].gameObject.AddComponent<CubismMouthParameter>();
+                }
+            }
+
+            ////目線追従クラスの追加
+            //if (model.gameObject.GetComponent<CubismLookController>() == null)
+            //{
+            //    var clc = model.gameObject.AddComponent<CubismLookController>();
+            //}
+        }
+
+
 
         /// <summary>
         /// 方向パラメータを取得する
@@ -833,6 +910,44 @@ namespace Assets.Scripts.LiplisSystem.Model
                 PramAngleX.Value = PARAM_NEWTRAL;
                 ParamBodyAngleX.Value = PARAM_NEWTRAL;
             }
+        }
+
+        /// <summary>
+        /// Checks whether the parameter is an eye blink parameter.
+        /// </summary>
+        /// <param name="parameter">Parameter to check.</param>
+        /// <param name="groupName">Name of group to query for.</param>
+        /// <returns><see langword="true"/> if parameter is an eye blink parameter; <see langword="false"/> otherwise.</returns>
+        private bool IsParameterInGroup(CubismParameter parameter, string groupName, SerializableGroup[] Groups)
+        {
+            // Return early if groups aren't available...
+            if (Groups == null || Groups.Length == 0)
+            {
+                return false;
+            }
+
+
+            for (var i = 0; i < Groups.Length; ++i)
+            {
+                if (Groups[i].Name != groupName)
+                {
+                    continue;
+                }
+
+                if (Groups[i].Ids != null)
+                {
+                    for (var j = 0; j < Groups[i].Ids.Length; ++j)
+                    {
+                        if (Groups[i].Ids[j] == parameter.name)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+
+            return false;
         }
 
 

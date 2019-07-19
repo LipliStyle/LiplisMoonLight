@@ -1,5 +1,16 @@
 ## Live2D Cubism Core Changelog
 
+*2019-01-31*
+
+- Added API to get the parent Part of the specified Part.
+- Added API to get moc3 version.
+
+
+*2018-12-20*
+- Upgrade Core version to 03.03.0000 (50528256). This upgrade is following Cubism Editor 3.3 features.
+- [Native, 3.3 Support] Support new Warp Deformer features.
+- [Native] Add new function: `csmGetPartParentPartIndices`
+
 *2018-08-22*
 
 - [Native] Add support for Neon.

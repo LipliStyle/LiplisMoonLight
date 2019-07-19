@@ -2,8 +2,8 @@
 //  ClassName : Browser
 //  概要      : ブラウザを開く
 //
-//  LiplisLive2DSystem
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //=======================================================================﻿
 using Assets.Scripts.LiplisSystem.Com;
 using UnityEngine;

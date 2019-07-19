@@ -3,22 +3,17 @@
 //  概要      : キャッシュデータ
 //              シングルトン
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //=======================================================================﻿
-using Assets.Scripts.Data.Cache;
 using Assets.Scripts.Data.SubData;
-using System;
-using System.Collections.Generic;
 
 namespace Assets.Scripts.Data
 {
     public class LiplisCache
     {
         //テクスチャーキャッシュ
-        //public Dictionary<string, CacheDataTexture> CacheThumbnail;
-
-
+        public DatImagePath ImagePath;
 
         //====================================================================
         //
@@ -49,7 +44,32 @@ namespace Assets.Scripts.Data
         /// </summary>
         public LiplisCache()
         {
-            //this.CacheThumbnail = new Dictionary<string, CacheDataTexture>();
+            DataLoad();
+        }
+
+        /// <summary>
+        /// インスタンスをセットする
+        /// </summary>
+        /// <param name="Instance"></param>
+        public static void SetInstance(LiplisCache Instance)
+        {
+            //インスタンスセット
+            instance = Instance;
+
+            //リストが初期化されない可能性があるので、データロードを呼んでおく。
+            instance.DataLoad();
+        }
+
+        /// <summary>
+        /// データロードする
+        /// </summary>
+        public void DataLoad()
+        {
+            //インスタンス化
+            if (this.ImagePath == null) { this.ImagePath = new DatImagePath(); }
+
+            //リストからディクショナリを復元する
+            this.ImagePath.Recovery();
         }
 
         #endregion

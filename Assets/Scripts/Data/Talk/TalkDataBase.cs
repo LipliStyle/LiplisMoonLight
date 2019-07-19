@@ -1,4 +1,11 @@
-﻿using Assets.Scripts.LiplisSystem.Msg;
+﻿//=======================================================================
+//  ClassName : TalkDataBase
+//  概要      : トークデータ ベース メッセージ
+//
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
+//=======================================================================﻿
+using Assets.Scripts.Msg;
 using System;
 using System.Collections.Generic;
 using System.Linq;

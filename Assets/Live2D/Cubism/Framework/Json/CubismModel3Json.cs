@@ -12,10 +12,12 @@ using System.IO;
 using Live2D.Cubism.Framework.MouthMovement;
 using Live2D.Cubism.Framework.Physics;
 using Live2D.Cubism.Framework.UserData;
+using Live2D.Cubism.Framework.Pose;
+using Live2D.Cubism.Framework.Expression;
+using Live2D.Cubism.Framework.MotionFade;
+using Live2D.Cubism.Framework.Raycasting;
 using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
-using Live2D.Cubism.Framework.Raycasting;
-using Live2D.Cubism.Framework.LookAt;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -93,7 +95,7 @@ namespace Live2D.Cubism.Framework.Json
 
             // Deserialize Json.
             var modelJson = JsonUtility.FromJson<CubismModel3Json>(modelJsonAsset);
-            //var modelJson = JsonConvert.DeserializeObject<CubismModel3Json>(modelJsonAsset);
+
 
             // Finalize deserialization.
             modelJson.AssetPath = assetPath;
@@ -136,6 +138,12 @@ namespace Live2D.Cubism.Framework.Json
         [SerializeField]
         public SerializableGroup[] Groups;
 
+        /// <summary>
+        /// Hit areas.
+        /// </summary>
+        [SerializeField]
+        public SerializableHitArea[] HitAreas;
+
         #endregion
 
         /// <summary>
@@ -149,6 +157,70 @@ namespace Live2D.Cubism.Framework.Json
             get
             {
                 return LoadReferencedAsset<byte[]>(FileReferences.Moc);
+            }
+        }
+
+        /// <summary>
+        /// <see cref="CubismPose3Json"/> backing field.
+        /// </summary>
+        [NonSerialized]
+        private CubismPose3Json _pose3Json;
+
+        /// <summary>
+        /// The contents of pose3.json asset.
+        /// </summary>
+        public CubismPose3Json Pose3Json
+        {
+            get
+            {
+                if(_pose3Json != null)
+                {
+                    return _pose3Json;
+                }
+
+                var jsonString = string.IsNullOrEmpty(FileReferences.Pose) ? null : LoadReferencedAsset<String>(FileReferences.Pose);
+                _pose3Json = CubismPose3Json.LoadFrom(jsonString);
+                return _pose3Json;
+            }
+        }
+
+        /// <summary>
+        /// <see cref="Expression3Jsons"/> backing field.
+        /// </summary>
+        [NonSerialized]
+        private CubismExp3Json[] _expression3Jsons;
+
+        /// <summary>
+        /// The referenced expression assets.
+        /// </summary>
+        /// <remarks>
+        /// The references aren't chached internally.
+        /// </remarks>
+        public CubismExp3Json[] Expression3Jsons
+        {
+            get
+            {
+                // Fail silently...
+                if(FileReferences.Expressions == null)
+                {
+                    return null;
+                }
+
+                // Load expression only if necessary.
+                if (_expression3Jsons == null)
+                {
+                    _expression3Jsons = new CubismExp3Json[FileReferences.Expressions.Length];
+
+                    for (var i = 0; i < _expression3Jsons.Length; ++i)
+                    {
+                        var expressionJson = (string.IsNullOrEmpty(FileReferences.Expressions[i].File))
+                                                ? null
+                                                : LoadReferencedAsset<string>(FileReferences.Expressions[i].File);
+                        _expression3Jsons[i] = CubismExp3Json.LoadFrom(expressionJson);
+                    }
+                }
+
+                return _expression3Jsons;
             }
         }
 
@@ -218,10 +290,11 @@ namespace Live2D.Cubism.Framework.Json
         /// <summary>
         /// Instantiates a <see cref="CubismMoc">model source</see> and a <see cref="CubismModel">model</see> with the default texture set.
         /// </summary>
+        /// <param name="shouldImportAsOriginalWorkflow">Should import as original workflow.</param>
         /// <returns>The instantiated <see cref="CubismModel">model</see> on success; <see langword="null"/> otherwise.</returns>
-        public CubismModel ToModel()
+        public CubismModel ToModel(bool shouldImportAsOriginalWorkflow = false)
         {
-            return ToModel(CubismBuiltinPickers.MaterialPicker, CubismBuiltinPickers.TexturePicker);
+            return ToModel(CubismBuiltinPickers.MaterialPicker, CubismBuiltinPickers.TexturePicker, shouldImportAsOriginalWorkflow);
         }
 
         /// <summary>
@@ -229,8 +302,9 @@ namespace Live2D.Cubism.Framework.Json
         /// </summary>
         /// <param name="pickMaterial">The material mapper to use.</param>
         /// <param name="pickTexture">The texture mapper to use.</param>
+        /// <param name="shouldImportAsOriginalWorkflow">Should import as original workflow.</param>
         /// <returns>The instantiated <see cref="CubismModel">model</see> on success; <see langword="null"/> otherwise.</returns>
-        public CubismModel ToModel(MaterialPicker pickMaterial, TexturePicker pickTexture)
+        public CubismModel ToModel(MaterialPicker pickMaterial, TexturePicker pickTexture, bool shouldImportAsOriginalWorkflow = false)
         {
             // Initialize model source and instantiate it.
             var mocAsBytes = Moc3;
@@ -241,13 +315,13 @@ namespace Live2D.Cubism.Framework.Json
                 return null;
             }
 
-            //キュービズムMoc生成
+
             var moc = CubismMoc.CreateFrom(mocAsBytes);
 
-            //モデル生成
+
             var model = CubismModel.InstantiateFrom(moc);
 
-            //モデル名設定
+
             model.name = Path.GetFileNameWithoutExtension(FileReferences.Moc);
 
 
@@ -257,35 +331,52 @@ namespace Live2D.Cubism.Framework.Json
             model.gameObject.AddComponent<CubismPartsInspector>();
 #endif
 
-
-            // CubismRenderControllerアタッチ
+            // Create renderers.
             var rendererController = model.gameObject.AddComponent<CubismRenderController>();
-
-            //レンダラー取得
             var renderers = rendererController.Renderers;
 
-            //ドローエイブル取得
             var drawables = model.Drawables;
 
-            // オーディオソースアタッチ
-            model.gameObject.AddComponent<AudioSource>();
 
-            // マテリアルの初期化
+            // Initialize materials.
             for (var i = 0; i < renderers.Length; ++i)
             {
                 renderers[i].Material = pickMaterial(this, drawables[i]);
             }
 
-            // テクスチャの初期化
+
+            // Initialize textures.
             for (var i = 0; i < renderers.Length; ++i)
             {
                 renderers[i].MainTexture = pickTexture(this, drawables[i]);
             }
 
-            // グループの初期化
+
+            // Initialize drawables. 
+            if(HitAreas != null)
+            {
+                for (var i = 0; i < HitAreas.Length; i++)
+                {
+                    for (var j = 0; j < drawables.Length; j++)
+                    {
+                        if (drawables[j].Id == HitAreas[i].Id)
+                        {
+                            // Add components for hit judgement to HitArea target Drawables.
+                            var hitDrawable = drawables[j].gameObject.AddComponent<CubismHitDrawable>();
+                            hitDrawable.Name = HitAreas[i].Name;
+
+                            drawables[j].gameObject.AddComponent<CubismRaycastable>();
+                            break;
+                        }
+                    }
+                }
+            }
+
+
+            // Initialize groups.
             var parameters = model.Parameters;
 
-            //パラメーターの読み込み、設定
+
             for (var i = 0; i < parameters.Length; ++i)
             {
                 if (IsParameterInGroup(parameters[i], "EyeBlink"))
@@ -293,15 +384,8 @@ namespace Live2D.Cubism.Framework.Json
                     if (model.gameObject.GetComponent<CubismEyeBlinkController>() == null)
                     {
                         model.gameObject.AddComponent<CubismEyeBlinkController>();
+                    }
 
-                        //上書きモードに設定
-                        model.gameObject.GetComponent<CubismEyeBlinkController>().BlendMode = CubismParameterBlendMode.Override;
-                    }
-                    //まばたきが存在したら、瞬きコントローラ追加
-                    if (model.gameObject.GetComponent<CubismAutoEyeBlinkInput>() == null)
-                    {
-                        model.gameObject.AddComponent<CubismAutoEyeBlinkInput>();
-                    }
 
                     parameters[i].gameObject.AddComponent<CubismEyeBlinkParameter>();
                 }
@@ -313,13 +397,6 @@ namespace Live2D.Cubism.Framework.Json
                     if (model.gameObject.GetComponent<CubismMouthController>() == null)
                     {
                         model.gameObject.AddComponent<CubismMouthController>();
-
-                        //上書きモードに設定
-                        model.gameObject.GetComponent<CubismMouthController>().BlendMode = CubismParameterBlendMode.Override;
-                    }
-                    if (model.gameObject.GetComponent<CubismAutoMouthInput>() == null)
-                    {
-                        model.gameObject.AddComponent<CubismAutoMouthInput>();
                     }
 
 
@@ -327,11 +404,10 @@ namespace Live2D.Cubism.Framework.Json
                 }
             }
 
-            // 必要があれば、マスクコントローラーを読み込む
+
+            // Add mask controller if required.
             for (var i = 0; i < drawables.Length; ++i)
             {
-
-
                 if (!drawables[i].IsMasked)
                 {
                     continue;
@@ -345,9 +421,56 @@ namespace Live2D.Cubism.Framework.Json
                 break;
             }
 
+            // Add original workflow component if is original workflow.
+            if(shouldImportAsOriginalWorkflow)
+            {
+                // Add cubism update manager.
+                var updateaManager = model.gameObject.GetComponent<CubismUpdateController>();
 
-            // 物理演算ファイルの初期化
+                if(updateaManager == null)
+                {
+                    model.gameObject.AddComponent<CubismUpdateController>();
+                }
+
+                // Add parameter store.
+                var parameterStore = model.gameObject.GetComponent<CubismParameterStore>();
+
+                if(parameterStore == null)
+                {
+                    parameterStore = model.gameObject.AddComponent<CubismParameterStore>();
+                }
+
+                // Add pose controller.
+                var poseController = model.gameObject.GetComponent<CubismPoseController>();
+
+                if(poseController == null)
+                {
+                    poseController = model.gameObject.AddComponent<CubismPoseController>();
+                }
+
+                // Add expression controller.
+                var expressionController = model.gameObject.GetComponent<CubismExpressionController>();
+
+                if(expressionController == null)
+                {
+                    expressionController = model.gameObject.AddComponent<CubismExpressionController>();
+                }
+
+
+                // Add fade controller.
+                var motionFadeController = model.gameObject.GetComponent<CubismFadeController>();
+
+                if(motionFadeController == null)
+                {
+                    motionFadeController = model.gameObject.AddComponent<CubismFadeController>();
+                }
+
+            }
+
+
+            // Initialize physics if JSON exists.
             var physics3JsonAsString = Physics3Json;
+
 
             if (!string.IsNullOrEmpty(physics3JsonAsString))
             {
@@ -363,7 +486,7 @@ namespace Live2D.Cubism.Framework.Json
                 physicsController.Initialize(physics3Json.ToRig());
             }
 
-            // ユーザーデータの初期化
+
             var userData3JsonAsString = UserData3Json;
 
 
@@ -394,28 +517,15 @@ namespace Live2D.Cubism.Framework.Json
                 }
             }
 
-            //アニメーターコンポーネントの追加
             if (model.gameObject.GetComponent<Animator>() == null)
             {
                 model.gameObject.AddComponent<Animator>();
             }
 
-            //当たり判定クラスの追加
-            if (model.gameObject.GetComponent<CubismRaycaster>() == null)
-            {
-                model.gameObject.AddComponent<CubismRaycaster>();
-            }
-
-            ////目線追従クラスの追加
-            //if (model.gameObject.GetComponent<CubismLookController>() == null)
-            //{
-            //    var clc = model.gameObject.AddComponent<CubismLookController>();
-            //}
-
             // Make sure model is 'fresh'
             model.ForceUpdateNow();
 
-            //モデルを返す
+
             return model;
         }
 
@@ -503,12 +613,14 @@ namespace Live2D.Cubism.Framework.Json
                     continue;
                 }
 
-
-                for (var j = 0; j < Groups[i].Ids.Length; ++j)
+                if(Groups[i].Ids != null)
                 {
-                    if (Groups[i].Ids[j] == parameter.name)
+                    for (var j = 0; j < Groups[i].Ids.Length; ++j)
                     {
-                        return true;
+                        if (Groups[i].Ids[j] == parameter.name)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -561,6 +673,24 @@ namespace Live2D.Cubism.Framework.Json
             public string[] Textures;
 
             /// <summary>
+            /// Relative path to the pose3.json.
+            /// </summary>
+            [SerializeField]
+            public string Pose;
+
+            /// <summary>
+            /// Relative path to the expression asset.
+            /// </summary>
+            [SerializeField]
+            public SerializableExpression[] Expressions;
+
+            /// <summary>
+            /// Relative path to the pose motion3.json.
+            /// </summary>
+            [SerializeField]
+            public SerializableMotions Motions;
+
+            /// <summary>
             /// Relative path to the physics asset.
             /// </summary>
             [SerializeField]
@@ -596,6 +726,100 @@ namespace Live2D.Cubism.Framework.Json
             /// </summary>
             [SerializeField]
             public string[] Ids;
+        }
+
+        /// <summary>
+        /// Expression data.
+        /// </summary>
+        [Serializable]
+        public struct SerializableExpression
+        {
+            /// <summary>
+            /// Expression Name.
+            /// </summary>
+            [SerializeField]
+            public string Name;
+            
+            /// <summary>
+            /// Expression File.
+            /// </summary>
+            [SerializeField]
+            public string File;
+
+            /// <summary>
+            /// Expression FadeInTime.
+            /// </summary>
+            [SerializeField]
+            public float FadeInTime;
+
+            /// <summary>
+            /// Expression FadeOutTime.
+            /// </summary>
+            [SerializeField]
+            public float FadeOutTime;
+        }
+
+        /// <summary>
+        /// Motion datas.
+        /// </summary>
+        [Serializable]
+        public struct SerializableMotions
+        {
+            /// <summary>
+            /// Motion group Idle.
+            /// </summary>
+            [SerializeField]
+            public SerializableMotion[] Idle;
+
+            /// <summary>
+            /// Motion group TapBody.
+            /// </summary>
+            [SerializeField]
+            public SerializableMotion[] TapBody;
+        }
+
+        /// <summary>
+        /// Motion data.
+        /// </summary>
+        [Serializable]
+        public struct SerializableMotion
+        {
+            /// <summary>
+            /// File path.
+            /// </summary>
+            [SerializeField]
+            public string File;
+
+            /// <summary>
+            /// Fade in time.
+            /// </summary>
+            [SerializeField]
+            public float FadeInTime;
+
+            /// <summary>
+            /// Fade out time.
+            /// </summary>
+            [SerializeField]
+            public float FadeOutTime;
+        }
+
+        /// <summary>
+        /// Hit Area.
+        /// </summary>
+        [Serializable]
+        public struct SerializableHitArea
+        {
+            /// <summary>
+            /// Hit area name.
+            /// </summary>
+            [SerializeField]
+            public string Name;
+            
+            /// <summary>
+            /// Hit area id.
+            /// </summary>
+            [SerializeField]
+            public string Id;
         }
 
         #endregion

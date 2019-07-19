@@ -2,8 +2,8 @@
 //  ClassName : ImgWindow
 //  概要      : 吹き出しイメージウインドウ
 //
-//  LiplisLive2DSystem
-//  Copyright(c) 2017-2017 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2017 sachin.
 //=======================================================================﻿
 #pragma warning disable 649,414
 using Assets.Scripts.Data;
@@ -34,11 +34,20 @@ public class TalkWindow : MonoBehaviour {
     public bool flgEnd;
 
     ///=============================
-    ///制御フラグ
+    ///対象モデル
     public IfsLiplisModel TargetModel;
 
+    //================================
+    //テキスト
+    [SerializeField]
+    Text TextFukidashi;
+
+    //================================
+    //メイントークウインドウテキスト
+    Text TextMainTalk;
+
     ///=============================
-    ///マイテキスト
+    ///背景イメージ
     Image image { get; set; }
 
     ///=============================
@@ -58,46 +67,35 @@ public class TalkWindow : MonoBehaviour {
 
     //スキップフラグ
     private bool FlgSkip = false;
-
+    
     ///=============================
     ///サイズ、表示位置
     public float heightImg { get; set; }
 
     //================================
-    //  新　文字制御関連プロパティ                 
-    //================================
+    // 文字制御関連プロパティ                 
     private string currentText = string.Empty;
-    private float timeUntilDisplay = 0;
     private int lastUpdateCharacter = -1;
-    private float LipValue = 0;                 //口パク量
 
-    [SerializeField]
-    public BubbleTextCtrl _bubbleText;
-
-    [SerializeField]
-    float _maxImageWidth = 0f; // zero to inf
-    public float maxImageWidth { set { _maxImageWidth = value; } get { return _maxImageWidth; } }
-
-    [SerializeField]
-    float _maxImageHeight = 0f;
-    public float maxImageHeight { set { _maxImageHeight = value; } get { return _maxImageHeight; } }
-
-    [SerializeField]
-    float _printSpeed = 0.1f;
-    public float printSpeed { set { _printSpeed = value; } get { return _printSpeed; } }
-
-    [SerializeField]
-    bool _isSayToClear;
-    public bool isSayToClear { set { _isSayToClear = value; } get { return _isSayToClear; } }
-
+    //================================
+    // レイアウトエレメント    
     LayoutElement _layoutElement;
     public LayoutElement layoutElement { get { return _layoutElement; } }
 
+    //================================
+    // コンテントサイズフィルター
     ContentSizeFitter _contentSizeFitter;
     public ContentSizeFitter contentSizeFitter { get { return _contentSizeFitter; } }
 
-    StringBuilder _builder = new StringBuilder();
-    public bool isTextPrinting { private set; get; }
+    //================================
+    // テキストバッファ
+    StringBuilder TextBuffer = new StringBuilder();
+
+    //================================
+    //レクトトランスフォーム
+    RectTransform _RectMine;
+    RectTransform _RectText;
+
 
     //====================================================================
     //
@@ -129,6 +127,16 @@ public class TalkWindow : MonoBehaviour {
             this.TargetPosition = ParentWindow.transform.localPosition;
         }
     }
+
+    /// <summary>
+    /// メインテキストを設定する
+    /// </summary>
+    /// <param name="text"></param>
+    public void SetMainText(Text text)
+    {
+        this.TextMainTalk = text;
+    }
+
 
     /// <summary>
     /// 移動対象を設定する
@@ -164,9 +172,7 @@ public class TalkWindow : MonoBehaviour {
     /// <param name="texture"></param>
     public void SetWindowImage(Sprite WindowSprite)
     {
-        var img = this.GetComponent<Image>();
-
-        img.sprite = WindowSprite;
+        
     }
 
     /// <summary>
@@ -175,7 +181,9 @@ public class TalkWindow : MonoBehaviour {
     void Start()
     {
         //イメージ取得
-        image = GetComponent<Image>();
+        image = this.GetComponent<Image>();
+
+        image.color = new Color(0.0f / 255.0f, 0.0f / 0.0f, 93.0f / 0.0f, 100.0f / 255.0f);
 
         //アルファ値を0セット
         SetAlfa();
@@ -183,9 +191,12 @@ public class TalkWindow : MonoBehaviour {
         this.flgOn = true;
 
         //テキスト関連
-        isTextPrinting = false;
         _layoutElement = GetComponent<LayoutElement>();
         _contentSizeFitter = GetComponent<ContentSizeFitter>();
+
+        //レクト取得
+        _RectMine = GetComponent<RectTransform>();
+        _RectText = TextFukidashi.GetComponent<RectTransform>();
 
         //タイマースタート
         startTimer();
@@ -449,6 +460,9 @@ public class TalkWindow : MonoBehaviour {
             //移動
             ParentWindow.transform.localPosition = new Vector3(x, y, z);
         }
+
+        //高さ設定
+        _layoutElement.preferredHeight = _RectText.rect.height + 33;
     }
 
     private void moveEnd()
@@ -578,20 +592,9 @@ public class TalkWindow : MonoBehaviour {
     /// <returns></returns>
     public void setText(string text)
     {
-        _bubbleText.text.text = _builder.Append(text).ToString();
-        if (_bubbleText.text.preferredWidth + 100 < _maxImageWidth)
-        {
-            _layoutElement.preferredWidth = _bubbleText.text.preferredWidth + 100;
-        }
-
-        if (_bubbleText.text.preferredHeight + 42 < _maxImageHeight)
-        {
-            _layoutElement.preferredHeight = _bubbleText.text.preferredHeight + 42;
-        }
-        else
-        {
-            _layoutElement.preferredHeight = _bubbleText.text.preferredHeight;
-        }
+        //テキストセット
+        TextFukidashi.text = TextBuffer.Append(text).ToString();
+        TextMainTalk.text = TextFukidashi.text;
     }
 
     /// <summary>
@@ -599,7 +602,7 @@ public class TalkWindow : MonoBehaviour {
     /// </summary>
     public void cleanBubbleText()
     {
-        _bubbleText.text.text = string.Empty;
+        TextFukidashi.text = string.Empty;
     }
 
     /// <summary>

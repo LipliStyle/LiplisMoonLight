@@ -3,11 +3,10 @@
 //  概要      : 音声データ取得
 //              
 //
-//  LiplisLive2D
-//  Copyright(c) 2017-2018 sachin. All Rights Reserved. 
+//  LiplisMoonlight
+//  Copyright(c) 2017-2018 sachin.
 //====================================================================
-using Assets.Scripts.LiplisSystem.Com;
-using Assets.Scripts.LiplisSystem.Msg;
+using Assets.Scripts.Msg;
 using Assets.Scripts.Utils;
 using Newtonsoft.Json;
 using System.Collections;

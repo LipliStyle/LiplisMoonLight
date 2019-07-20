@@ -71,3 +71,5 @@ Assets/Live2D/
 KeyStore/
 
 !LiplisMoonlightSetting.dll
+!Newtonsoft.Json.dll
+!ICSharpCode.SharpZipLib.dll

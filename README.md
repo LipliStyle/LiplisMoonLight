@@ -13,7 +13,7 @@ Unityで開発している、スマホ向けアプリです。
 
 ## 導入方法
 ###1. LiplisMoonlightのダウンロード
-現在表示しているGitHubのページから、ソースコードを取得します。
+リリースのページから、ソースコードダウンロードして下さい。
 https://github.com/LipliStyle/LiplisMoonLight/releases/edit/2.0
 
 ### 2. UnityでLiplisMoonlightを開く

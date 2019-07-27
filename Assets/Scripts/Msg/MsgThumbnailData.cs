@@ -71,7 +71,8 @@ namespace Assets.Scripts.Msg
                 //-----------------------------------------
 
                 //スクリーン幅の33%
-                float screanWidt = LpsDefine.SCREAN_DEFAULT_WIDTH / 3;
+                //float screanWidt = LpsDefine.SCREAN_DEFAULT_WIDTH / 3;
+                float screanWidt = LpsDefine.SCREAN_DEFAULT_WIDTH/2;
 
                 //横に合わせる
                 rate = screanWidt / (float)tex.width;

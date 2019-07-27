@@ -157,28 +157,16 @@ namespace Assets.Scripts.LiplisUi.TopicController
             //ファイルからサムネイル取得を試みる
             Texture2D texture = LiplisCache.Instance.ImagePath.GetWebTexutreFromFile(thumbUrl);
 
-            //NULLならWebからダウンロードする
-            if(texture == null)
+            //NULLならノーイメージ適用
+            if (texture == null)
             {
-                //からテクスチャ取得
+                //優先要求リストに入れる
+                LiplisCache.Instance.ImagePath.SetRequestUrlQPrioritize(thumbUrl);
+
+                //ノーイメージテクスチャを返す
                 texture = LiplisCache.Instance.ImagePath.GetNoImageTex();
-
-                //設定
-                icon.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-
-                //最新ニュースデータ取得
-                var Async = LiplisCache.Instance.ImagePath.GetWebTexutre(thumbUrl);
-
-                //非同期実行
-                yield return CoroutineHandler.StartStaticCoroutine(Async);
-
-                //再度データを取り直す
-                data = ScrollViewController.sc.NewsDataList[this.dataIndex];
-
-                //データ取得
-                texture = (Texture2D)Async.Current;
             }
-
+            
             //ボタンのテキスト変更
             if (texture != null)
             {

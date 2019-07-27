@@ -227,7 +227,7 @@ namespace Assets.Scripts.LiplisSystem.Model
         private void InitPrefab()
         {
             //ウインドウプレハブインスタンス生成
-            this.ImageInstanceWindow = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_TALK_S_2);
+            this.ImageInstanceWindow = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_TALK_S_1);
             this.ImageInstanceLogWindowL = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_L1);
             this.ImageInstanceLogWindowR = (GameObject)Resources.Load(PREFAB_NAMES.WINDOW_LOG_CHAR_R1);
         }

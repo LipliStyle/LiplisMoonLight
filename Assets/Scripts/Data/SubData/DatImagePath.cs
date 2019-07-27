@@ -12,7 +12,9 @@
 using Assets.Scripts.Com;
 using Assets.Scripts.LiplisSystem.Com;
 using Assets.Scripts.LiplisSystem.Model.Setting;
+using Assets.Scripts.LiplisSystem.Web;
 using Assets.Scripts.LiplisSystem.Web.Clalis;
+using Assets.Scripts.Msg;
 using Assets.Scripts.Util;
 using System;
 using System.Collections;
@@ -30,7 +32,14 @@ namespace Assets.Scripts.Data.SubData
         // URLディクショナリー
         public Dictionary<string, DatImageFileInfo> DicImage;
 
+        //=====================================
+        // イメージリスト
         public List<DatImageFileInfo> DicImageList;
+
+        //=====================================
+        // 要求キュー
+        public List<string> RequestUrlQ;
+        public List<string> RequestUrlQPrioritize;
 
         //=====================================
         // URLディクショナリー
@@ -47,10 +56,9 @@ namespace Assets.Scripts.Data.SubData
         {
             DicImage = new Dictionary<string, DatImageFileInfo>();
             DicImageList = new List<DatImageFileInfo>();
+            RequestUrlQ = new List<string>();
+            RequestUrlQPrioritize = new List<string>();
         }
-
-
-
 
         /// <summary>
         /// Web上からテクスチャを取得する。
@@ -153,6 +161,105 @@ namespace Assets.Scripts.Data.SubData
         }
 
 
+        /// <summary>
+        /// 対象のニュースリストを回し
+        /// </summary>
+        /// <param name="NewsList"></param>
+        /// <param name="NotExistsUrlList"></param>
+        private void SetNotExistsUrlList(List<MsgBaseNewsData> NewsList, ref List<string> NotExistsUrlList)
+        {
+            List<MsgBaseNewsData> rvList = new List<MsgBaseNewsData>(NewsList);
+
+            //rvList.Reverse();
+
+            foreach (var news in rvList)
+            {
+                string thumbUrl = ThumbnailUrl.CreateListThumbnailUrl(news.THUMBNAIL_URL);
+
+                if (!DicImage.ContainsKey(thumbUrl))
+                {
+                    NotExistsUrlList.Add(thumbUrl);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Web上からテクスチャを取得する。
+        /// キャッシュにあれば、キャッシュから返す
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public IEnumerator DownloadWebTexutre(string url)
+        {
+            //ディクショナリ存在チェック
+            if (DicImage.ContainsKey(url))
+            {
+                yield break;
+            }
+
+            //ファイル名、ファイルパス生成
+            string path = CreateFilePath(url);
+
+            //ファイル名取得失敗時
+            if (path != "")
+            {
+                //最新ニュースデータ取得
+                var Async = WebImage.GetImage(url);
+
+                //非同期実行
+                yield return Async;
+
+                //データ取得
+                Texture2D texture = (Texture2D)Async.Current;
+
+                if (texture != null)
+                {
+                    try
+                    {
+                        if (!texture.isBogus())
+                        {
+                            //PNGで保存
+                            TextureUtil.SavePng(texture, path);
+
+                            //辞書に登録
+                            this.Add(new DatImageFileInfo(url, path, DateTime.Now));
+                        }
+                        else
+                        {
+                            //ノーイメージをセット
+                            texture = GetNoImageTex();
+
+                            //辞書に登録
+                            this.Add(new DatImageFileInfo(url, "", DateTime.Now));
+                        }
+                    }
+                    catch
+                    {
+                        Debug.Log("ファイル保存失敗:" + url);
+                    }
+                }
+                else
+                {
+                    //ノーイメージをセット
+                    texture = GetNoImageTex();
+
+                    //辞書に登録
+                    this.Add(new DatImageFileInfo(url, "", DateTime.Now));
+                }
+
+                //セーブ
+                Save();
+            }
+            else
+            {
+
+                //辞書に登録
+                this.Add(new DatImageFileInfo(url, "", DateTime.Now));
+            }
+        }
+
+
 
         /// <summary>
         /// ファイルからテクスチャを取得する
@@ -194,7 +301,7 @@ namespace Assets.Scripts.Data.SubData
             try
             {
                 //イメージキャッシュフォルダ 存在チェック
-                string dirPath = Application.persistentDataPath + "/ImageCache";
+                string dirPath = Application.persistentDataPath + ModelPathDefine.IMAGE_CACHE;
 
                 //フォルダ存在チェック
                 if (!Directory.Exists(dirPath))
@@ -277,12 +384,113 @@ namespace Assets.Scripts.Data.SubData
             }
         }
 
+        /// <summary>
+        /// リクエストキューをセットする
+        /// </summary>
+        public void SetRequestUrlQ()
+        {
+            //ニュースリスト
+            List<string> NotExistsUrlAllList = new List<string>();
+
+            if (LiplisStatus.Instance.NewsList == null)
+            {
+                return;
+            }
+
+            //トークインスタンス取得
+            DatNewsList NewsList = LiplisStatus.Instance.NewsList;
+
+            //未登録のURLリストを生成する
+            SetNotExistsUrlList(LiplisStatus.Instance.NewTopic.GetTopic2BaseNewsDataAllList(), ref NotExistsUrlAllList);
+            SetNotExistsUrlList(NewsList.LastNewsQ.NewsList, ref NotExistsUrlAllList);
+            SetNotExistsUrlList(NewsList.LastNewsQ.MatomeList, ref NotExistsUrlAllList);
+            SetNotExistsUrlList(NewsList.LastNewsQ.ReTweetList, ref NotExistsUrlAllList);
+            SetNotExistsUrlList(NewsList.LastNewsQ.PictureList, ref NotExistsUrlAllList);
+            SetNotExistsUrlList(NewsList.LastNewsQ.HashList, ref NotExistsUrlAllList);
+            SetNotExistsUrlList(NewsList.LastNewsQ.HotWordList, ref NotExistsUrlAllList);
+
+            //URLリストを回し、キューに入れる
+            foreach (var item in NotExistsUrlAllList)
+            {
+                SetRequestUrlQ(item);
+            }
+        }
+
+        /// <summary>
+        /// リクエストキューに登録する
+        /// </summary>
+        public void SetRequestUrlQ(string url)
+        {
+            if (DicImage.ContainsKey(url))
+            {
+                return;
+            }
+
+            RequestUrlQ.Add(url);
+        }
+
+        /// <summary>
+        /// 優先リクエストキューに入れる
+        /// </summary>
+        /// <param name="url"></param>
+        public void SetRequestUrlQPrioritize(string url)
+        {
+            if (DicImage.ContainsKey(url))
+            {
+                return;
+            }
+
+            RequestUrlQPrioritize.Add(url);
+        }
+
+        /// <summary>
+        /// テクスチャをダウンロードする。
+        /// 
+        /// 優先リストのURLは最初に
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator DownloadWebTexutrePrioritize()
+        {
+            while (RequestUrlQPrioritize.Count > 0)
+            {
+                yield return DownloadWebTexutre(RequestUrlQPrioritize.Dequeue());
+            }
+        }
+
+        /// <summary>
+        /// 通常ダウンロード ゆっくりダウンロード
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable DownloadWebTexutre()
+        {
+            if (RequestUrlQ.Count > 0)
+            {
+                yield return DownloadWebTexutre(RequestUrlQ.Dequeue());
+            }
+
+            //非同期待機
+            yield return new WaitForSeconds(0.5f);
+        }
+
+
+        /// <summary>
+        /// リクエストが存在するか
+        /// </summary>
+        /// <returns></returns>
+        public bool IsRequest()
+        {
+            return RequestUrlQ.Count > 0 || RequestUrlQPrioritize.Count > 0;
+        }
 
         /// <summary>
         /// 辞書と実ファイルをクリーンする
         /// </summary>
         public void Clean()
         {
+            //更新時刻が古いデータを辞書から削除する
+            CleanOldFileFromDictionary();
+
             //辞書に存在しないファイルを削除する
             CleanNotExistsDictionaryFile();
 
@@ -372,6 +580,32 @@ namespace Assets.Scripts.Data.SubData
         }
 
         /// <summary>
+        /// 3日以上前に登録されたデータを辞書から削除する。
+        /// あとの処理で、辞書に存在しなければ削除される。
+        /// </summary>
+        public void CleanOldFileFromDictionary()
+        {
+            //ファイルディクショナリ
+            Dictionary<string, DatImageFileInfo> NewDicImage = new Dictionary<string, DatImageFileInfo>();
+
+            foreach (var item in DicImage)
+            {
+                if(item.Value.GetCreateTime() < DateTime.Now.AddDays(-3))
+                {
+                    //3日以前のデータは削除
+                }
+                else
+                {
+                    //それ以外は追加
+                    NewDicImage.Add(item.Value.Url, item.Value);
+                }
+            }
+
+            //ファイルが実在するディクショナリに置き換える。
+            this.DicImage = NewDicImage;
+        }
+
+        /// <summary>
         /// ノーイメージテクステゃを取得する
         /// </summary>
         /// <returns></returns>
@@ -427,6 +661,10 @@ namespace Assets.Scripts.Data.SubData
 
             //イメージ初期化
             TexNoImage = Resources.Load("Image/NoImage") as Texture2D;
+
+            //キューリストの初期化
+            RequestUrlQ = new List<string>();
+            RequestUrlQPrioritize = new List<string>();
         }
 
         /// <summary>
@@ -455,7 +693,7 @@ namespace Assets.Scripts.Data.SubData
     {
         public string Url;
         public string FilePath;
-        public DateTime CreateTime;
+        public string CreateTime;
 
         /// <summary>
         /// コンストラクター
@@ -466,7 +704,25 @@ namespace Assets.Scripts.Data.SubData
         {
             this.Url = Url;
             this.FilePath = FilePath;
-            this.CreateTime = CreateTime;
+            this.CreateTime = CreateTime.ToString("yyyy/MM/dd HH:mm:ss");
         }
+
+        /// <summary>
+        /// 日付を取得する
+        /// </summary>
+        /// <returns></returns>
+        public DateTime? GetCreateTime()
+        {
+            try
+            {
+                return DateTime.Parse(this.CreateTime);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
     }
 }

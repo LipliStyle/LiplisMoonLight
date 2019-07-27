@@ -7,9 +7,7 @@
 //  Copyright(c) 2017-2019 sachin.
 //====================================================================
 using Assets.Scripts.Data;
-using Assets.Scripts.Define;
 using Assets.Scripts.LiplisSystem.Web.Clalis;
-using Assets.Scripts.LiplisUi.TopicController;
 using System.Collections;
 using UnityEngine;
 
@@ -43,7 +41,10 @@ public class CtrlDataController : MonoBehaviour
         instance = this;
 
         //定周期ループスタート
-        StartCoroutine(DacaCollectTimerTick());
+        StartCoroutine(DataCollectTimerTick());
+
+        //サムネダウンロード
+        StartCoroutine(ThumbnailCollectTimerTick());
     }
 
     // Update is called once per frame
@@ -58,7 +59,7 @@ public class CtrlDataController : MonoBehaviour
     /// TIME_OUTに設定した周期で回る
     /// </summary>
     /// <returns></returns>
-    IEnumerator DacaCollectTimerTick()
+    IEnumerator DataCollectTimerTick()
     {
         while (true)
         {
@@ -67,6 +68,39 @@ public class CtrlDataController : MonoBehaviour
 
             //トピック収集処理
             StartCoroutine(DataCollectTopic());
+
+            //非同期待機
+            yield return new WaitForSeconds(setTimeOut);
+        }
+    }
+
+
+
+
+    /// <summary>
+    /// データ収集ループ　
+    /// TIME_OUTに設定した周期で回る
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator ThumbnailCollectTimerTick()
+    {
+
+
+        while (true)
+        {
+            if (LiplisCache.Instance.ImagePath.IsRequest())
+            {
+                //テクスチャダウンロード処理
+                yield return LiplisCache.Instance.ImagePath.DownloadWebTexutrePrioritize();
+
+                //テクスチャダウンロード処理
+                yield return LiplisCache.Instance.ImagePath.DownloadWebTexutre();
+            }
+            else
+            {
+                //非同期待機
+                yield return new WaitForSeconds(setTimeOut);
+            }
 
             //非同期待機
             yield return new WaitForSeconds(setTimeOut);

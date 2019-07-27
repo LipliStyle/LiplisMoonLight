@@ -23,7 +23,7 @@ namespace Assets.Scripts.LiplisSystem.Model.Setting
         public const string MOTIONS             = "/Motions";
         public const string SETTINGS            = "/Settings";
         public const string IMAGES              = "/Images";
-        public const string IMAGE_CACHE         = "/imageCache";
+        public const string IMAGE_CACHE         = "/ImageCache";
         public const string LIPLIS_CHAT_SETTING = "/LiplisChatSetting.json";
         public const string LIPLIS_TONE_SETTING = "/LiplisToneSetting.json";
         public const string EXT_MOTION_JSON     = " *.motion3.json";

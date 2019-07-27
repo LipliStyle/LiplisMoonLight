@@ -146,7 +146,7 @@ namespace Assets.Scripts.LiplisUi.LogController
             }
 
             //一個前のURL設定
-            prvData.URL = data.URL;
+            prvData = data;
 
             //タイトル表示
             this.txtNews.text = data.TITLE;
@@ -162,6 +162,12 @@ namespace Assets.Scripts.LiplisUi.LogController
 
             //ファイルからサムネイル取得を試みる
             Texture2D texture = LiplisCache.Instance.ImagePath.GetWebTexutreFromFile(thumbUrl);
+
+            //NULLならノーイメージ適用
+            if (texture == null)
+            {
+                texture = LiplisCache.Instance.ImagePath.GetNoImageTex();
+            }
 
             //NULLならWebからダウンロードする
             if (texture == null)

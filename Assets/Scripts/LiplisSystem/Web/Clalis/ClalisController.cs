@@ -238,6 +238,9 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis
             //最新データをダウンロードする
             yield return CoroutineHandler.StartStaticCoroutine(SetLastTopicMltData());
 
+            //要求データセット
+            LiplisCache.Instance.ImagePath.SetRequestUrlQ();
+
             //古いデータを削除する
             CoroutineHandler.StartStaticCoroutine(DeleteOldData());
 
@@ -422,7 +425,12 @@ namespace Assets.Scripts.LiplisSystem.Web.Clalis
             CoroutineHandler.StartStaticCoroutine(Save());
 
             //最終更新時刻設定
-            yield return LiplisStatus.Instance.NewsList.LastUpdateTime = LpsDatetimeUtil.Now;
+            LiplisStatus.Instance.NewsList.LastUpdateTime = LpsDatetimeUtil.Now;
+
+            //要求データセット
+            LiplisCache.Instance.ImagePath.SetRequestUrlQ();
+
+            yield return null;
         }
 
         #endregion

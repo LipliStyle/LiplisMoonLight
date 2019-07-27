@@ -13,7 +13,6 @@ namespace Assets.Scripts.Define
         public const string WINDOW_INFO        = "Prefab/PrefabInfoWindow";
         public const string WINDOW_IMAGE       = "Prefab/PrefabImageWindow";
         public const string WINDOW_TALK_S_1    = "Prefab/PrefabTalkWindow_S1";
-        public const string WINDOW_TALK_S_2    = "Prefab/PrefabTalkWindow_S3";
         public const string WINDOW_LOG_NEWS    = "Prefab/PrefabLogNewsContent";
         public const string WINDOW_LOG_CHAR_L1 = "Prefab/PrefabLogWindowL1";
         public const string WINDOW_LOG_CHAR_R1 = "Prefab/PrefabLogWindowR1";

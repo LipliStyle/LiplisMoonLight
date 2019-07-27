@@ -301,6 +301,7 @@ public class CtrlGameController : ConcurrentBehaviour
     /// </summary>
     void UpdateUI_60F()
     {
+        //デバッグ表示
         if (LiplisSetting.Instance.Setting.FlgDebug)
         {
             //件数表示の非表示
@@ -325,8 +326,6 @@ public class CtrlGameController : ConcurrentBehaviour
             VisibleUtil.SetVisible(TxtMemory1, false);
             VisibleUtil.SetVisible(TxtMemory2, false);
         }
-
-
     }
 
     /// <summary>
